@@ -1,4 +1,4 @@
-INTRODUCTION
+Introduction
 ============
 
 This software is intended to help in designing and running simulations involving agents and their cognitive capacities.
@@ -19,8 +19,15 @@ In our research proposal we address two issues: the dynamics of categorization p
 .. [5] Maass W., Natschlaeger T., Markram H. (2002) Real-time computing without stable states: A new framework for neural computation based on perturbations. Neural Computation, 14(11):2531-2560.
 
 
+Documentation
+=============
 
-USAGE
+Can be found on ReadTheDocs_.
+
+.. _ReadTheDocs: http://cog-abm.readthedocs.org
+
+
+Usage
 =====
 
 To run this software you need Python in version 2.x (3.x is not supported).
@@ -109,3 +116,25 @@ Required librares (easy to install with pip)
     *Programming:* Konrad Kurdej, Michał Łukasik, Marek Maj
 
     *Mentoring:* Dariusz Plewczyński, Franciszek Rakowski
+
+
+Origins
+-------
+
+This software is fork of **COG-ABM** from account **cogcomp**.
+
+
+License
+-------
+
+This software is dual-licensed.
+
+By commercial usage we mean:
+
+- selling software that uses any part of this software
+- providing service that uses any part of this software
+
+With the restriction of non-commercial usage you can use this software with application of AGPL-3.0 license. See **NC_LICENSE.rst** for more information.
+
+
+License for commercial usage is under development.
