@@ -36,7 +36,6 @@ class ReactiveUnit(object):
         a = np.array([(xi - mi) ** 2. for xi, mi in
             izip(x, self.central_value)])
         w = np.exp(a.sum() * self.mdub_sqr_sig)
-        print w, type(w)
         return w
 
     def __eq__(self,  other):
