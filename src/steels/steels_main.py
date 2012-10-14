@@ -72,7 +72,8 @@ if __name__ == "__main__":
 
     sys.path.append('../')
     sys.path.append('')
-    from steels.steels_experiment import *
+    from steels.steels_experiment import steels_basic_experiment_DG, \
+        steels_basic_experiment_GG
 
     params = load_params(opts.param_file)
 

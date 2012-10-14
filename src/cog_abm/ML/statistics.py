@@ -135,7 +135,7 @@ def _ROC(classified_test_samples, positive_class):
         prob = distrib.get(positive_class, 0.)
         if prob != prev_prob:
             res.append((fp, tp))
-        prev_prob = prob
+            prev_prob = prob
         if sample.get_cls() == positive_class:
             tp += 1
         else:
@@ -144,7 +144,7 @@ def _ROC(classified_test_samples, positive_class):
     if tp == 0:
         tp = 1
         # this is dirty hack - there were no positive samples in data
-        # so eighter way we will get there 0
+        # so either way we will get there 0
     if fp == 0:
         fp = 1
 

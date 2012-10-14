@@ -166,7 +166,7 @@ class TestSteelsClassifier(unittest.TestCase):
         ]
         wc = [self.sc.classify(s) for s in samples]
         wc.sort()
-        self.assertEqual(wc[0], wc[len(wc) - 1])
+        self.assertEqual(wc[0], wc[-1])
 
 
 class TestSteelsExperiment(unittest.TestCase):

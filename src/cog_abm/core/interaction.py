@@ -1,6 +1,5 @@
 
 
-
 class Interaction(object):
 
     def num_agents(self):
@@ -8,7 +7,6 @@ class Interaction(object):
         Should return number of agents taking part in interaction
         """
         pass
-
 
     def interact(self, *agents):
         """
