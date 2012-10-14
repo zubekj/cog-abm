@@ -1,0 +1,8 @@
+numpy
+scipy
+orange
+python-graph-core
+matplotlib
+progressbar
+#optional:
+#python-graph-dot
