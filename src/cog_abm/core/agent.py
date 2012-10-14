@@ -1,7 +1,8 @@
 """
 Module implementing agent in our system
 """
-from simulation import Simulation
+from multiprocessing import Lock
+
 
 class Agent(object):
     """
@@ -10,20 +11,24 @@ class Agent(object):
     In most cases you shouldn't change or redefine this class.
     There is special class for that: AgentState
     """
-
-    ID = 2**30
+    AID = 10 ** 8
+    AID_lock = Lock()
 
     def __init__(self, aid=None, state=None, sensor=None, environment=None):
-        if aid is None:
-            Agent.ID+=1
-            self.id = Agent.ID
-        else:
-            self.id = aid
+        self.id = aid or Agent.get_next_id()
         self.sensor = sensor
         self.state = state
         self.env = environment
         self.inter_res = []
         self.fitness = {}
+
+    @classmethod
+    def get_next_id(cls):
+        cls.AID_lock.acquire()
+        cls.AID += 1
+        w = cls.AID
+        cls.AID_lock.release()
+        return w
 
     def set_state(self, state):
         self.state = state
@@ -47,10 +52,7 @@ class Agent(object):
         """
         Gives environment where given agent "lives"
         """
-        if self.env is None:
-            return Simulation.global_environment
-
-        return Simulation.environments[self.env]
+        return self.env
 
     environment = property(get_environment)
 
@@ -70,8 +72,8 @@ class Agent(object):
     def sense_and_class_probabilities(self, stimulus):
         return self.state.class_probabilities(self.sense(stimulus))
 
-    def __str__(self):
-        return "Agent("+str(self.id)+":"+str(self.state)+")"
+    def __repr__(self):
+        return "Agent(" + str(self.id) + ":" + str(self.state) + ")"
 
     def __eq__(self, other):
         return self.id == other.id
