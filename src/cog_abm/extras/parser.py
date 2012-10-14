@@ -70,7 +70,7 @@ class Parser(object):
         #lrn = agent.getElementsByTagName("classifier")
         #lrn_type = lrn[0].getElementsByTagName("type")[0].firstChild.data
 
-        agent = Agent(environment = env_name)
+        agent = Agent()
         if network is not None:
             network.add_agent(agent, node_name)
         return agent
@@ -145,7 +145,7 @@ class Parser(object):
         dictionary["dump_freq"] = self.return_if_exist(sock, "history",
         "freq", int)
         dictionary["topology"] = self.parse_graph(self.return_if_exist
-                                                  (sock,"network", "source", str))
+            (sock, "network", "source", str))
 
         environments = {}
         envs = sock.getElementsByTagName("environment")
@@ -154,9 +154,9 @@ class Parser(object):
             env_source = env.getAttribute("source")
             environments[env_name] = self.parse_environment(env_source, env)
 
-        dictionary ['environments']  = environments
+        dictionary['stimuli'] = environments['global'].stimuli
         dictionary["agents"] = self.parse_agents(self.return_if_exist
-                                        (sock,"agents", "source", str), dictionary["topology"])
+            (sock, "agents", "source", str), dictionary["topology"])
 
         #inters = sock.getElementsByTagName("interaction")
         inter = self.return_element_if_exist(sock, "interaction", False)
@@ -197,7 +197,7 @@ class Parser(object):
         params = self.return_element_if_exist(inter, "params", False)
         if params is None:
             return {}
-        dictionary = {"interaction_type":"DG"}
+        dictionary = {"interaction_type": "DG"}
 
         dictionary["num_iter"] = self.return_if_exist(params, "num_iter",
         "value", int)
@@ -208,11 +208,11 @@ class Parser(object):
         dictionary["beta"] = self.return_if_exist(params, "beta",
         "value", float)
         dictionary["sigma"] = self.return_if_exist(params,
-        "inc_category_treshold", "value", float)
+        "sigma", "value", float)
         dictionary["inc_category_treshold"] = self.return_if_exist(params,
         "inc_category_treshold", "value", float)
-        dictionary["classifier"] = self.return_if_exist(params, "classifier",
-                                                                                                "name", str)
+        dictionary["classifier"] = \
+            self.return_if_exist(params, "classifier", "name", str)
 
         return dictionary
 
@@ -220,22 +220,22 @@ class Parser(object):
         params = self.return_element_if_exist(inter, "params", False)
         if params is None:
             return {}
-        dictionary = {"interaction_type":"GG"}
+        dictionary = {"interaction_type": "GG"}
 
         dictionary["num_iter"] = self.return_if_exist(params,
         "num_iter", "value", int)
         dictionary["context_size"] = self.return_if_exist(params,
         "context_size", "value", int)
-        dictionary["alpha"] = self.return_if_exist(params, "alpha", "value",
-                                                                                        float)
-        dictionary["beta"] = self.return_if_exist(params, "beta",
-        "value", float)
-        dictionary["sigma"] = self.return_if_exist(params,
-        "inc_category_treshold", "value", float)
+        dictionary["alpha"] = \
+            self.return_if_exist(params, "alpha", "value", float)
+        dictionary["beta"] = \
+            self.return_if_exist(params, "beta", "value", float)
+        dictionary["sigma"] = \
+            self.return_if_exist(params, "sigma", "value", float)
         dictionary["inc_category_treshold"] = self.return_if_exist(params,
-        "inc_category_treshold", "value", float)
-        dictionary["classifier"] = self.return_if_exist(params, "classifier",
-                                                                                                "name", str)
+            "inc_category_treshold", "value", float)
+        dictionary["classifier"] = \
+            self.return_if_exist(params, "classifier", "name", str)
 
         return dictionary
 
@@ -252,7 +252,7 @@ class Parser(object):
         else:
             return None
 
-    def return_element_if_exist(self, sock, name, child = True, function=None):
+    def return_element_if_exist(self, sock, name, child=True, function=None):
         if sock is None:
             return None
         elif (len(sock.getElementsByTagName(name)) == 0):
