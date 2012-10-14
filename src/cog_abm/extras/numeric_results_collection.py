@@ -29,6 +29,15 @@ class NumericResultCollector(object):
     def iter_results_table(self):
         return izip(*self.columns)
 
+    def iter_by_columns(self):
+        for i, c in enumerate(self.columns):
+            yield self.column_names[i][1], c
+
+    def iter_by_columns_with_errs(self):
+        for i in xrange(0, len(self.columns), 2):
+            yield self.column_names[i][1], \
+                zip(self.columns[i], self.columns[i + 1])
+
     def _save(self, f):
         f.write('# {0}\n'.format(json.dumps(self.column_names)))
         for r in self.iter_results_table():
