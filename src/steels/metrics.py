@@ -3,14 +3,18 @@ This module implements measurements used in evaluating the outcome of the
 experiment.
 """
 import math
-from itertools import combinations
+
+from itertools import combinations, imap
+
 from cog_abm.extras.fitness import get_buffered_average
 
 #WINDOW_SIZE = 20
 WINDOW_SIZE = 50
 
+
 def get_DS_fitness():
     return get_buffered_average(WINDOW_SIZE)
+
 
 def get_CS_fitness():
     return get_buffered_average(WINDOW_SIZE)
@@ -19,21 +23,21 @@ def get_CS_fitness():
 def DS_A(agent):
     return agent.get_fitness("DG")
 
+
 def DS(agents, it):
     if it == 0:
         return 0
-    return math.fsum([DS_A(a) for a in agents])/len(agents)
+    return math.fsum(imap(DS_A, agents)) / len(agents)
 
 
 def CS_A(agent):
     return agent.get_fitness("GG")
 
+
 def CS(agents, it):
     if it == 0:
         return 0
-    return math.fsum([CS_A(a) for a in agents])/len(agents)
-
-
+    return math.fsum(imap(CS_A, agents)) / len(agents)
 
 
 def ru_dist(ru1, ru2):
@@ -43,12 +47,13 @@ def ru_dist(ru1, ru2):
     #what was in Steels:
     return ru1[0].dist(ru2[0])
 
+
 def d(A, B, m):
 
     s1 = math.fsum([min([m(a, b) for b in B]) for a in A])
     s2 = math.fsum([min([m(a, b) for a in A]) for b in B])
 
-    return (s1+s2)/(len(A) * len(B))
+    return (s1 + s2) / (len(A) * len(B))
     #/math.log((len(A) * len(B))+1)
 
 
@@ -62,9 +67,10 @@ def d_category(c, cp):
 def D(a, ap):
     return d(a, ap, d_category)
 
+
 def cv(agents, it):
     if it == 0:
-        return None# it's fine on graph
+        return None  # it's fine on graph
 
 #       ag_centres = [tuple(
 #                           [tuple(
@@ -86,13 +92,6 @@ def cv(agents, it):
 
 
 
-
-
-
-
-
-
-
 def mcv(agents_centres):
     """ calculates the category varianve between agents categorical split
     @agents_centres: list of lists of centre value = list of classes:
@@ -103,7 +102,7 @@ def mcv(agents_centres):
     for i in range(1, len(agents_centres)):
         for j in range(i):
             cat_var += cat_dist(agents_centres[i], agents_centres[j])
-    cat_var /= len(agents_centres) * (len(agents_centres)-1)
+    cat_var /= len(agents_centres) * (len(agents_centres) - 1)
     cat_var *= 2
     return cat_var
 
