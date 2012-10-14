@@ -35,10 +35,10 @@ class RandomStimuliChooser(StimuliChooser):
 
         for _ in xrange(250):
             ret = [self.get_stimulus(stimuli)]
-            for _ in xrange(n-1):
+            for _ in xrange(n - 1):
                 mind = 0
                 try_limit = 10
-                while mind < self.distance and try_limit>0:
+                while mind < self.distance and try_limit > 0:
                     tmp = self.get_stimulus(stimuli)
                     mind = min(imap(tmp.distance, ret))
                     try_limit -= 1
@@ -46,8 +46,13 @@ class RandomStimuliChooser(StimuliChooser):
                     break
                 ret.append(tmp)
             if len(ret) == n:
+                random.shuffle(ret)
                 return ret
         raise Exception("Couldn't get samples separated by such distance!")
+
+    def __repr__(self):
+        return "RandomStimuliChooser: use_distance:%s; distance:%s" % \
+            (self.use_distance, self.distance)
 
 
 class OneDifferentClass(StimuliChooser):
@@ -64,9 +69,9 @@ class OneDifferentClass(StimuliChooser):
         for _ in xrange(100):
             ret = [self.get_stimulus(stimuli)]
             cls = ret[0].get_cls()
-            for _ in xrange(n-1):
+            for _ in xrange(n - 1):
                 try_limit = 100
-                while try_limit>0:
+                while try_limit > 0:
                     tmp = self.get_stimulus(stimuli)
                     if cls != tmp.get_cls():
                         break
@@ -78,6 +83,9 @@ class OneDifferentClass(StimuliChooser):
                 return ret
         raise Exception("Couldn't get samples in different classes")
 
+    def __repr__(self):
+        return "OneDifferentClass"
+
 
 class Environment(object):
     """
@@ -85,8 +93,7 @@ class Environment(object):
     It's main function is to provide stimuli for agents
     """
 
-
-    def __init__(self,  stimuli, stimuli_chooser=None):
+    def __init__(self, stimuli, stimuli_chooser=None):
         """
         Initialize environment
 
