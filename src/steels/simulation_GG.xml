@@ -4,7 +4,7 @@
 	<network source="graph2.xml"/>
 	<agents source="agent2.xml"/>
 
-	<interaction id="1" type="DiscriminationGame">
+	<interaction id="1" type="GuessingGame">
 		<params>
 			<alpha value="0.1"/>
 			<beta value="1"/>
