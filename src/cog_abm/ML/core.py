@@ -2,6 +2,7 @@
 Most useful things connected with ML
 """
 import math
+import copy
 
 from itertools import izip
 from random import shuffle
@@ -31,6 +32,12 @@ class Classifier(object):
     def train(self, samples):
         pass
 
+    def train_with_weights(self, samples_with_weights):
+        """ samples_with_weights should be [(sample, weight), ... ]
+        By default we ignore weights"""
+        raise NotImplementedError
+        self.train((sample for sample, weight in samples_with_weights))
+
     def clone(self):
         """
         Returns copy of classifier. This is default implementation.
@@ -39,7 +46,6 @@ class Classifier(object):
         @rtype: Classifier
         @return: New instance of classifier.
         """
-        import copy
         return copy.deepcopy(self)
 
 
@@ -159,7 +165,7 @@ class Sample(object):
 
     def copy_full(self):
         return Sample(self.values, self.meta, self.cls, self.cls_meta,
-                                self.dist_fun)
+                self.dist_fun)
 
     def copy_set_cls(self, cls, meta):
         s = self.copy_basic()
