@@ -255,51 +255,34 @@ class GuessingGame(Interaction):
 
     def learning_after_hearer_doesnt_know_word(self, topic, context, f,
             sp, hr, spctopic):
-        # old commented
-#               self.disc_game.play_learn_save(hr, context, topic)
-#               class_id = hr.sense_and_classify(topic)
-#               hr.state.lexicon.add_element(class_id, f)
-#
-#               sp.state.lexicon.decrease(spctopic, f)
         succ, hectopic = self.disc_game.play_save(hr, context, topic)
-            #TODO Q: should hearer also learn?
+
         if succ:
-                #print " ale dyskryminuje topic "+str(ctopic)
-                #???: the word form f is associated with category ...??
             hr.state.lexicon.add_element(hectopic, f)
-
         else:
-                #print " i go nie dyskryminuje"
-
-                #class_id = hearer.state.classifier.add_category(
-                #                     hearer.sense(topic).to_ML_data())
-                #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
             self.disc_game.learning_after(hr, topic, succ, hectopic)
             class_id = hr.sense_and_classify(topic)
             hr.state.lexicon.add_element(class_id, f)
 
-    def learning_after_game_succeeded(self, word, topic, context, sp, spc,
-            hr, hrc):
-#               for a, c in izip([sp, hr], [spc, hrc]):
-#                       a.state.lexicon.increase_pair_decrease_other(c, word)
+    def learning_after_game_succeeded(self, word, topic, context,
+            sp, spc, hr, hrc):
         sp.state.lexicon.inc_dec_categories(spc, word)
+        # ^^ as in 4.2 1.(a)
         hr.state.lexicon.inc_dec_words(hrc, word)
-        # TODO is this all?
+        # ^^ as in 4.2 2.(a)
 
-#               self.disc_game.play_learn_save(hr, context, topic)
-#               self.disc_game.learning_after(hr, topic, True, hrc)
-
-        # *************
         for a in [sp, hr]:
             a.state.classifier.increase_samples_category(a.sense(topic))
 
-    def learning_after_agents_mismatched_words(self, topic, sp, spw, spc,
+    def learning_after_agents_mismatched_words(self, topic,
+            sp, spw, spc,
             hr, hrw, hrc):
         sp.state.lexicon.decrease(spc, spw)
+        # ^^ as in 4.2 1.(b)
         hr.state.lexicon.decrease(hrc, hrw)
-        # TODO: this is not finished
+        # ^^ as in 4.2 2.(b)
 
-        # *********
+        # TODO: Not lexicon related:
         self.disc_game.learning_after(hr, topic, False)
 
     def guess_game(self, speaker, hearer):
@@ -308,11 +291,12 @@ class GuessingGame(Interaction):
         context = env.get_stimuli(self.disc_game.context_len)
 
         topic = context[0]
-        # ^^^^ they are already shuffled - and needed when different classes
+        # ^^^^ they are already shuffled
+        # this is needed when other samples may be more similar to each other
 
         succ, spctopic = self.disc_game.play_save(speaker, context, topic)
-#               succ, spctopic, _, _ =\
-#                   self.disc_game.play_learn_save(speaker, context, topic)
+        # succ, spctopic, _, _ =\
+        #           self.disc_game.play_learn_save(speaker, context, topic)
 
         if not succ:
             self.learning_after_speaker_DG_fail(speaker, topic, spctopic)
@@ -320,38 +304,36 @@ class GuessingGame(Interaction):
 
         f = speaker.state.word_for(spctopic)
         if f is None:
-            # ^^^^^ from 4.1 (iii) - we still play? is succ still posible? TODO
             f = speaker.state.lexicon.add_element(spctopic)
 
         hcategory = hearer.state.category_for(f)
         if hcategory is None:
-            self.learning_after_hearer_doesnt_know_word(topic, context, f,
-                speaker, hearer, spctopic)
+            self.learning_after_hearer_doesnt_know_word(topic,
+                context, f, speaker, hearer, spctopic)
             return False
 
-        # Which sample belongs with the highest probability to class hcategory
         random.shuffle(context)
-        maxx, val = float("-inf"), None
-        for c in context:
-            strn = hearer.state.sample_strength(hcategory, hearer.sense(c))
-            if strn > maxx:
-                maxx, val = strn, c
+        max_hr_sample = self.find_best_matching_sample_to_category(hearer,
+            context, hcategory)
 
-#               if val != topic:
-#                       print out
-        hsf = val
-#               hsf = argmax(lambda c: hearer.state.sample_strength(hcategory,
-#                   hearer.sense(c)), context)[1]
-
-        succ = hsf == topic
-        if succ:  # success in the game!
-
+        # checking game result
+        succ = max_hr_sample == topic
+        if succ:
             self.learning_after_game_succeeded(f, topic, context,
                 speaker, spctopic, hearer, hcategory)
         else:
             self.learning_after_agents_mismatched_words(topic,
-                speaker, f, spctopic, hearer, f, hcategory)  # *****
+                speaker, f, spctopic, hearer, f, hcategory)
         return succ
+
+    def find_best_matching_sample_to_category(self, agent, samples, category):
+        max_reaction, max_sample = float("-inf"), None
+        for sample in samples:
+            strength = agent.state.sample_strength(category,
+                agent.sense(sample))
+            if strength > max_reaction:
+                max_reaction, max_sample = strength, sample
+        return max_sample
 
     def interact(self, speaker, hearer):
         r = self.guess_game(speaker, hearer)
