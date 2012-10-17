@@ -80,17 +80,12 @@ class Lexicon(object):
 
     #L = C x F x [0.0, 1.0]
     def __init__(self, base=None):
-        if base is None:
-            base = {}
-        self.base = base
+        self.base = base or {}
         self.F = set()  # words
 
     def add_element(self, category, word=None, weight=None):
-        if weight is None:
-            weight = Lexicon.s
-
-        if word is None:
-            word = Word.get_random_not_in(self.F)
+        weight = weight or Lexicon.s
+        word = word or Word.get_random_not_in(self.F)
 
         if word not in self.F:
             self.F.add(word)
