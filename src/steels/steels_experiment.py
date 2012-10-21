@@ -235,6 +235,8 @@ class DiscriminationGame(Interaction):
 
 
 class GuessingGame(Interaction):
+    # Based mostly on work "Colourful language and colour categories"
+    # of Tony Belpaeme and Joris Bleys
 
     def __init__(self, disc_game=None, context_size=None):
         if disc_game is None:
