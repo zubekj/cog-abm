@@ -83,6 +83,9 @@ class Lexicon(object):
         self.base = base or {}
         self.F = set()  # words
 
+    def set_value(self, cord, weight):
+        self.base[cord] = round(max(min(1., weight), 0.), 1)
+
     def add_element(self, category, word=None, weight=None):
         weight = weight or Lexicon.s
         word = word or Word.get_random_not_in(self.F)
@@ -90,14 +93,11 @@ class Lexicon(object):
         if word not in self.F:
             self.F.add(word)
 
-        self.base[(category, word)] = weight
+        self.set_value((category, word), weight)
         return word
 
     def _find_best(self, choser):
         rval = (None, None)
-        if len(self.base) == 0:
-            return rval
-
         maxx = -float('inf')
         for k, v in self.base.iteritems():
             if choser(k) and v > maxx:
@@ -113,44 +113,31 @@ class Lexicon(object):
 
     def decrease(self, category, word):
         w = self.base.pop((category, word)) - Lexicon.delta_dec
-        if w > 0.:
-            self.base[(category, word)] = w
-        # there is possibility that some unused word will stay in self.F
-        # FIX THIS ^^^^^ ?
+        self.set_value((category, word), w)
 
     def _decreaser(self, choser):
-        remove = deque()
-        update = deque()
-
-        for k, v in self.base.iteritems():
-            if choser(k):
+        for cat_word, v in self.base.items():
+            if choser(cat_word):
                 w = v - Lexicon.delta_inh
-                if w > 0.:
-                    update.append((k, w))
-                else:
-                    remove.append(k)
+                self.set_value(cat_word, w)
 
-        for k in remove:
-            del self.base[k]
-
-        for k, v in update:
-            self.base[k] = v
+    def do_inc_decrs(self, category, word, decrasers_filters):
+        w = self.base.pop((category, word)) + self.delta_inc
+        for fun in decrasers_filters:
+            self._decreaser(fun)
+        self.set_value((category, word), w)
 
     def inc_dec_categories(self, category, word):
-        w = self.base.pop((category, word)) + self.delta_inc
-        self._decreaser(lambda k: k[1] == word)
-        self.base[(category, word)] = w
+        self.do_inc_decrs(category, word, [lambda k: k[1] == word])
 
     def inc_dec_words(self, category, word):
-        w = self.base.pop((category, word)) + self.delta_inc
-        self._decreaser(lambda k: k[0] == category)
-        self.base[(category, word)] = w
+        self.do_inc_decrs(category, word, [lambda k: k[0] == category])
 
     def increase_pair_decrease_other(self, category, word):
-        w = self.base.pop((category, word)) + self.delta_inc
-        self._decreaser(lambda k: k[1] == word)
-        self._decreaser(lambda k: k[0] == category)
-        self.base[(category, word)] = min(w, 1.)
+        self.do_inc_decrs(category, word, [
+            lambda k: k[1] == word,
+            lambda k: k[0] == category]
+            )
 
     def known_words(self):
         return set(self.base.values())
