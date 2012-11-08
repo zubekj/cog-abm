@@ -2,7 +2,6 @@
 This module implements Steels exepriment.
 """
 import logging
-import math
 import random
 
 from itertools import izip
@@ -60,8 +59,8 @@ class AdaptiveNetwork(object):
         """ Must be with weights !
         """
         self.units = def_value(reactive_units, [])
-        self.alpha = np.longdouble(def_value(alpha, AdaptiveNetwork.def_alpha))
-        self.beta = np.longdouble(def_value(beta, AdaptiveNetwork.def_beta))
+        self.alpha = np.longdouble(alpha or AdaptiveNetwork.def_alpha)
+        self.beta = np.longdouble(beta or AdaptiveNetwork.def_beta)
 
     def _index_of(self, unit):
         """ Finds index of given unit.

@@ -2,7 +2,6 @@ import random
 
 #from tools import *
 from itertools import groupby
-from collections import deque
 
 
 class Syllable:

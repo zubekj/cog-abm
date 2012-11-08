@@ -1,6 +1,10 @@
 import unittest
+import random
 
-from steels_experiment import *
+import numpy as np
+
+from steels_experiment import (ReactiveUnit,
+    AdaptiveNetwork, SteelsClassifier)
 from cog_abm.ML.core import Sample
 
 
