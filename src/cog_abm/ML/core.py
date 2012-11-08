@@ -35,7 +35,6 @@ class Classifier(object):
     def train_with_weights(self, samples_with_weights):
         """ samples_with_weights should be [(sample, weight), ... ]
         By default we ignore weights"""
-        raise NotImplementedError
         self.train((sample for sample, weight in samples_with_weights))
 
     def clone(self):
@@ -148,8 +147,10 @@ class Sample(object):
         return self.dist_fun(self, other)
 
     def __eq__(self, other):
-        return self.cls == other.cls and self.cls_meta == other.cls_meta and \
-            self.meta == other.meta and self.values == other.values
+        return self.cls == other.cls and \
+                self.cls_meta == other.cls_meta and \
+                self.meta == other.meta and \
+                self.values == other.values
 
     def __hash__(self):
         return 3 * hash(tuple(self.values)) + 5 * hash(self.cls)
