@@ -58,7 +58,7 @@ class AdaptiveNetwork(object):
     def __init__(self,  reactive_units=None, alpha=None, beta=None):
         """ Must be with weights !
         """
-        self.units = def_value(reactive_units, [])
+        self.units = reactive_units or []
         self.alpha = np.longdouble(alpha or AdaptiveNetwork.def_alpha)
         self.beta = np.longdouble(beta or AdaptiveNetwork.def_beta)
 
