@@ -1,6 +1,7 @@
 import sys
 sys.path.append('../')
 import os
+import math
 import pygtk
 pygtk.require("2.0")
 import gtk
