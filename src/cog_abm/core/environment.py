@@ -2,7 +2,7 @@
 Module providing environment and it's functionality
 """
 
-import random
+from random import choice, shuffle
 from itertools import imap
 
 
@@ -12,7 +12,7 @@ class StimuliChooser(object):
         self.n = n
 
     def get_stimulus(self, stimuli):
-        return random.choice(stimuli)
+        return choice(stimuli)
 
     def get_stimuli(self, stimuli, n=None):
         pass
@@ -33,20 +33,22 @@ class RandomStimuliChooser(StimuliChooser):
         if not self.use_distance:
             return [self.get_stimulus(stimuli) for _ in xrange(n)]
 
+        dist, get_stimulus = self.distance, self.get_stimulus
+        # ^^ abandoning dots - small speed up ..
         for _ in xrange(250):
-            ret = [self.get_stimulus(stimuli)]
+            ret = [get_stimulus(stimuli)]
             for _ in xrange(n - 1):
                 mind = 0
                 try_limit = 10
-                while mind < self.distance and try_limit > 0:
-                    tmp = self.get_stimulus(stimuli)
+                while mind < dist and try_limit > 0:
+                    tmp = get_stimulus(stimuli)
                     mind = min(imap(tmp.distance, ret))
                     try_limit -= 1
-                if mind < self.distance:
+                if mind < dist:
                     break
                 ret.append(tmp)
             if len(ret) == n:
-                random.shuffle(ret)
+                shuffle(ret)
                 return ret
         raise Exception("Couldn't get samples separated by such distance!")
 
