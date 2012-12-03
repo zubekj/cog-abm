@@ -8,6 +8,9 @@ from steels_experiment import (ReactiveUnit,
 from cog_abm.ML.core import Sample
 
 
+S = Sample
+
+
 class TestReactiveUnit(unittest.TestCase):
 
     def setUp(self):
@@ -18,15 +21,15 @@ class TestReactiveUnit(unittest.TestCase):
         for _ in xrange(self.N):
             n = random.randint(3, 6)
             w = [random.randint(0, 10) for _ in xrange(n)]
-            z = ReactiveUnit(w)
-            self.assertEqual(1,  z.value_for(w))
+            z = ReactiveUnit(S(w))
+            self.assertEqual(1, z.value_for(S(w)))
 
         for _ in xrange(self.N):
             n = random.randint(3, 6)
             m = [random.randint(0, 10) for _ in range(n)]
-            z = ReactiveUnit(m)
+            z = ReactiveUnit(S(m))
             w = [random.randint(0, 10) for _ in range(n)]
-            self.assertTrue(0 <= z.value_for(w) <= 1)
+            self.assertTrue(0 <= z.value_for(S(w)) <= 1)
 
     def test_comparision(self):
         for _ in xrange(self.N):
@@ -37,15 +40,15 @@ class TestReactiveUnit(unittest.TestCase):
             while w2 == w1:
                 w2 = [random.randint(0, 10) for _ in range(n)]
 
-            self.assertNotEqual(ReactiveUnit(w1),  ReactiveUnit(w2))
+            self.assertNotEqual(ReactiveUnit(S(w1)), ReactiveUnit(S(w2)))
 
         for _ in xrange(self.N):
             n = random.randint(3, 6)
             w1 = [random.randint(0, 10) for _ in range(n)]
             w2 = [x for x in w1]
-            self.assertEqual(ReactiveUnit(w1),  ReactiveUnit(w2))
+            self.assertEqual(ReactiveUnit(S(w1)), ReactiveUnit(S(w2)))
 
-        self.assertFalse(ReactiveUnit([1, 2, 3]) == 5)
+        self.assertFalse(ReactiveUnit(S([1, 2, 3])) == 5)
 
 
 class TestAdaptiveNetwork(unittest.TestCase):
@@ -54,31 +57,31 @@ class TestAdaptiveNetwork(unittest.TestCase):
         self.N = 100
 
         self.sample = [
-            (ReactiveUnit([1, 2, 3, 4]), 0.5),
-            (ReactiveUnit([1, 1, 1, 1]), 0.8),
-            (ReactiveUnit([2, 2, 2, 2]), 0.2),
-            (ReactiveUnit([3, 3, 3, 3]), 1)
+            (ReactiveUnit(S([1, 2, 3, 4])), 0.5),
+            (ReactiveUnit(S([1, 1, 1, 1])), 0.8),
+            (ReactiveUnit(S([2, 2, 2, 2])), 0.2),
+            (ReactiveUnit(S([3, 3, 3, 3])), 1)
         ]
         self.an = AdaptiveNetwork(self.sample)
 
     def test__index_of(self):
-        self.assertEqual(-1, self.an._index_of(ReactiveUnit([6, 6, 6])))
-        self.assertEqual(1, self.an._index_of(ReactiveUnit([1, 1, 1, 1])))
+        self.assertEqual(-1, self.an._index_of(ReactiveUnit(S([6, 6, 6]))))
+        self.assertEqual(1, self.an._index_of(ReactiveUnit(S([1, 1, 1, 1]))))
         self.assertEqual(-1,
-            AdaptiveNetwork()._index_of(ReactiveUnit([23, 4])))
+            AdaptiveNetwork()._index_of(ReactiveUnit(S([23, 4]))))
 
     def test_add_reactive_unit(self):
 
         for _ in xrange(2):
-            self.an.add_reactive_unit(ReactiveUnit([1, 1]))
-            self.assertTrue(-1 != self.an._index_of(ReactiveUnit([1, 1])))
-            self.assertTrue(-1 == self.an._index_of(ReactiveUnit([1, 1, 1])))
+            self.an.add_reactive_unit(ReactiveUnit(S([1, 1])))
+            self.assertTrue(-1 != self.an._index_of(ReactiveUnit(S([1, 1]))))
+            self.assertTrue(-1 == self.an._index_of(ReactiveUnit(S([1, 1, 1]))))
 
     def test_reaction(self):
         #TODO: give specific net and specific values
         an = AdaptiveNetwork(self.sample)
         for _ in xrange(self.N):
-            pack = [random.randint(0, 10) for _ in range(4)]
+            pack = S([random.randint(0, 10) for _ in range(4)])
             out = np.array([w * ru.value_for(pack) for ru, w in
                 self.sample]).sum()
             self.assertEqual(an.reaction(pack), out)
@@ -132,7 +135,7 @@ class TestSteelsClassifier(unittest.TestCase):
             Sample([2, 2, 2, 2]),
             Sample([3, 3, 3, 3])
         ]
-        self.ru = [ReactiveUnit(s.get_values()) for s in self.samples]
+        self.ru = map(ReactiveUnit, self.samples)
 
     def _init(self):
         self.sc = SteelsClassifier()

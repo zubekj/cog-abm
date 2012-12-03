@@ -4,8 +4,6 @@ This module implements Steels exepriment.
 import logging
 import random
 
-from itertools import izip
-
 import numpy as np
 
 from cog_abm.core import Environment, Simulation
@@ -30,15 +28,15 @@ class ReactiveUnit(object):
     def_sigma = 1.
 
     def __init__(self, central_value, sigma=None):
-        self.central_value = [np.longdouble(x) for x in central_value]
+        self.central_value = central_value
         sigma = sigma or ReactiveUnit.def_sigma
         self.mdub_sqr_sig = np.longdouble(-0.5 / (sigma ** 2.))
 
     def value_for(self, x):
         """ Calculate reaction for given vector
         """
-        a = ((xi - mi) ** 2. for xi, mi in izip(x, self.central_value))
-        w = np.exp(sum(a) * self.mdub_sqr_sig)
+        a = self.central_value.distance(x) ** 2.
+        w = np.exp(a * self.mdub_sqr_sig)
         return w
 
     def __eq__(self,  other):
@@ -118,7 +116,7 @@ class SteelsClassifier(Classifier):
 
         if sample is not None:
             adaptive_network.add_reactive_unit(
-                ReactiveUnit(sample.get_values())
+                ReactiveUnit(sample)
             )
 
         self.categories[class_id] = adaptive_network
@@ -130,21 +128,19 @@ class SteelsClassifier(Classifier):
     def classify(self, sample):
         if len(self.categories) == 0:
             return None
-        values = sample.get_values()
         return max(self.categories.iteritems(),
-            key=lambda kr: kr[1].reaction(values))[0]
+            key=lambda kr: kr[1].reaction(sample))[0]
 
     def increase_samples_category(self, sample):
         category_id = self.classify(sample)
-        values = sample.get_values()
-        self.categories[category_id].increase_sample(values)
+        self.categories[category_id].increase_sample(sample)
 
     def forgetting(self):
         for an in self.categories.itervalues():
             an.forgetting()
 
     def sample_strength(self, category_id, sample):
-        return self.categories[category_id].reaction(sample.get_values())
+        return self.categories[category_id].reaction(sample)
 
 
 class DiscriminationGame(Interaction):
