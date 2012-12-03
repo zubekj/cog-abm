@@ -9,7 +9,7 @@
 			<alpha value="0.1"/>
 			<beta value="1"/>
 			<sigma value="1"/>
-			<num_iter value="3000"/>
+			<num_iter value="10000"/>
 			<context_size value="4"/>
 			<inc_category_treshold value="0.95"/>
 			<classifier name="SteelsClassifier"/>
