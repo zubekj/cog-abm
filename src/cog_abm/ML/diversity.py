@@ -62,7 +62,7 @@ class ClassifierSubsetOfAttrs(Classifier):
     def ensure_attrs_mask(self, num_attrs):
         if self.attrs_mask is None or \
                 num_attrs != len(self.attrs_mask):
-            self._gen_attributes_mask(self, num_attrs)
+            self._gen_attributes_mask(num_attrs)
 
     def train(self, samples):
         self.ensure_attrs_mask(len(samples[0].values))
