@@ -1,6 +1,8 @@
 import unittest
-from cog_abm.core.environment import *
+from cog_abm.core.environment import (OneDifferentClass,
+    Environment, RandomStimuliChooser)
 from cog_abm.ML.core import Sample, load_samples_arff
+
 
 class TestChoosers(unittest.TestCase):
 
@@ -42,7 +44,7 @@ class TestEnvironment(unittest.TestCase):
         self.assertEqual(env.get_all_stimuli(),  range(10))
 
     def test_random_stimuli_with_distance(self):
-        samples = [Sample([x]) for x in xrange(10)]*10
+        samples = [Sample([x]) for x in xrange(10)] * 10
         chooser = RandomStimuliChooser(None, True, 3)
         env = Environment(samples, chooser)
         for _ in xrange(10):
