@@ -1,5 +1,7 @@
-from ..extras.tools import abstract
-from ..ML.diversity import new_sample_specified_attributes
+from cog_abm.extras.tools import abstract
+from cog_abm.ML.diversity import new_sample_specified_attributes
+from cog_abm.ML.core import normalize_sample_on_nconfig
+
 
 class Sensor(object):
     """ Basic sensor.
@@ -20,3 +22,13 @@ class SimpleSensor(Sensor):
             return item
         else:
             return new_sample_specified_attributes(item, self.mask)
+
+
+class NormalizingSensor(object):
+
+    def __init__(self, norm_conf):
+        self.norm_conf = norm_conf
+
+    def sense(self, sample):
+        return normalize_sample_on_nconfig(sample,
+            self.norm_conf)

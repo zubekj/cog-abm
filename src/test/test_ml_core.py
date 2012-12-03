@@ -2,8 +2,9 @@ import math
 import random
 import unittest
 
-from cog_abm.ML.core import (NominalAttribute, NumericAttribute, Sample,
-    load_samples_arff, split_data, split_data_cv)
+from cog_abm.ML.core import (NominalAttribute,
+    NumericAttribute, Sample, load_samples_arff,
+    split_data, split_data_cv, normalize_samples)
 
 
 animals = ["dog", "cat", "lion", "duck", "python:)"]
@@ -86,6 +87,44 @@ class TestSample(unittest.TestCase):
 
 class TestSampleDistances(unittest.TestCase):
     pass
+
+
+class TestSampleNormalization(unittest.TestCase):
+
+    def _gen_samples(self):
+        na = self.meta[-1]
+        return [
+            Sample([0., 0., na.get_idx('dog')], self.meta),
+            Sample([-100., 30., na.get_idx('lion')], self.meta),
+            Sample([50, -20., na.get_idx('cat')], self.meta),
+            Sample([2, -6, na.get_idx('dog')], self.meta),
+        ]
+
+    def setUp(self):
+        self.meta = [NumericAttribute(), NumericAttribute(),
+            NominalAttribute(animals)]
+        self.samples = self._gen_samples()
+        self.samples_org = self._gen_samples()
+
+    def testSampleNormalization(self):
+        samples_config = normalize_samples(self.samples)
+        ss, ssorg = self.samples, self.samples_org
+        self.assertEqual(samples_config, [150., 50., None])
+        self.assertEqual(ss[0], ssorg[0])
+        for s1, s2 in zip(ss, ssorg)[1:]:
+            self.assertNotEqual(s1, s2)
+            s1v, s2v = s1.get_values(), s2.get_values()
+            self.assertNotEqual(s1v[0], s2v[0])
+            self.assertNotEqual(s1v[1], s2v[1])
+            self.assertEqual(s1v[2], s2v[2])
+
+    def testAnotherDistance(self):
+        normalize_samples(self.samples)
+        ss = self.samples
+        for s1 in ss:
+            for s2 in ss:
+                self.assertTrue(0. <= s1.distance(s2)
+                     <= 1. * len(s1.values))
 
 
 class TestSamplePreparation(unittest.TestCase):

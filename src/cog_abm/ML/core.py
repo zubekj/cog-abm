@@ -1,7 +1,6 @@
 """
 Most useful things connected with ML
 """
-import math
 import copy
 
 from itertools import izip
@@ -234,6 +233,69 @@ def load_samples_arff(file_name, last_is_class=False, look_for_cls=True):
             Sample(values, meta, last_is_class=last_is_class, cls_idx=cls_idx)
 
     return [create_sample(s) for s in a_data]
+
+
+def normalize_attribute_on_config(sample, attr_idx, diff):
+    attr = sample.meta[attr_idx]
+    old_val = attr.get_value(sample.values[attr_idx])
+    sample.values[attr_idx] = attr.set_value(old_val / diff)
+
+
+def normalize_numeric_attribute(attr_idx, samples):
+    attr = samples[0].meta[attr_idx]
+    values = [attr.get_value(s.values[attr_idx])
+            for s in samples]
+    diff = float(max(values) - min(values))
+    if diff == 0.:
+        return None
+
+    for sample in samples:
+        normalize_attribute_on_config(sample, attr_idx, diff)
+
+    return diff
+
+
+def normalize_nominal_attribute(attr_idx, samples):
+    return None
+
+
+NORMALIZATION_CONFIG = {
+    NumericAttribute.ID: normalize_numeric_attribute,
+    NominalAttribute.ID: normalize_nominal_attribute,
+}
+
+
+def calc_normalization_attriubte_conf(attr_idx, samples):
+    attr = samples[0].meta[attr_idx]
+    if attr.ID != NumericAttribute.ID:
+        return None
+    values = [attr.get_value(s.values[attr_idx])
+            for s in samples]
+    diff = float(max(values) - min(values))
+    if diff == 0.:
+        return None
+    return diff
+
+
+def calc_normalization_config(samples):
+    return [calc_normalization_attriubte_conf(i, samples)
+        for i in xrange(len(samples[0].values))]
+
+
+def normalize_samples(samples, config=None):
+    config = config or NORMALIZATION_CONFIG
+    norm_conf = [NORMALIZATION_CONFIG[meta.ID](i, samples)
+            for i, meta in enumerate(samples[0].meta)]
+    return norm_conf
+
+
+def normalize_sample_on_nconfig(sample, nconfig):
+    sample = sample.copy_full()
+    for i, conf_params in enumerate(nconfig):
+        if conf_params is not None:
+            normalize_attribute_on_config(sample,
+                i, conf_params)
+    return sample
 
 
 def split_data(data, train_ratio=2. / 3.):
