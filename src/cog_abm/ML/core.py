@@ -6,6 +6,7 @@ import copy
 
 from itertools import izip
 from random import shuffle
+from math import fsum
 
 from scipy.io.arff import loadarff
 
@@ -67,6 +68,12 @@ class Attribute(object):
     def __eq__(self, other):
         return self.ID == other.ID
 
+    def dist(self, value1, value2):
+        ''' Calculates distance between
+            two values of this attribute
+        '''
+        pass
+
 
 class NumericAttribute(Attribute):
 
@@ -74,6 +81,9 @@ class NumericAttribute(Attribute):
 
     def get_value(self, value):
         return value
+
+    def dist(self, value1, value2):
+        return abs(value1 - value2)
 
 
 class NominalAttribute(Attribute):
@@ -109,6 +119,9 @@ class NominalAttribute(Attribute):
         return super(NominalAttribute, self).__eq__(other) and \
             set(self.symbols) == set(other.symbols)
 
+    def dist(self, value1, value2):
+        return int(value1 != value2)
+
 
 class Sample(object):
 
@@ -128,11 +141,8 @@ class Sample(object):
             self.cls = cls
             self.cls_meta = cls_meta
 
-        if dist_fun is None and \
-                all(attr.ID == NumericAttribute.ID for attr in self.meta):
-            self.dist_fun = euclidean_distance
-        else:
-            self.dist_fun = dist_fun
+        self.dist_fun = dist_fun or \
+                get_default_dist_fun(self.meta)
 
     def get_cls(self):
         if self.cls_meta is None or self.cls is None:
@@ -175,11 +185,31 @@ class Sample(object):
         return s
 
 
+def get_default_dist_fun(meta):
+    if all(attr.ID == NumericAttribute.ID for attr in meta):
+        return euclidean_distance
+    return almost_euclidean_distance
+
+
 #Sample distance functions
-def euclidean_distance(sx, sy):
-    return math.sqrt(math.fsum([
+def non_sqrted_euclidean_distance(sx, sy):
+    return fsum([
         (x - y) * (x - y) for x, y in izip(sx.get_values(), sy.get_values())
-        ]))
+        ])
+
+
+def euclidean_distance(sx, sy):
+    return non_sqrted_euclidean_distance(sx, sy) ** 0.5
+
+
+def almost_non_squered_euclidean_distance(sx, sy):
+    return fsum(meta.dist(x_val, y_val)
+        for meta, x_val, y_val in
+        izip(sx.meta, sx.get_values(), sy.get_values()))
+
+
+def almost_euclidean_distance(sx, sy):
+    return almost_non_squered_euclidean_distance(sx, sy) ** 0.5
 
 
 def load_samples_arff(file_name, last_is_class=False, look_for_cls=True):

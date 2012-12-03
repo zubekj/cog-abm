@@ -84,6 +84,10 @@ class TestSample(unittest.TestCase):
         self.assertNotEqual(self.sample_cl, sample)
 
 
+class TestSampleDistances(unittest.TestCase):
+    pass
+
+
 class TestSamplePreparation(unittest.TestCase):
 
     def setUp(self):
