@@ -18,6 +18,8 @@ from cog_abm.extras.tools import def_value
 from steels import metrics
 from metrics import DS_A
 
+from cog_abm.extras.words_storage import extract_colour_order
+
 log = logging.getLogger('steels')
 
 
@@ -379,7 +381,8 @@ class SteelsAgentStateWithLexicon(SteelsAgentState):
 
 def steels_uniwersal_basic_experiment(num_iter, agents,
         interaction, classifier=SteelsClassifier, topology=None,
-        inc_category_treshold=None, dump_freq=50, stimuli=None, chooser=None):
+        inc_category_treshold=None, dump_freq=50, stimuli=None, chooser=None,
+        distance = 50., word_naming_per_color=None):
 
     topology = topology or generate_simple_network(agents)
 
@@ -389,12 +392,13 @@ def steels_uniwersal_basic_experiment(num_iter, agents,
     if inc_category_treshold is not None:
         interaction.__class__.def_inc_category_treshold = inc_category_treshold
 
-    chooser = chooser or RandomStimuliChooser(use_distance=True, distance=50.)
+    chooser = chooser or RandomStimuliChooser(use_distance=True, distance=distance)
     env = Environment(stimuli, chooser)
     for agent in agents:
         agent.env = env
-
-    s = Simulation(topology, interaction, agents)
+    
+    colour_order = extract_colour_order(env, word_naming_per_color)
+    s = Simulation(topology, interaction, agents, colour_order=colour_order)
     res = s.run(num_iter, dump_freq)
 
 #       import pprint
@@ -416,7 +420,7 @@ def steels_uniwersal_basic_experiment(num_iter, agents,
 def steels_basic_experiment_DG(inc_category_treshold=0.95, classifier=None,
         interaction_type="DG", beta=1., context_size=4, stimuli=None,
         agents=None, dump_freq=50, alpha=0.1, sigma=1., num_iter=1000,
-        topology=None):
+        topology=None, distance = 50., word_naming_per_color = None):
 
     classifier, classif_arg = SteelsClassifier, []
 
@@ -433,13 +437,13 @@ def steels_basic_experiment_DG(inc_category_treshold=0.95, classifier=None,
 
     return steels_uniwersal_basic_experiment(num_iter, agents,
         DiscriminationGame(context_size), topology=topology,
-            dump_freq=dump_freq, stimuli=stimuli)
+            dump_freq=dump_freq, stimuli=stimuli, distance = distance, word_naming_per_color=word_naming_per_color)
 
 
 def steels_basic_experiment_GG(inc_category_treshold=0.95, classifier=None,
         interaction_type="GG", beta=1., context_size=4, stimuli=None,
         agents=None, dump_freq=50, alpha=0.1, sigma=1., num_iter=1000,
-        topology=None):
+        topology=None, distance = 50., word_naming_per_color = None):
 
     classifier, classif_arg = SteelsClassifier, []
     #agents = [Agent(SteelsAgentStateWithLexicon(classifier()), SimpleSensor())\
@@ -459,4 +463,5 @@ def steels_basic_experiment_GG(inc_category_treshold=0.95, classifier=None,
 
     return steels_uniwersal_basic_experiment(num_iter, agents,
         GuessingGame(None, context_size), topology=topology,
-            dump_freq=dump_freq, stimuli=stimuli)
+            dump_freq=dump_freq, stimuli=stimuli, distance = distance, 
+            word_naming_per_color=word_naming_per_color)

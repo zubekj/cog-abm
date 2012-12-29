@@ -20,7 +20,7 @@ class Simulation(object):
     """
 
     def __init__(self, graph=None, interaction=None, agents=None, pb=False, 
-                 dump_words=True, colour_order=None):
+                 colour_order=None):
         ''' pb - show progress bar
             dump_words - dump words in seperate files
             colour_order - list of colours in the order used when storing agents words
@@ -31,7 +31,6 @@ class Simulation(object):
         self.statistic = []
         self.dump_often = True
         self.pb = True#pb
-        self.dump_words = dump_words
         self.colour_order = colour_order
 
     def dump_results(self, iter_num):
@@ -43,7 +42,7 @@ class Simulation(object):
             f = open(str(iter_num) + ".pout", "wb")
             cPickle.dump(kr, f, PICKLE_PROTOCOL)
             f.close()
-            if self.dump_words:
+            if self.colour_order:
                 store_words(self.agents, self.colour_order, str(iter_num)+"words.pout")
 
     def _choose_agents(self):

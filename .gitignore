@@ -2,3 +2,10 @@
 *.pyc
 *.bak
 *.swp
+#SIMULATION RESULTS:
+*.pout
+*result
+*results
+#PROJECT FILES:
+*.project
+*.pydevproject

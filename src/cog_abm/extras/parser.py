@@ -236,6 +236,10 @@ class Parser(object):
             "inc_category_treshold", "value", float)
         dictionary["classifier"] = \
             self.return_if_exist(params, "classifier", "name", str)
+        
+        dictionary["distance"] = self.return_if_exist(params, "distance", "value", float)
+        dictionary["word_naming_per_color"] = \
+            self.return_if_exist(params, "word_naming_per_color", "value", str)
 
         return dictionary
 
