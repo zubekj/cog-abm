@@ -3,7 +3,7 @@ Module with functions for words storage.
 
 Created on Dec 29, 2012
 
-@author: mlukasik
+@author: mlukasik 
 '''
 def store_words(agents, colour_order, out_file):
     """Stores words used by agents to a file.
