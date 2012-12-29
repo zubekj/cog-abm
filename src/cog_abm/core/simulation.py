@@ -22,7 +22,6 @@ class Simulation(object):
     def __init__(self, graph=None, interaction=None, agents=None, pb=False, 
                  colour_order=None):
         ''' pb - show progress bar
-            dump_words - dump words in seperate files
             colour_order - list of colours in the order used when storing agents words
         '''
         self.graph = graph

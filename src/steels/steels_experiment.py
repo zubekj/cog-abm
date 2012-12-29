@@ -18,7 +18,7 @@ from cog_abm.extras.tools import def_value
 from steels import metrics
 from metrics import DS_A
 
-from cog_abm.extras.words_storage import extract_colour_order
+from cog_abm.extras.extract_colour_order import extract_colour_order
 
 log = logging.getLogger('steels')
 
