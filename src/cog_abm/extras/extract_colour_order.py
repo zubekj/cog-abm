@@ -13,22 +13,24 @@ def extract_colour_order(stimuli, clab_name):
     return get_environment_in_order(stimuli, chip_map)
     
 def get_environment_in_order(stimuli, chip_map):
-    '''Return sorted list of stimuli from environment in order specified by chip_map.
+    '''Return sorted list of stimuli from environment in order specified by 
+    chip_map.
     '''
     visited = set()
     colour_order_keyed = []
     #traverse all stimuli and add them to the list, excluding repetitions
-    for s in stimuli:
-        (L, a, b) = tuple(s.get_values())
+    for stimulus in stimuli:
+        (L, a, b) = tuple(stimulus.get_values())
         if (L, a, b) not in visited:
             visited.add((L, a, b))
-            try:
-                colour_name = chip_map[(float(L), float(a), float(b))]
-            except:
-                print "[get_environment_in_order]: ERROR! chip_map: ", chip_map
-                import sys
-                sys.exit(1)
-            colour_order_keyed.append( (s, colour_name) )
+            float_values = (float(L), float(a), float(b))
+            #if float_values not in chip_map:
+            #    print "[get_environment_in_order]: ERROR!" + \
+            #    "stimulus not in chip_map!"
+            #    import sys
+            #    sys.exit(1)
+            colour_name = chip_map[float_values]
+            colour_order_keyed.append( (stimulus, colour_name) )
     
     #sort by colour_name
     colour_order_keyed.sort(key = lambda x: x[1])
@@ -38,20 +40,21 @@ def get_environment_in_order(stimuli, chip_map):
 
 def extract_chip_map(fname):
     """
-    Read a chipmap from fname, extract information about which ordinal number is
-    given to each of the Lab coordinates.
-    
+    Read a chipmap from fname, extract information about which ordinal number
+    is given to each of the Lab coordinates.
     """
     chip_map = {}
     with open(fname) as f:
         #each line is read from a c-lab file
-        for l in f:
-            ll = l.split()
+        for line in f:
+            line_list = line.split()
             #if it is already in a chip_map then there is some repetition!
-            if (float(ll[6]), float(ll[7]), float(ll[8])) in chip_map:
-                print "[extract_colour_order] ERROR!", (float(ll[6]), float(ll[7]), float(ll[8])), "in chip_map !!!"
-                import sys
-                sys.exit(1)
-            else:#else everything is ok
-                chip_map[(float(ll[6]), float(ll[7]), float(ll[8]))] = ll[0]
+            float_values = (float(line_list[6]), float(line_list[7]), \
+                            float(line_list[8]))
+            #if float_values in chip_map:
+            #    print "[extract_colour_order] ERROR!"+str(float_values)+ \
+            #    "in chip_map !!!"
+            #    import sys
+            #    sys.exit(1)
+            chip_map[float_values] = line_list[0]
     return chip_map
