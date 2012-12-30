@@ -5,20 +5,20 @@ Created on Dec 29, 2012
 
 @author: mlukasik
 '''
-def extract_colour_order(environment, clab_name):
+def extract_colour_order(stimuli, clab_name):
     '''
     Extract colour order from clab_fname and return stimuli in that order (exclude repetitions).
     '''
     chip_map = extract_chip_map(clab_name)
-    return get_environment_in_order(environment, chip_map)
+    return get_environment_in_order(stimuli, chip_map)
     
-def get_environment_in_order(environment, chip_map):
+def get_environment_in_order(stimuli, chip_map):
     '''Return sorted list of stimuli from environment in order specified by chip_map.
     '''
     visited = set()
     colour_order_keyed = []
     #traverse all stimuli and add them to the list, excluding repetitions
-    for s in environment.stimuli:
+    for s in stimuli:
         (L, a, b) = tuple(s.get_values())
         if (L, a, b) not in visited:
             visited.add((L, a, b))

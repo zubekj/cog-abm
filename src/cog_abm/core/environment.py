@@ -95,15 +95,18 @@ class Environment(object):
     It's main function is to provide stimuli for agents
     """
 
-    def __init__(self, stimuli, stimuli_chooser=None):
+    def __init__(self, stimuli, stimuli_chooser=None, colour_order=None):
         """
         Initialize environment
 
         @param stimuli: initial set of stimuli
         @type stimuli: sequence
+        @param colour_order: list of distinct stimuli in order of saving to a file (if needed)
+        @type colour_order: sequence
         """
         self.stimuli = stimuli
         self.stimuli_chooser = stimuli_chooser or RandomStimuliChooser(1)
+        self.colour_order = colour_order
 
     def get_stimulus(self):
         """
