@@ -1,0 +1,210 @@
+'''
+
+Created on Jan 2, 2013
+
+@author: mlukasik
+
+Module with functions for analysis of output file from simulation with words.
+
+File with words is of the following form:
+agent-no1 list-of-words
+agent-no2 list-of-words
+.
+.
+.
+
+
+'''
+from __future__ import division
+from collections import defaultdict
+
+def read_words(f):
+	'''
+	Read words as saved by the steels simulation.
+	
+	Create a dictionary: agent -> list of words
+	'''
+	words_per_agent = {}
+	for ind, line in enumerate(f):
+		words_per_agent[ind] = line.split()[1:]
+	return words_per_agent
+
+def is_number(s):
+	'''
+	@type s - string 
+	Checks if s is a number.
+	'''
+	try:
+		float(s)
+		return True
+	except ValueError:
+		return False
+
+def string2prefix_num(s):
+	'''
+	Maps s into an integer corresponding iteration number. This is done basing
+	on naming of results of simulation.
+	>>> string2prefix_num("0words.pout")
+	0
+	>>> string2prefix_num("1000words.pout")
+	1000
+	>>> string2prefix_num("10000words.pout")
+	10000
+	'''
+	if not is_number(s[1]):
+		return int(s[0])
+	if not is_number(s[4]):
+		return int(s[:4])
+	return int(s[:5])
+
+def get_word_count(words_per_agent, nullify = True):
+	'''
+	For each position in the words list, calculate how many times each word occurs.
+	'''
+	word_count = defaultdict(lambda: {})
+	
+	for words in words_per_agent.itervalues():
+		for ind, word in enumerate(words):
+			if word not in word_count[ind]:
+				word_count[ind][word] = 1
+			else:
+				word_count[ind][word] += 1
+	
+	#force -1's count to be 0 - we exclude it from further analysis
+	if nullify:
+		for ind in word_count.iterkeys():
+			word_count[ind][-1] = 0
+	
+	return dict(word_count)
+
+def read_clab_splitted_by_median(lines, coordinate):
+	'''
+	Return 2 subsets of colours, divided by the median of values for a given
+	coordinate.
+	'''
+	median = get_median_in_clab(lines, coordinate)
+	bigger, smaller = read_clab_splitted_into_2(lines, coordinate, median)
+	return bigger, smaller
+
+def get_median_in_clab(lines, coordinate):
+	'''
+	Find a median in terms of values for a given coordinate.
+	
+	lines - lines of a c-lab file, where coordinates start from 6th column
+	 onwards. Therefore, the coordinate parameter is added to 6 when 
+	 extracting values.
+	'''
+	elems = []
+	for _, colour in lines:
+		elems.append(colour[coordinate] )
+	import numpy
+	mid_pnt = numpy.median(elems)
+	return mid_pnt
+
+def read_clab_splitted_into_2(lines, coordinate, splitting_point):
+	'''
+	Read the c-lab data by splitting it into 2 subsets: elements larger
+	with respected to coordinate then the given splitting_point, 
+	and elements smaller then the splitting_point.
+	'''
+	bigger = set()
+	smaller = set()
+	
+	for index, colour in lines:
+		v = colour[coordinate]
+		if v >= splitting_point:
+			bigger.add(index)
+		else:
+			smaller.add(index)
+	return bigger, smaller
+
+def calculate_moda(elements):
+	'''
+	Calculates what percentage the biggest element contributes.
+	
+	>>> calculate_moda( [5, 5, 5, 5] )
+	0.25
+	>>> calculate_moda( [0, 10] )
+	1.0
+	>>> calculate_moda( [1, 2, 1] )
+	0.5
+	>>> calculate_moda( [0] )
+	0
+	'''
+	moda = 0
+	all_occurences = sum(elements)
+	if all_occurences != 0:
+		moda = max(elements)*1.0/sum(elements)
+	return moda
+
+def get_moda_fraction_list_per_set(word_count, set1, set2):
+	'''
+	word_count - maps a position, to a dictionary, which in turn maps each word
+	to occurence count
+	
+	For each position in set1 and set2, return what percentage the most common
+		word contributes.
+	'''
+	moda_for_set1 = []
+	moda_for_set2 = []
+	for index, words in word_count.iteritems():
+		#calculate moda:
+		moda = calculate_moda(list(words.itervalues()))
+		if index in set1:
+			moda_for_set1.append(moda)
+		elif index in set2:
+			moda_for_set2.append(moda)
+		else:
+			print "[get_moda_fraction_list_per_set ] ERROR, index in none of the sets", index
+			exit(1)
+	return moda_for_set1, moda_for_set2
+
+def avg_num_of_words_per_agent_for_sets(words_per_agent, set1, set2):
+	'''
+	For each set find number of distinct words per index.
+	'''
+	
+	agent_distinctwords_set1 = defaultdict(lambda: set())
+	agent_distinctwords_set2 = defaultdict(lambda: set())
+	
+	for words in words_per_agent.itervalues():
+		#print "words:", words
+		for ind, word in enumerate(words):
+			if ind in set1:
+				agent_distinctwords_set1[ind].add(word)
+			elif ind in set2:
+				agent_distinctwords_set2[ind].add(word)
+			else:
+				print "[find_num_of_words_per_agent_per_set] ERROR, ind in none of the sets", ind
+				exit(1)
+	
+	def calculate_avg_words(agent_distinctwords_set):
+		lengths = map(lambda x: len(x), agent_distinctwords_set.itervalues())
+		return sum(lengths)*1.0/len(lengths)
+	
+	avg_bigger = calculate_avg_words( agent_distinctwords_set1 )
+	avg_smaller = calculate_avg_words( agent_distinctwords_set2 )
+	return avg_bigger, avg_smaller
+	
+def get_mode_word_stats(fname, clab_fname, coordinate):
+	'''
+	fname - path to a file with words saved.
+	clab_fname - path to a c-lab file.
+	coordinate - according to which coordinate we perform split in analysis.
+	'''
+	words_per_agent = read_words(open(fname, 'r'))
+	bigger, smaller = read_clab_splitted_by_median( \
+						open(clab_fname, 'r').readlines(), coordinate)
+	
+	avg_wordnum1, avg_wordnum2 = \
+		avg_num_of_words_per_agent_for_sets(words_per_agent, bigger, smaller)
+	
+	word_count = get_word_count(words_per_agent)
+	moda_bigger, moda_smaller = get_moda_fraction_list_per_set(word_count, bigger, smaller)
+	avg_moda_bigger = sum(moda_bigger)*1.0/len(moda_bigger)
+	avg_moda_smaller = sum(moda_smaller)*1.0/len(moda_smaller)
+	return avg_moda_bigger, avg_moda_smaller, avg_wordnum1, avg_wordnum2
+	
+if __name__ == "__main__":
+	import doctest
+	doctest.testmod()
