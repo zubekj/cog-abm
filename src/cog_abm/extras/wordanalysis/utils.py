@@ -186,6 +186,15 @@ def avg_num_of_words_per_agent_for_sets(words_per_agent, set1, set2):
 	avg_smaller = calculate_avg_words( agent_distinctwords_set2 )
 	return avg_bigger, avg_smaller
 	
+def traverse_clab_file(lines):
+	'''
+	Yield each consecutive: index (starting from 0) + coordinates of a point.
+	'''
+	for line in lines:
+		splitted = line.split()
+		yield int(splitted[0]) - 1, \
+		(float(splitted[6]), float(splitted[7]), float(splitted[8]))
+
 def get_mode_word_stats(fname, clab_fname, coordinate):
 	'''
 	fname - path to a file with words saved.
@@ -194,7 +203,8 @@ def get_mode_word_stats(fname, clab_fname, coordinate):
 	'''
 	words_per_agent = read_words(open(fname, 'r'))
 	bigger, smaller = read_clab_splitted_by_median( \
-						open(clab_fname, 'r').readlines(), coordinate)
+						list(traverse_clab_file( open(clab_fname, 'r') )), \
+						coordinate)
 	
 	avg_wordnum1, avg_wordnum2 = \
 		avg_num_of_words_per_agent_for_sets(words_per_agent, bigger, smaller)
@@ -205,6 +215,29 @@ def get_mode_word_stats(fname, clab_fname, coordinate):
 	avg_moda_smaller = sum(moda_smaller)*1.0/len(moda_smaller)
 	return avg_moda_bigger, avg_moda_smaller, avg_wordnum1, avg_wordnum2
 	
+#===============================WORD GENERATING===============================#
+def get_numerical(line):
+	'''
+	Extracts a numerical value from inside of xml line.
+	'''
+	return float(line.split('>')[1].split("<")[0])
+
+def for_each_chip(f):
+	'''
+	For each munsell chip found in f, yields numerical values of its coordinates.
+	'''
+	while True:
+		l = f.readline()
+		if not l:
+			break
+		if "<munsell_chip>" in l:
+			x = get_numerical(f.readline())
+			y = get_numerical(f.readline())
+			z = get_numerical(f.readline())
+			if "</munsell_chip>" not in f.readline():#closing of munsell_chip
+				print "[for_each_chip] ERROR! no closing of munsell_chip found"
+			yield x, y, z
+
 if __name__ == "__main__":
 	import doctest
 	doctest.testmod()

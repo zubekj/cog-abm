@@ -9,17 +9,7 @@ Compute statistics on words - result of cog_abm simulation.
 Simple statistics for the set of colours seperated into 2 subsets, based on one coordinate.
 Point of division is median.
 '''
-from utils import get_mode_word_stats, string2prefix_num
-from src.cog_abm.extras.wordstats.utils import is_number
-
-def traverse_clab_file(lines):
-    '''
-    Yield each consecutive: index (starting from 0) + coordinates of a point.
-    '''
-    for line in lines:
-        splitted = line.split()
-        yield int(splitted[0]) - 1, \
-        (float(splitted[6]), float(splitted[7]), float(splitted[8]))
+from utils import get_mode_word_stats, string2prefix_num, is_number
 
 #statistics to be calculated; their names must correspond to methods in numpy package
 STATISTICS_MEASURES = ['average', 'median', 'std']
@@ -85,19 +75,33 @@ if __name__ == "__main__":
                 statistics[ind]['mode_'+key] = sub_stats[key]
             
             sub_stats = get_numpy_statistics( map(lambda x: x[ind], \
-                                                        all_results_words) )
+                                                        all_results_words), \
+                                             STATISTICS_MEASURES )
             for key in sub_stats.iterkeys():
                 statistics[ind]['wordnum_'+key] = sub_stats[key]
             
         
         #=====print results for current fname=====#
-        print string2prefix_num(fname)+":"
+        print str(string2prefix_num(fname))+":"
         
         def printable_elem(s):
-            if is_number(s):
-                return "%.4f" % s
-            else:
-                return s
+            #check if integer
+            try:
+                int(s)
+                return str(s)
+            except:
+                #check if float:
+                if is_number(s):
+                    return "%.4f" % s
+                else:
+                    return s
+            
+        #print header
+        res_line = ["Bigger wins", "Smaller wins", "|"] + \
+            map(lambda x: "mode "+x, STATISTICS_MEASURES) + \
+            ["|"] + \
+            map(lambda x: "word number "+x, STATISTICS_MEASURES)
+        print "\t".join([printable_elem(res) for res in res_line])
         
         for ind in [0, 1]:#index of half
             res_line = []
