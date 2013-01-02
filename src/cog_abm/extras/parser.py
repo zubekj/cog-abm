@@ -194,7 +194,8 @@ class Parser(object):
             
             word_naming_per_color = \
             self.return_if_exist(params, "word_naming_per_color", "value", str)
-            colour_order = extract_colour_order(list_of_stimuli, word_naming_per_color)
+            if word_naming_per_color:
+                colour_order = extract_colour_order(list_of_stimuli, word_naming_per_color)
         else:
             chooser = RandomStimuliChooser()
 
