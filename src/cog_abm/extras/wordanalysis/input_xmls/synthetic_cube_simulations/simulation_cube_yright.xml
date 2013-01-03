@@ -8,20 +8,18 @@
 		<params>
 			<alpha value="0.1"/>
 			<beta value="1"/>
-			<sigma value="10"/>
+			<sigma value="1"/>
 			<num_iter value="10000"/>
 			<context_size value="4"/>
-			<inc_category_treshold value="0.90"/>
+			<inc_category_treshold value="0.95"/>
 			<classifier name="SteelsClassifier"/>
-			<svm_cost value="1.0"/>
-			<distance value="1"/>
-			<word_naming_per_color value="../cog_abm/extras/biom_words_convertions/c-lab-synthetic-cubic.txt"/>
 		</params>
 	</interaction>
 
-	<environment name="global" source="../cog_abm/extras/wordanalysis/input_xmls/simulation_synthetic_cube/simulation_synthetic_cube_zleft.xml">
+	<environment name="global" source="../cog_abm/extras/wordanalysis/input_xmls/synthetic_cube_colours/simulation_synthetic_cube_yright.xml">
 		<params>
 			<distance value="1"/>
+			<word_naming_per_color value="../cog_abm/extras/c-lab-synthetic-cubic.txt"/>
 		</params>
 	</environment>
 

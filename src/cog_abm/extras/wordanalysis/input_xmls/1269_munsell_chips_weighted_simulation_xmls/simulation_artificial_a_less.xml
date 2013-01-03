@@ -8,20 +8,18 @@
 		<params>
 			<alpha value="0.1"/>
 			<beta value="1"/>
-			<sigma value="10"/>
+			<sigma value="1"/>
 			<num_iter value="10000"/>
 			<context_size value="4"/>
-			<inc_category_treshold value="0.90"/>
+			<inc_category_treshold value="0.95"/>
 			<classifier name="SteelsClassifier"/>
-			<svm_cost value="1.0"/>
-			<distance value="45"/>
-			<word_naming_per_color value="cog_abm/extras/biom_words_convertions/c-lab-1268.txt"/>
 		</params>
 	</interaction>
 
 	<environment name="global" source="../cog_abm/extras/wordanalysis/input_xmls/1269_munsell_chips_weighted/1269_munsell_chips_a_less.xml">
 		<params>
 			<distance value="45"/>
+			<word_naming_per_color value="../cog_abm/extras/c-lab-1268.txt"/>
 		</params>
 	</environment>
 
