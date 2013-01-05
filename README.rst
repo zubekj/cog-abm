@@ -103,14 +103,27 @@ python munsell_palette.py -d ../ -a 10 --findfocal strength_based -l t
 
 
 Required librares (easy to install with pip)
---------------------------------------------
- * numpy
- * scipy
- * progressbar
- * matplotlib (for charts)
- * grapefruit (built in?)
- * pygraph (named python-graph-core)
+============================================
 
+- numpy
+- scipy
+- progressbar
+- matplotlib (for charts)
+- grapefruit (built in?)
+- pygraph (named python-graph-core)
+
+
+Unofficial tutorial
+===================
+
+Can be found here_.
+
+.. _here: https://github.com/kkonrad/cog-abm-tutorial
+
+
+
+Authors
+=======
 
 :Authors:
     *Programming:* Konrad Kurdej, Michał Łukasik, Marek Maj
@@ -119,13 +132,13 @@ Required librares (easy to install with pip)
 
 
 Origins
--------
+=======
 
 This software is fork of **COG-ABM** from account **cogcomp**.
 
 
 License
--------
+=======
 
 This software is dual-licensed.
 
