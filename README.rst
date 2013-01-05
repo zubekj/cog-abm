@@ -104,13 +104,17 @@ python munsell_palette.py -d ../ -a 10 --findfocal strength_based -l t
 
 Required librares (easy to install with pip)
 --------------------------------------------
- * numpy
- * scipy
- * progressbar
- * matplotlib (for charts)
- * grapefruit (built in?)
- * pygraph (named python-graph-core)
 
+- numpy
+- scipy
+- progressbar
+- matplotlib (for charts)
+- grapefruit (built in?)
+- pygraph (named python-graph-core)
+
+
+Authors
+-------
 
 :Authors:
     *Programming:* Konrad Kurdej, Michał Łukasik, Marek Maj
