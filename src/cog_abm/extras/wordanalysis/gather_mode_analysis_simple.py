@@ -97,10 +97,10 @@ if __name__ == "__main__":
                     return s
             
         #print header
-        res_line = ["Bigger wins", "Smaller wins", "|"] + \
-            map(lambda x: "mode "+x, STATISTICS_MEASURES) + \
+        res_line = ["Bigger_wins", "Smaller_wins", "|"] + \
+            map(lambda x: "mode_"+x, STATISTICS_MEASURES) + \
             ["|"] + \
-            map(lambda x: "word number "+x, STATISTICS_MEASURES)
+            map(lambda x: "word_number_"+x, STATISTICS_MEASURES)
         print "\t".join([printable_elem(res) for res in res_line])
         
         for ind in [0, 1]:#index of half
