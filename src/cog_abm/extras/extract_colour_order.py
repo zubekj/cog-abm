@@ -35,7 +35,7 @@ def get_environment_in_order(stimuli, chip_map):
     #sort by colour_name
     colour_order_keyed.sort(key = lambda x: x[1])
     #return only necessary part
-    return map(lambda x: x[0], colour_order_keyed)
+    return [x[0] for x in colour_order_keyed]
 
 
 def extract_chip_map(fname):
