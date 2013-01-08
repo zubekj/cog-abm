@@ -68,14 +68,14 @@ if __name__ == "__main__":
         statistics = [{}, {}]
         for ind in [0, 1]:#index of half
             sub_stats = {}
-            sub_stats = get_numpy_statistics( map(lambda x: x[ind], \
-                                                        all_results_modes), \
+            sub_stats = get_numpy_statistics( map(lambda x: x[ind],
+                                                        all_results_modes), 
                                              STATISTICS_MEASURES )
             for key in sub_stats.iterkeys():
                 statistics[ind]['mode_'+key] = sub_stats[key]
             
-            sub_stats = get_numpy_statistics( map(lambda x: x[ind], \
-                                                        all_results_words), \
+            sub_stats = get_numpy_statistics( map(lambda x: x[ind],
+                                                        all_results_words),
                                              STATISTICS_MEASURES )
             for key in sub_stats.iterkeys():
                 statistics[ind]['wordnum_'+key] = sub_stats[key]
