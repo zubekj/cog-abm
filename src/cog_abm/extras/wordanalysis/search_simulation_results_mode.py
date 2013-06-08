@@ -46,6 +46,7 @@ if __name__ == "__main__":
     maximum_std = -1
     
     for inner_cat in catalogues_with_subres:
+        print "Checking:", inner_cat
         statistics, mode_bigger, files = gather_repeated_simulation_statistics(clab_fname, coordinate, outer_cat+"/"+inner_cat)
         
         val = statistics[files[-1]][0][stat_name] - statistics[files[-1]][1][stat_name]
