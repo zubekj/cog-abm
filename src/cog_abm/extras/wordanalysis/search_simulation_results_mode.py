@@ -47,19 +47,22 @@ if __name__ == "__main__":
     
     for inner_cat in catalogues_with_subres:
         print "Checking:", inner_cat
-        statistics, mode_bigger, files = gather_repeated_simulation_statistics(clab_fname, coordinate, outer_cat+"/"+inner_cat)
-        
-        val = statistics[files[-1]][0][stat_name] - statistics[files[-1]][1][stat_name]
-        
-        if val > maximum_diff:
-            maximum_name = inner_cat
-            maximum_diff = val
-            maximum_std = (statistics[files[-1]][0][std_name], statistics[files[-1]][1][std_name])
-        
-        if val < minimum_diff:
-            minimum_name = inner_cat
-            minimum_diff = val
-            minimum_std = (statistics[files[-1]][0][std_name], statistics[files[-1]][1][std_name])
+        try:#try, because let's give the opportunity to call this script, when the simulations have not finished (so a catalogue may be empty
+            statistics, mode_bigger, files = gather_repeated_simulation_statistics(clab_fname, coordinate, outer_cat+"/"+inner_cat)
+            
+            val = statistics[files[-1]][0][stat_name] - statistics[files[-1]][1][stat_name]
+            
+            if val > maximum_diff:
+                maximum_name = inner_cat
+                maximum_diff = val
+                maximum_std = (statistics[files[-1]][0][std_name], statistics[files[-1]][1][std_name])
+            
+            if val < minimum_diff:
+                minimum_name = inner_cat
+                minimum_diff = val
+                minimum_std = (statistics[files[-1]][0][std_name], statistics[files[-1]][1][std_name])
+        except:
+            break
 
     print "====================================="
     print "Maximum difference between 0 and 1:"
