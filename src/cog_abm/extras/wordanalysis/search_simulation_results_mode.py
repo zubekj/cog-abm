@@ -28,10 +28,10 @@ if __name__ == "__main__":
         print "Parameter 4: what statistic to look for extremum of (example: mode_average)"
         exit(1)
     stat_name = sys.argv[4]#katalog z katalogami z wynikami
-    if len(sys.argv) < 5:
-        print "Parameter 4: what std statistic to check (example: mode_std)"
+    if len(sys.argv) < 6:
+        print "Parameter 5: what std statistic to check (example: mode_std)"
         exit(1)
-    std_name = sys.argv[4]#katalog z katalogami z wynikami
+    std_name = sys.argv[5]#katalog z katalogami z wynikami
     
     
     
