@@ -182,8 +182,8 @@ def avg_num_of_words_per_agent_for_sets(words_per_agent, set1, set2):
 		lengths = map(lambda x: len(x), agent_distinctwords_set.itervalues())
 		return sum(lengths)*1.0/len(lengths)
 	
-	avg_bigger = calculate_avg_words( agent_distinctwords_set1 )
-	avg_smaller = calculate_avg_words( agent_distinctwords_set2 )
+	avg_bigger = calculate_avg_words(agent_distinctwords_set1)
+	avg_smaller = calculate_avg_words(agent_distinctwords_set2)
 	return avg_bigger, avg_smaller
 	
 def traverse_clab_file(lines):
@@ -192,8 +192,7 @@ def traverse_clab_file(lines):
 	'''
 	for line in lines:
 		splitted = line.split()
-		yield int(splitted[0]) - 1, \
-		(float(splitted[6]), float(splitted[7]), float(splitted[8]))
+		yield int(splitted[0]) - 1, (float(splitted[6]), float(splitted[7]), float(splitted[8]))
 
 def get_mode_word_stats(fname, clab_fname, coordinate):
 	'''
@@ -202,8 +201,8 @@ def get_mode_word_stats(fname, clab_fname, coordinate):
 	coordinate - according to which coordinate we perform split in analysis.
 	'''
 	words_per_agent = read_words(open(fname, 'r'))
-	bigger, smaller = read_clab_splitted_by_median( \
-						list(traverse_clab_file( open(clab_fname, 'r') )), \
+	bigger, smaller = read_clab_splitted_by_median(
+						list(traverse_clab_file(open(clab_fname, 'r'))),
 						coordinate)
 	
 	avg_wordnum1, avg_wordnum2 = \

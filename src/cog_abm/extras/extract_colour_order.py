@@ -30,7 +30,7 @@ def get_environment_in_order(stimuli, chip_map):
             #    import sys
             #    sys.exit(1)
             colour_name = chip_map[float_values]
-            colour_order_keyed.append( (stimulus, colour_name) )
+            colour_order_keyed.append((stimulus, colour_name))
     
     #sort by colour_name
     colour_order_keyed.sort(key = lambda x: x[1])
@@ -49,7 +49,7 @@ def extract_chip_map(fname):
         for line in f:
             line_list = line.split()
             #if it is already in a chip_map then there is some repetition!
-            float_values = (float(line_list[6]), float(line_list[7]), \
+            float_values = (float(line_list[6]), float(line_list[7]),
                             float(line_list[8]))
             #if float_values in chip_map:
             #    print "[extract_colour_order] ERROR!"+str(float_values)+ \

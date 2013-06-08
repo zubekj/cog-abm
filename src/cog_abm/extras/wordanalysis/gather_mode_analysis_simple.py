@@ -23,22 +23,16 @@ def get_numpy_statistics(data, statistics_measures):
     for stat in statistics_measures:
         statistics[stat] = getattr(numpy, stat)(data)
     return statistics
-        
-if __name__ == "__main__":
-    import sys
-    if len(sys.argv) < 2:
-        print "Parameter 1: a file with words in c-lab format."
-        exit(1)
-    clab_fname = sys.argv[1]#plik z c-lab
-    if len(sys.argv) < 3:
-        print "Parameter 2: an integer corresponding to a coordinate by which colours are separated."
-        exit(1)
-    coordinate = int(sys.argv[2])#podzial wzgledem ktorej wspolrzednej
-    if len(sys.argv) < 4:
-        print "Parameter 3: catalogue, where results of a simulation are stored."
-        exit(1)
-    cat = sys.argv[3]#katalog z wynikami
 
+def gather_repeated_simulation_statistics(clab_fname, coordinate, cat):
+    '''
+    Gathers statistics from several repetitions of the same simulation.
+    
+    Returns:
+    statistics - a dictionary: {chwila czasowa: {lewy: {stat1: , stat2: ...}, prawy: {}}, ...} lewy i prawy zamienione na 0/1
+    mode_bigger - 
+    files - ids of consecutive time stamps, used in statistics dictionary
+    '''
     import os
     cats = map(lambda x: cat+"//"+x, os.listdir(cat))
     #assume that in each catalogue there are files named the same, which correspond to one another
@@ -46,6 +40,7 @@ if __name__ == "__main__":
 
     #how many simulations chose bigger, how many chose smaller
     mode_bigger = {}
+    statistics = {} # 
     #list statistics for each file, gathering info from all catalogues:
     for fname in sorted(files, key=lambda x: string2prefix_num(x)):
         mode_bigger[fname] = [0, 0]
@@ -65,37 +60,61 @@ if __name__ == "__main__":
             all_results_words += [(avg_wordnum1, avg_wordnum2)]
         
         #=====calculate statistics for current fname=====#
-        statistics = [{}, {}]
+        statistics[fname] = [{}, {}]
         for ind in [0, 1]:#index of half
             sub_stats = {}
-            sub_stats = get_numpy_statistics( map(lambda x: x[ind], \
-                                                        all_results_modes), \
+            sub_stats = get_numpy_statistics( map(lambda x: x[ind],
+                                                        all_results_modes), 
                                              STATISTICS_MEASURES )
             for key in sub_stats.iterkeys():
-                statistics[ind]['mode_'+key] = sub_stats[key]
+                statistics[fname][ind]['mode_'+key] = sub_stats[key]
             
-            sub_stats = get_numpy_statistics( map(lambda x: x[ind], \
-                                                        all_results_words), \
+            sub_stats = get_numpy_statistics( map(lambda x: x[ind],
+                                                        all_results_words),
                                              STATISTICS_MEASURES )
             for key in sub_stats.iterkeys():
-                statistics[ind]['wordnum_'+key] = sub_stats[key]
-            
-        
+                statistics[fname][ind]['wordnum_'+key] = sub_stats[key]
+    
+    return statistics, mode_bigger, files
+
+def printable_elem(s):
+    '''
+    Return printable version of s.
+    '''
+    #check if integer
+    try:
+        int(s)
+        return str(s)
+    except:
+        #check if float:
+        if is_number(s):
+            return "%.4f" % s
+        else:
+            return s
+
+if __name__ == "__main__":
+    import sys
+    if len(sys.argv) < 2:
+        print "Parameter 1: a file with words in c-lab format."
+        exit(1)
+    clab_fname = sys.argv[1]#plik z c-lab
+    if len(sys.argv) < 3:
+        print "Parameter 2: an integer corresponding to a coordinate by which colours are separated."
+        exit(1)
+    coordinate = int(sys.argv[2])#podzial wzgledem ktorej wspolrzednej
+    if len(sys.argv) < 4:
+        print "Parameter 3: catalogue, where results of a simulation are stored."
+        exit(1)
+    cat = sys.argv[3]#katalog z wynikami
+
+    statistics, mode_bigger, files = gather_repeated_simulation_statistics(clab_fname, coordinate, cat)
+    
+    #=====print results=====#
+    
+    for fname in sorted(files, key=lambda x: string2prefix_num(x)):
         #=====print results for current fname=====#
         print str(string2prefix_num(fname))+":"
-        
-        def printable_elem(s):
-            #check if integer
-            try:
-                int(s)
-                return str(s)
-            except:
-                #check if float:
-                if is_number(s):
-                    return "%.4f" % s
-                else:
-                    return s
-            
+
         #print header
         res_line = ["Bigger_wins", "Smaller_wins", "|"] + \
             map(lambda x: "mode_"+x, STATISTICS_MEASURES) + \
@@ -110,11 +129,11 @@ if __name__ == "__main__":
             res_line.append( "|" )
             
             for key in STATISTICS_MEASURES:
-                res_line.append( statistics[ind]['mode_'+key] )
+                res_line.append( statistics[fname][ind]['mode_'+key] )
             res_line.append( "|" )
                 
             for key in STATISTICS_MEASURES:
-                res_line.append( statistics[ind]['wordnum_'+key] )
+                res_line.append( statistics[fname][ind]['wordnum_'+key] )
             
             print "\t".join([printable_elem(res) for res in res_line])
         

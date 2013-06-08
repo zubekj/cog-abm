@@ -10,13 +10,13 @@ from utils import *
 class TestGetWordCount(unittest.TestCase):
 
     def test_case1(self):
-        words_per_agent = {0: ["a", "b", "c", "b", 'None'], \
-                           1: ["a", "c", "e", "b", "f"], \
+        words_per_agent = {0: ["a", "b", "c", "b", 'None'],
+                           1: ["a", "c", "e", "b", "f"],
                            2: ["b", "c", "r", 'None', 'None']}
         
         expected_result = {0: {"a": 2, "b": 1}, 1: {"b": 1, "c": 2}, 
-                           2: {"c": 1, "e": 1, "r": 1}, \
-                           3: {"b": 2, 'None': 1}, \
+                           2: {"c": 1, "e": 1, "r": 1},
+                           3: {"b": 2, 'None': 1},
                            4: {'None': 2, "f": 1}}
         
         self.assertEqual(get_word_count(words_per_agent, nullify=False), expected_result)
@@ -26,8 +26,8 @@ class TestGetModaFractionListPerSet(unittest.TestCase):
     def test_case1(self):
         
         word_count = {0: {"a": 2, "b": 1}, 1: {"b": 1, "c": 2}, 
-                           2: {"c": 1, "e": 1, "r": 1}, \
-                           3: {"b": 2, 'None': 1}, \
+                           2: {"c": 1, "e": 1, "r": 1},
+                           3: {"b": 2, 'None': 1},
                            4: {'None': 2, "f": 1}}
         
         set1 = {0, 1, 2}
@@ -43,8 +43,8 @@ class TestAvgNumOfWordsPerAgentForSets(unittest.TestCase):
 
     def test_case1(self):
         
-        words_per_agent = {0: ["a", "b", "c", "b", 'None'], \
-                           1: ["a", "c", "e", "b", "f"], \
+        words_per_agent = {0: ["a", "b", "c", "b", 'None'],
+                           1: ["a", "c", "e", "b", "f"],
                            2: ["b", "c", "r", 'None', 'None']}
         
         set1 = {0, 1, 2}
