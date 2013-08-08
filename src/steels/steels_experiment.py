@@ -19,6 +19,7 @@ from steels import metrics
 from metrics import DS_A
 
 log = logging.getLogger('steels')
+log.level = logging.INFO
 
 
 class ReactiveUnit(object):
@@ -145,15 +146,15 @@ class SteelsClassifier(Classifier):
 
 class DiscriminationGame(Interaction):
 
-    def_inc_category_treshold = 0.95
-
-    def __init__(self, context_len=4, inc_category_treshold=None):
+    def __init__(self, context_len=4, inc_category_treshold=0.95):
         self.context_len = context_len
-        self.inc_category_treshold = def_value(inc_category_treshold,
-            DiscriminationGame.def_inc_category_treshold)
+        self.inc_category_treshold = inc_category_treshold
 
     def num_agents(self):
         return 2
+
+    def set_inc_category_treshold(self, new_inc_category_threshold):
+        self.inc_category_treshold = new_inc_category_threshold
 
     def save_result(self, agent, result):
         agent.add_payoff("DG", int(result))
@@ -243,6 +244,9 @@ class GuessingGame(Interaction):
 
     def num_agents(self):
         return 2
+
+    def set_inc_category_treshold(self, new_inc_category_threshold):
+        self.disc_game.set_inc_category_treshold(new_inc_category_threshold)
 
     def save_result(self, agent, result):
         agent.add_payoff("GG", int(result))
@@ -377,44 +381,30 @@ class SteelsAgentStateWithLexicon(SteelsAgentState):
 #Steels experiment main part
 
 
-def steels_uniwersal_basic_experiment(num_iter, agents,
-        interaction, classifier=SteelsClassifier, topology=None,
-        inc_category_treshold=None, dump_freq=50, stimuli=None, chooser=None):
+def steels_uniwersal_basic_experiment(num_iter, agents, interaction,
+        stimuli, topology=None, dump_freq=50, chooser=None):
 
     topology = topology or generate_simple_network(agents)
-
-#       if stimuli == None:
-#               stimuli = def_value(None, default_stimuli())
-
-    if inc_category_treshold is not None:
-        interaction.__class__.def_inc_category_treshold = inc_category_treshold
 
     chooser = chooser or RandomStimuliChooser(use_distance=True, distance=50.)
     env = Environment(stimuli, chooser)
     for agent in agents:
         agent.env = env
 
+    log.info("Running steels experiment with: %s", str({
+            'interaction': str(interaction),
+            'stimuli num': len(stimuli),
+            'chooser': str(chooser),
+            'num agents': len(agents),
+        }))
     s = Simulation(topology, interaction, agents)
     res = s.run(num_iter, dump_freq)
-
-#       import pprint
-#       print pprint.pprint(error_counter)
-    try:
-#               s = sum(error_counter.values())
-#               for k,v in error_counter.iteritems():
-#                       print "%s: %s" % (k, float(v)/s)
-        for a in agents:
-            print "[%s]:%s" % (len(a.state.lexicon.known_words()),
-                                                    a.state.lexicon.known_words())
-        print "OK"
-    except:
-        pass
 
     return res
 
 
 def steels_basic_experiment_DG(inc_category_treshold=0.95, classifier=None,
-        interaction_type="DG", beta=1., context_size=4, stimuli=None,
+        beta=1., context_size=4, stimuli=None,
         agents=None, dump_freq=50, alpha=0.1, sigma=1., num_iter=1000,
         topology=None):
 
@@ -429,15 +419,15 @@ def steels_basic_experiment_DG(inc_category_treshold=0.95, classifier=None,
     AdaptiveNetwork.def_alpha = float(alpha)
     AdaptiveNetwork.def_beta = float(beta)
     ReactiveUnit.def_sigma = float(sigma)
-    DiscriminationGame.def_inc_category_treshold = float(inc_category_treshold)
+    inc_category_treshold = float(inc_category_treshold)
 
     return steels_uniwersal_basic_experiment(num_iter, agents,
-        DiscriminationGame(context_size), topology=topology,
+        DiscriminationGame(context_size, inc_category_treshold), topology=topology,
             dump_freq=dump_freq, stimuli=stimuli)
 
 
 def steels_basic_experiment_GG(inc_category_treshold=0.95, classifier=None,
-        interaction_type="GG", beta=1., context_size=4, stimuli=None,
+        beta=1., context_size=4, stimuli=None,
         agents=None, dump_freq=50, alpha=0.1, sigma=1., num_iter=1000,
         topology=None):
 
@@ -455,8 +445,8 @@ def steels_basic_experiment_GG(inc_category_treshold=0.95, classifier=None,
     AdaptiveNetwork.def_alpha = float(alpha)
     AdaptiveNetwork.def_beta = float(beta)
     ReactiveUnit.def_sigma = float(sigma)
-    DiscriminationGame.def_inc_category_treshold = float(inc_category_treshold)
+    dg = DiscriminationGame(context_size, float(inc_category_treshold))
 
     return steels_uniwersal_basic_experiment(num_iter, agents,
-        GuessingGame(None, context_size), topology=topology,
-            dump_freq=dump_freq, stimuli=stimuli)
+        GuessingGame(dg), topology=topology, dump_freq=dump_freq,
+        stimuli=stimuli)

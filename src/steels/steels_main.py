@@ -81,11 +81,11 @@ if __name__ == "__main__":
 
     if opts.game is not None:
         params["interaction_type"] == opts.game
-
-    if params["interaction_type"] == "DG":
+    interaction_type = params.pop("interaction_type")
+    if interaction_type == "DG":
         #r = steels_basic_experiment_DG
         r = steels_basic_experiment_DG(**params)
-    elif params["interaction_type"] == "GG":
+    elif interaction_type == "GG":
         r = steels_basic_experiment_GG(**params)
 
     save_res((r, params), opts.file)
