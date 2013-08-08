@@ -38,6 +38,19 @@ class NumericResultCollector(object):
             yield self.column_names[i][1], \
                 zip(self.columns[i], self.columns[i + 1])
 
+    def iter_smart_columns(self):
+        i = 0
+        while i < len(self.columns):
+            i1 = i + 1
+            name = self.column_names[i][1]
+            if i1 < len(self.columns) and \
+                    name + self.ERR_SUFIX == self.column_names[i1][1]:
+                yield name, zip(self.columns[i], self.columns[i + 1])
+                i += 2
+            else:
+                yield name, (self.columns[i], self.columns[i])
+                i += 1
+
     def _save(self, f):
         f.write('# {0}\n'.format(json.dumps(self.column_names)))
         for r in self.iter_results_table():
