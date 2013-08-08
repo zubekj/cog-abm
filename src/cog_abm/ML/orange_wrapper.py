@@ -100,10 +100,10 @@ class OrangeClassifier(core.Classifier):
 
     def classify_pval(self, sample):
         if self.domain_with_cls is None:
-            return None
+            return None, 0.
         s = convert_sample(self.domain_with_cls, sample)
         v, p = self.classifier(s, orange.GetBoth)
-        return (self._extract_value(v), p[v])
+        return self._extract_value(v), p[v]
 
     def class_probabilities(self, sample):
         if self.domain_with_cls is None:
