@@ -74,6 +74,7 @@ def get_word_count(words_per_agent, nullify = True):
 	if nullify:
 		for ind in word_count.iterkeys():
 			word_count[ind][-1] = 0
+			word_count[ind]['-1'] = 0
 	
 	return dict(word_count)
 
@@ -194,6 +195,18 @@ def traverse_clab_file(lines):
 		splitted = line.split()
 		yield int(splitted[0]) - 1, (float(splitted[6]), float(splitted[7]), float(splitted[8]))
 
+def load_position2coordinates(chip_fname):
+	'''
+	Returns: position2coordinates - mapping from position of a colour in result file to its coordinates
+		in 2d plane.
+	'''
+	position2coordinates = {}
+	for l in open(chip_fname, 'U').xreadlines():
+		pos, x, y, _ = l.split()
+		position2coordinates[int(pos)] = (ord(x)-ord('A'), int(y))
+	return position2coordinates
+		
+
 def get_mode_word_stats(fname, clab_fname, coordinate):
 	'''
 	fname - path to a file with words saved.
@@ -237,6 +250,38 @@ def for_each_chip(f):
 				print "[for_each_chip] ERROR! no closing of munsell_chip found"
 			yield x, y, z
 
+def get_files(cat):
+	'''
+		Returns: files - ids of consecutive time stamps, used in statistics dictionary
+	'''
+	import os
+	cats = map(lambda x: cat+"//"+x, os.listdir(cat))
+	#assume that in each catalogue there are files named the same, which correspond to one another
+	files = os.listdir(cats[0])
+	return files
+
+import os
+def get_moda_dict(big_cat, fname):
+	'''
+	Returns: word_moda - dictionary mapping each colour to moda value.
+	'''
+	print "[get_intensity_matrix]: big_cat", big_cat, "fname:", fname
+	cats = map(lambda x: big_cat+"//"+x, os.listdir(big_cat))
+	
+	word_moda = {}
+	for cat in cats:
+		#read list of words per each color 
+		words_per_agent = read_words(open(cat+"/"+fname, 'r'))
+		#counts of words per each color
+		word_count = get_word_count(words_per_agent)
+		#convert to maximum, adding at once which corresponds to taking average
+		for key, item in word_count.iteritems():
+			word_moda[key] = word_moda.get(key, 0) + max(item.itervalues())
+	for key in word_moda.iterkeys():
+		word_moda[key] /= len(cats)
+	
+	return word_moda
+		
 if __name__ == "__main__":
 	import doctest
 	doctest.testmod()

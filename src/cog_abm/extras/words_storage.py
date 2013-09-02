@@ -27,6 +27,7 @@ def get_agents_words(agents, colour_order):
     for colour in colour_order:#stimuli:
         #add this colour to each agent:
         for ind, agent in enumerate(agents):
+            #print agent.sense_and_classify(colour), 
             word = agent.state.word_for(agent.sense_and_classify(colour))
             agentsdict[ind] = agentsdict.get(ind, []) + [word]
             
