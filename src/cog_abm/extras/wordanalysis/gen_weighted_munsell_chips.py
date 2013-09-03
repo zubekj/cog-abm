@@ -3,17 +3,8 @@ Created on Jan 2, 2013
 
 @author: mlukasik
 '''
-from utils import traverse_clab_file, get_median_in_clab
-from utils import for_each_chip
-def print_point(point):
-	'''Prints a point in a Munsell Chip manner.
-	'''
-	(x, y, z) = point
-	print "\t<munsell_chip>"
-	print "\t\t<L>%f</L>" % x
-	print "\t\t<a>%f</a>" % y
-	print "\t\t<b>%f</b>" % z
-	print "\t</munsell_chip>"
+from utils import traverse_clab_file, get_median_in_clab,\
+for_each_chip, print_munsell_chip
 
 def is_to_be_multiplied(point, coordinate, side, mid_pnt):
 	'''Checks if the conditions to be multipled are fulfilled.
@@ -60,9 +51,9 @@ if __name__ == "__main__":
 	print "<environment type=\"CIELab\">"
 	
 	for x, y, z in for_each_chip(open(fname, 'r')):
-		print_point((x, y, z))
+		print_munsell_chip((x, y, z))
 		if is_to_be_multiplied((x, y, z), coordinate, side, mid_pnt):
 			for _ in xrange(freq-1):
-				print_point((x, y, z))
+				print_munsell_chip((x, y, z))
 	
 	print "</environment>"

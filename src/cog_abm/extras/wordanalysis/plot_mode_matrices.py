@@ -6,10 +6,12 @@ Created on Sep 01, 2013
 
 Plot intensity matrices depicting modes. 
 '''
-from utils import string2prefix_num, get_files, get_moda_dict, load_position2coordinates
+from utils import string2prefix_num, get_files, get_moda_dict, load_position2coordinates,\
+ ensure_dir, get_borders_position2coordinates
 from scipy import matrix
 import scipy
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 if __name__ == "__main__":
     import sys
     if len(sys.argv) < 2:
@@ -18,16 +20,19 @@ if __name__ == "__main__":
         exit(1)
     chip_fname = sys.argv[1]#plik z c-lab
     if len(sys.argv) < 3:
-        print "Parameter 2: catalogue, where results of a simulation are stored."
+        print "Parameter 2: catalogue, where results of a simulation to be analyzed are stored."
         exit(1)
-    cat = sys.argv[2]#katalog z wynikami
+    cat = sys.argv[2]#katalog z danymi
+    if len(sys.argv) < 4:
+        print "Parameter 3: catalogue, where pictures resulting from this script are to be stored."
+        exit(1)
+    res_cat = sys.argv[3]#katalog z wynikami
+    print "res_cat:", res_cat
+    ensure_dir(res_cat)
     
     position2coordinates = load_position2coordinates(chip_fname)
     print "position2coordinates:", position2coordinates 
-    min_x = min(map(lambda (x, y): x, position2coordinates.itervalues()))
-    max_x = max(map(lambda (x, y): x, position2coordinates.itervalues()))
-    min_y = min(map(lambda (x, y): y, position2coordinates.itervalues()))
-    max_y = max(map(lambda (x, y): y, position2coordinates.itervalues()))
+    min_x, max_x, min_y, max_y = get_borders_position2coordinates(position2coordinates)
     print "min_x:", min_x
     print "max_x:", max_x
     print "min_y:", min_y
@@ -46,14 +51,14 @@ if __name__ == "__main__":
         for key, moda in word_moda.iteritems():
             x, y = position2coordinates[key+1]
             mtx[x][y] = moda
-            if y == 1:
-                print moda
-        print "======="
-        for x in xrange(min_x, max_x+1):
-            print mtx[x][1]
-        print matrix(mtx)
+        #print matrix(mtx)
         #matrices[string2prefix_num(fname)] = ...
         #scipy.misc.imsave(str(string2prefix_num(fname))+'.jpg', matrix(mtx))
-        plt.imshow(matrix(mtx)) #Needs to be in row,col order
-        plt.savefig(str(string2prefix_num(fname))+'.jpg')
+        ax = plt.gca()
+        ax.patch.set_alpha(0.0)
+        img = plt.imshow(matrix(mtx))#, cmap=cm.Greys_r) #Needs to be in row,col order
+        # make a color bar
+        plt.colorbar(img)
+        plt.savefig(res_cat+str(string2prefix_num(fname))+'.jpg', bbox_inches='tight')
+        plt.close()
 

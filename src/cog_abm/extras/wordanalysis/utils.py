@@ -195,6 +195,12 @@ def traverse_clab_file(lines):
 		splitted = line.split()
 		yield int(splitted[0]) - 1, (float(splitted[6]), float(splitted[7]), float(splitted[8]))
 
+def load_clab(lines):
+	clab = {}
+	for pos, (L, a, b) in traverse_clab_file(lines):
+		clab[pos] = (L, a, b)
+	return clab
+
 def load_position2coordinates(chip_fname):
 	'''
 	Returns: position2coordinates - mapping from position of a colour in result file to its coordinates
@@ -205,7 +211,28 @@ def load_position2coordinates(chip_fname):
 		pos, x, y, _ = l.split()
 		position2coordinates[int(pos)] = (ord(x)-ord('A'), int(y))
 	return position2coordinates
-		
+
+def load_coordinates2position(chip_fname):
+	'''
+	Returns: coordinates2position - mapping from coordinates
+		in 2d plane to position of a colour in result file.
+	'''
+	coordinates2position = {}
+	for l in open(chip_fname, 'U').xreadlines():
+		pos, x, y, _ = l.split()
+		coordinates2position[(ord(x)-ord('A'), int(y))] = int(pos) 
+	return coordinates2position
+
+def get_borders_position2coordinates(position2coordinates):
+	'''
+	Returns borders of coordinates.
+	'''
+	min_x = min(map(lambda (x, y): x, position2coordinates.itervalues()))
+	max_x = max(map(lambda (x, y): x, position2coordinates.itervalues()))
+	min_y = min(map(lambda (x, y): y, position2coordinates.itervalues()))
+	max_y = max(map(lambda (x, y): y, position2coordinates.itervalues()))
+	return min_x, max_x, min_y, max_y
+
 
 def get_mode_word_stats(fname, clab_fname, coordinate):
 	'''
@@ -250,23 +277,31 @@ def for_each_chip(f):
 				print "[for_each_chip] ERROR! no closing of munsell_chip found"
 			yield x, y, z
 
+#############################################################################################################
+
+import os
+def get_nested_catalogues(cat):
+	'''
+		Returns: cats - catalogues from cat
+	'''
+	cats = map(lambda x: cat+"//"+x, os.listdir(cat))
+	return cats
+	
+
 def get_files(cat):
 	'''
 		Returns: files - ids of consecutive time stamps, used in statistics dictionary
 	'''
-	import os
-	cats = map(lambda x: cat+"//"+x, os.listdir(cat))
 	#assume that in each catalogue there are files named the same, which correspond to one another
+	cats = get_nested_catalogues(cat)
 	files = os.listdir(cats[0])
 	return files
 
-import os
-def get_moda_dict(big_cat, fname):
+def get_moda_dict(arg_cat, fname):
 	'''
 	Returns: word_moda - dictionary mapping each colour to moda value.
 	'''
-	print "[get_intensity_matrix]: big_cat", big_cat, "fname:", fname
-	cats = map(lambda x: big_cat+"//"+x, os.listdir(big_cat))
+	cats = get_nested_catalogues(arg_cat)
 	
 	word_moda = {}
 	for cat in cats:
@@ -281,7 +316,29 @@ def get_moda_dict(big_cat, fname):
 		word_moda[key] /= len(cats)
 	
 	return word_moda
-		
+
+#############################################################################################################
+
+def ensure_dir(f):
+	'''
+	Ensures that dir f exists, if not then creates it
+	'''
+	d = os.path.dirname(f)
+	if not os.path.exists(d):
+		os.makedirs(d)
+
+#############################################################################################################
+import sys
+def print_munsell_chip(point, fout=sys.stdout):
+	'''Prints a point in a Munsell Chip manner.
+	'''
+	(x, y, z) = point
+	fout.write("\t<munsell_chip>\n")
+	fout.write("\t\t<L>%f</L>\n" % x)
+	fout.write("\t\t<a>%f</a>\n" % y)
+	fout.write("\t\t<b>%f</b>\n" % z)
+	fout.write("\t</munsell_chip>\n")
+	
 if __name__ == "__main__":
 	import doctest
 	doctest.testmod()
