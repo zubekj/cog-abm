@@ -7,18 +7,7 @@ from utils import load_clab, load_position2coordinates, load_coordinates2positio
 for_each_chip, print_munsell_chip, get_borders_position2coordinates
 import matplotlib.pyplot as plt
 from scipy import matrix
-	
-def is_to_be_multiplied(x, y):
-	'''
-	This function returns boolean if a given point in 2d should be multiplied or not.
-	'''
-	#Letter H
-	if y == 30 or y == 31: #y == 10 or y == 11 or 
-		return True
-	#elif (x == 5 or x == 4) and (y >= 10 or y <= 30):
-#		return True
-	else:
-		return False
+from params import *
 
 if __name__ == "__main__":
 	import sys
