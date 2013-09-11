@@ -18,7 +18,19 @@ def H(x, y):
     else:
         return False
 
+def two_circles(x, y):
+    if ((x-5)**2 + (y-30)**2 < 11) or( (x-5)**2 + (y-10)**2 < 11): 
+        return True
+    return False
 
+
+freq = 100
+munsell_fname = "../wcs_input_data/330WCS.xml"
+clab_fname = "../wcs_input_data/c-lab-330.txt"
+chip_fname = "../wcs_input_data/chip.txt"
+out_fname = "../wcs_input_data/330WCS_two_circles.xml"
+out_picname = "../wcs_input_data/330WCS_two_circles.png"
+cat = "../../../steels/simulations_two_circles"
+res_cat = "pictures_two_circles"
 #This function returns boolean if a given point in 2d should be multiplied or not.
-is_to_be_multiplied = ellipse
-    
+is_to_be_multiplied = two_circles

@@ -12,8 +12,9 @@ from scipy import matrix
 import scipy
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
+from params import *
 if __name__ == "__main__":
-    import sys
+    """import sys
     if len(sys.argv) < 2:
         print "Parameter 1: a file with words in chip format (probably available only for"+\
             " 330 munsell chips, since it is used to map a chip to its 2d coordinates."
@@ -28,7 +29,7 @@ if __name__ == "__main__":
         exit(1)
     res_cat = sys.argv[3]#katalog z wynikami
     print "res_cat:", res_cat
-    ensure_dir(res_cat)
+    ensure_dir(res_cat)"""
     
     position2coordinates = load_position2coordinates(chip_fname)
     print "position2coordinates:", position2coordinates 
@@ -59,6 +60,7 @@ if __name__ == "__main__":
         img = plt.imshow(matrix(mtx))#, cmap=cm.Greys_r) #Needs to be in row,col order
         # make a color bar
         plt.colorbar(img)
+        plt.clim(0,8)
         plt.savefig(res_cat+str(string2prefix_num(fname))+'.jpg', bbox_inches='tight')
         plt.close()
 
