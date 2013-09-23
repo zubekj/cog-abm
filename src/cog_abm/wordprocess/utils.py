@@ -317,6 +317,40 @@ def get_moda_dict(arg_cat, fname):
 	
 	return word_moda
 
+def get_modacolor_dict(arg_cat, fname):
+	'''
+	Returns: word_modacolor - dictionary mapping each colour to its name taken from moda.
+	'''
+	cats = get_nested_catalogues(arg_cat)
+	
+	word_modacolor = {}
+	for cat in cats:
+		#read list of words per each color 
+		words_per_agent = read_words(open(cat+"/"+fname, 'r'))
+		#counts of words per each color
+		word_count = get_word_count(words_per_agent)
+		#find the most frequent colour:
+		for key, item in word_count.iteritems():
+			highest = 0
+			for color, intensity in item.iteritems():
+				if intensity > highest:
+					word_modacolor[key] = color
+	
+	return word_modacolor
+
+def convert_modacolor_to_naturals(word_modacolor):
+	'''
+	Assigns a natural number to each colour.
+	'''
+	color2natural = {}
+	next_natural = 1
+	for key in word_modacolor:
+		if word_modacolor[key] not in color2natural:
+			color2natural[word_modacolor[key]] = next_natural
+			next_natural += 1
+		word_modacolor[key] = color2natural[word_modacolor[key]]
+	return word_modacolor
+	
 #############################################################################################################
 
 def ensure_dir(f):
@@ -338,6 +372,19 @@ def print_munsell_chip(point, fout=sys.stdout):
 	fout.write("\t\t<a>%f</a>\n" % y)
 	fout.write("\t\t<b>%f</b>\n" % z)
 	fout.write("\t</munsell_chip>\n")
+	
+def rescale(mtx_orig, p):
+	'''
+	Rescales mtx, printing each cell p times.
+	'''
+	mtx = [[0 for _ in xrange(p*len(mtx_orig[0]))] for _ in xrange(p*len(mtx_orig))]
+	for ri, row in enumerate(mtx_orig):
+		for ci, cell in enumerate(row):
+			for i in xrange(p): 
+				for j in xrange(p):
+			 		mtx[p*ri+i][p*ci+j] = cell
+	return mtx
+	
 	
 if __name__ == "__main__":
 	import doctest
