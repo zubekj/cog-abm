@@ -10,7 +10,7 @@ from scipy import matrix
 from params import *
 
 if __name__ == "__main__":
-	import sys
+	"""import sys
 	if len(sys.argv) < 2:
 		print "1. parameter: how many times frequent points are going to be multiplied."
 		sys.exit(1)
@@ -34,7 +34,7 @@ if __name__ == "__main__":
 	if len(sys.argv) < 7:
 		print "6. parameter: path to a 2d picture of result Munsell chips file."
 		sys.exit(1)
-	out_picname = sys.argv[6]
+	out_picname = sys.argv[6]"""
 
 	fout = open(out_fname, 'w')
 

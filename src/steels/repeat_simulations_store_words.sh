@@ -6,5 +6,6 @@ for ((num = 1; num <= $3; num++)); do
 	mkdir -p $2'_'$num/
 	python steels_main.py -p $1;
 	mv *words.pout $2'_'$num/
+	rm experiment*
 done
 
