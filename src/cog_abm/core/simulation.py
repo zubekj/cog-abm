@@ -28,9 +28,10 @@ class Simulation(object):
         self.interaction = interaction
         self.agents = tuple(agents)
         self.statistic = []
-        self.dump_often = False
+        self.dump_often = True
         self.pb = pb
         self.colour_order = colour_order
+        print colour_order
 
     def dump_results(self, iter_num):
         cc = copy.deepcopy(self.agents)

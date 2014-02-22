@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <simulation>
-	<history freq="50"/>
+	<history freq="1000"/>
 	<network source="graph2.xml"/>
 	<agents source="agent2.xml"/>
 
@@ -16,9 +16,10 @@
 		</params>
 	</interaction>
 
-	<environment name="global" source="../cog_abm/extras/1269_munsell_chips.xml">
+	<environment name="global" source="../../data/wcs_input_data/1269_munsell_chips_reconstructed.xml">
 		<params>
 			<distance value="50"/>
+			<word_naming_per_color value="../../data/wcs_input_data/c-lab-1268.txt"/>
 		</params>
 	</environment>
 
