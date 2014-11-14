@@ -32,10 +32,10 @@ class Color(Sample):
 def get_WCS_colors():
     from cog_abm.extras.parser import Parser
     return Parser().parse_environment(
-        os.path.join(os.path.dirname(__file__), "330WCS.xml")).stimuli
+        os.path.join(os.path.dirname(__file__), "../../../data/wcs_input_data/330WCS.xml")).stimuli
 
 
 def get_1269Munsell_chips():
     from cog_abm.extras.parser import Parser
     return Parser().parse_environment(os.path.join(os.path.dirname(__file__),
-        "1269_munsell_chips.xml")).stimuli
+        "../../../data/wcs_input_data/1269_munsell_chips.xml")).stimuli

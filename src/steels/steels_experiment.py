@@ -471,7 +471,7 @@ def steels_basic_experiment_DG(inc_category_treshold=0.95, classifier=None,
 
     # FIX THIS !!
     for agent in agents:
-        agent.set_state(SteelsAgentState(classifier(*classif_arg)))
+        agent.set_state(SteelsAgentStateWithLexicon(classifier(*classif_arg)))
         agent.set_sensor(SimpleSensor())
         agent.set_fitness_measure("DG", metrics.get_DS_fitness())
 
