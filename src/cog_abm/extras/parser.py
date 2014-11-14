@@ -7,6 +7,7 @@ from cog_abm.core.network import Network
 from cog_abm.core.agent import *
 from cog_abm.core.environment import *
 from cog_abm.extras.color import Color
+from cog_abm.extras.extract_colour_order import extract_colour_order
 
 
 class Parser(object):
@@ -155,6 +156,7 @@ class Parser(object):
             environments[env_name] = self.parse_environment(env_source, env)
 
         dictionary['stimuli'] = environments['global'].stimuli
+        dictionary['environment'] = environments['global']
         dictionary["agents"] = self.parse_agents(self.return_if_exist
             (sock, "agents", "source", str), dictionary["topology"])
 
@@ -185,13 +187,19 @@ class Parser(object):
         params = self.return_element_if_exist(main_sock, "params", False)
 
         chooser = None
+        colour_order = None
         if params is not None:
             dist = self.return_if_exist(params, "distance", "value", float)
             chooser = RandomStimuliChooser(use_distance=True, distance=dist)
+            
+            word_naming_per_color = \
+            self.return_if_exist(params, "word_naming_per_color", "value", str)
+            if word_naming_per_color:
+                colour_order = extract_colour_order(list_of_stimuli, word_naming_per_color)
         else:
             chooser = RandomStimuliChooser()
 
-        return Environment(list_of_stimuli, chooser)
+        return Environment(list_of_stimuli, chooser, colour_order)
 
     def parse_discrimination_game(self, inter):
         params = self.return_element_if_exist(inter, "params", False)

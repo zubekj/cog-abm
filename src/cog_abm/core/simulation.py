@@ -7,6 +7,7 @@ from time import time
 import copy
 import cPickle
 from ..extras.tools import get_progressbar
+from ..extras.words_storage import store_words
 
 log = logging.getLogger('COG-ABM')
 
@@ -18,15 +19,19 @@ class Simulation(object):
     This class defines what happens and when.
     """
 
-    def __init__(self, graph=None, interaction=None, agents=None, pb=False):
+    def __init__(self, graph=None, interaction=None, agents=None, pb=False, 
+                 colour_order=None):
         ''' pb - show progress bar
+            colour_order - list of colours in the order used when storing agents words
         '''
         self.graph = graph
         self.interaction = interaction
         self.agents = tuple(agents)
         self.statistic = []
-        self.dump_often = False
+        self.dump_often = True
         self.pb = pb
+        self.colour_order = colour_order
+        print colour_order
 
     def dump_results(self, iter_num):
         cc = copy.deepcopy(self.agents)
@@ -37,6 +42,8 @@ class Simulation(object):
             f = open(str(iter_num) + ".pout", "wb")
             cPickle.dump(kr, f, PICKLE_PROTOCOL)
             f.close()
+            if self.colour_order:
+                store_words(self.agents, self.colour_order, str(iter_num)+"words.pout")
 
     def _choose_agents(self):
         if self.interaction.num_agents() == 2:

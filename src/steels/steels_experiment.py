@@ -256,17 +256,38 @@ class GuessingGame(Interaction):
 
     def learning_after_hearer_doesnt_know_word(self, topic, context, f,
             sp, hr, spctopic):
+        #agent hr plays discrimination game on context and topic
+        #The game returns: succ (boolean whether the game ended in success) 
+        #and hectopic (the category to which topic belongs)
         succ, hectopic = self.disc_game.play_save(hr, context, topic)
 
+        #if hr succesfuly played discrimination game:
         if succ:
+            #add word f to category hectopic
+            #=================================================================
+            #MAYBE HERE IS A GOOD PLACE TO PUT ADDITIONAL CONDITION
+            #=================================================================
             hr.state.lexicon.add_element(hectopic, f)
+        #if hr does not discriminate the topic from context:
         else:
+            #hr learns to discriminate:
             self.disc_game.learning_after(hr, topic, succ, hectopic)
+            #get the category of hr to which topic belongs to after learning:
             class_id = hr.sense_and_classify(topic)
+            #add word f to category hectopic in agent hr
+            #=================================================================
+            #MAYBE HERE IS A GOOD PLACE TO PUT ADDITIONAL CONDITION?
+            #=================================================================
             hr.state.lexicon.add_element(class_id, f)
 
     def learning_after_game_succeeded(self, word, topic, context,
             sp, spc, hr, hrc):
+        """
+        sp - speaker
+        spc - category of speaker for topic
+        hr - hearer
+        hrc - category of hearer for topic
+        """
         sp.state.lexicon.inc_dec_categories(spc, word)
         # ^^ as in 4.2 1.(a)
         hr.state.lexicon.inc_dec_words(hrc, word)
@@ -287,42 +308,74 @@ class GuessingGame(Interaction):
         self.disc_game.learning_after(hr, topic, False)
 
     def guess_game(self, speaker, hearer):
+        """
+        The most important method: the guessing game logic.
+        
+        Each line explained by a comment.
+        """
 
+        #Get list of stimuli known by the speaker:
         env = speaker.get_environment()
+        #Get a random list of stimuli from env of size self.disc_game.context_len:
         context = env.get_stimuli(self.disc_game.context_len)
 
+        #The first element of this context is topic:
         topic = context[0]
-        # ^^^^ they are already shuffled
-        # this is needed when other samples may be more similar to each other
-
+        
+        #The speaker plays the discrimination game on the selected context and topic. 
+        #The game returns: succ (boolean whether the game ended in success) 
+        #and spctopic (the speaker's category to which topic belongs)
         succ, spctopic = self.disc_game.play_save(speaker, context, topic)
-        # succ, spctopic, _, _ =\
-        #           self.disc_game.play_learn_save(speaker, context, topic)
 
+        #If the speaker did not discriminate the topic from the rest of the context himself:
         if not succ:
+            #learn by himself this discrimination:
             self.learning_after_speaker_DG_fail(speaker, topic, spctopic)
+            #do not proceed further:
             return False
-
+        
+        #f = word that speaker uses to call the spctopic category
         f = speaker.state.word_for(spctopic)
+        #if there is no word that speaker has for this category:
         if f is None:
+            #a random word is chosen for this category and added:
             f = speaker.state.lexicon.add_element(spctopic)
 
+        #hcategory = a category that hearer thinks of when using the word f:
         hcategory = hearer.state.category_for(f)
+        #if there is no category for word f in hearer's memory:
         if hcategory is None:
+            #the hearer learns a new word: 
+            #if he discriminates topic from context, a new word is added
+            #if he does not, he first learns to discriminate and only then learns a new word
+            #=================================================================
+            #MAYBE HERE IS A GOOD PLACE TO PUT THE CONDITION: INSIDE THE METHOD:
+            #learning_after_hearer_doesnt_know_word
+            #=================================================================
             self.learning_after_hearer_doesnt_know_word(topic,
                 context, f, speaker, hearer, spctopic)
             return False
 
+        #randomly shuffle the context: 
         random.shuffle(context)
+        #Choose a stimulus from context, which is most characteristic to the hcategory 
         max_hr_sample = self.find_best_matching_sample_to_category(hearer,
             context, hcategory)
 
-        # checking game result
+        # checking game result: is the strongest activated stimulus same as topic?
         succ = max_hr_sample == topic
+        
+        #if it is the same:
         if succ:
+            #increase the confidence in word for topic in both speaker and hearer:
+            #this is a symetric function from the perspective of speaker and hearer:
             self.learning_after_game_succeeded(f, topic, context,
                 speaker, spctopic, hearer, hcategory)
+            
+        #if it is different:
         else:
+            #decrease the confidence in word for topic in both speaker and hearer:
+            #further, learning on hearer performed but without use of word f
             self.learning_after_agents_mismatched_words(topic,
                 speaker, f, spctopic, hearer, f, hcategory)
         return succ
@@ -381,13 +434,19 @@ class SteelsAgentStateWithLexicon(SteelsAgentState):
 #Steels experiment main part
 
 
-def steels_uniwersal_basic_experiment(num_iter, agents, interaction,
-        stimuli, topology=None, dump_freq=50, chooser=None):
+def steels_uniwersal_basic_experiment(num_iter, agents,
+        interaction, stimuli, topology=None,
+        dump_freq=50, chooser=None, env=None):
 
     topology = topology or generate_simple_network(agents)
 
-    chooser = chooser or RandomStimuliChooser(use_distance=True, distance=50.)
-    env = Environment(stimuli, chooser)
+#       if stimuli == None:
+#               stimuli = def_value(None, default_stimuli())
+
+    if env is None:
+        chooser = chooser or RandomStimuliChooser(use_distance=True, distance=distance)
+        env = Environment(stimuli, chooser)
+
     for agent in agents:
         agent.env = env
 
@@ -397,7 +456,7 @@ def steels_uniwersal_basic_experiment(num_iter, agents, interaction,
             'chooser': str(chooser),
             'num agents': len(agents),
         }))
-    s = Simulation(topology, interaction, agents)
+    s = Simulation(topology, interaction, agents, colour_order=env.colour_order)
     res = s.run(num_iter, dump_freq)
 
     return res
@@ -406,7 +465,7 @@ def steels_uniwersal_basic_experiment(num_iter, agents, interaction,
 def steels_basic_experiment_DG(inc_category_treshold=0.95, classifier=None,
         beta=1., context_size=4, stimuli=None,
         agents=None, dump_freq=50, alpha=0.1, sigma=1., num_iter=1000,
-        topology=None):
+        topology=None, environment=None):
 
     classifier, classif_arg = SteelsClassifier, []
 
@@ -423,13 +482,12 @@ def steels_basic_experiment_DG(inc_category_treshold=0.95, classifier=None,
 
     return steels_uniwersal_basic_experiment(num_iter, agents,
         DiscriminationGame(context_size, inc_category_treshold), topology=topology,
-            dump_freq=dump_freq, stimuli=stimuli)
-
+            dump_freq=dump_freq, stimuli=stimuli, env=environment)
 
 def steels_basic_experiment_GG(inc_category_treshold=0.95, classifier=None,
         beta=1., context_size=4, stimuli=None,
         agents=None, dump_freq=50, alpha=0.1, sigma=1., num_iter=1000,
-        topology=None):
+        topology=None, environment=None):
 
     classifier, classif_arg = SteelsClassifier, []
     #agents = [Agent(SteelsAgentStateWithLexicon(classifier()), SimpleSensor())\
@@ -449,4 +507,4 @@ def steels_basic_experiment_GG(inc_category_treshold=0.95, classifier=None,
 
     return steels_uniwersal_basic_experiment(num_iter, agents,
         GuessingGame(dg), topology=topology, dump_freq=dump_freq,
-        stimuli=stimuli)
+        stimuli=stimuli, env=environment)
