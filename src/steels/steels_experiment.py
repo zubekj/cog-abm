@@ -434,7 +434,7 @@ class SteelsAgentStateWithLexicon(SteelsAgentState):
 #Steels experiment main part
 
 
-def steels_uniwersal_basic_experiment(num_iter, agents,
+def steels_universal_basic_experiment(num_iter, agents,
         interaction, stimuli, topology=None,
         dump_freq=50, chooser=None, env=None):
 
@@ -480,7 +480,7 @@ def steels_basic_experiment_DG(inc_category_treshold=0.95, classifier=None,
     ReactiveUnit.def_sigma = float(sigma)
     inc_category_treshold = float(inc_category_treshold)
 
-    return steels_uniwersal_basic_experiment(num_iter, agents,
+    return steels_universal_basic_experiment(num_iter, agents,
         DiscriminationGame(context_size, inc_category_treshold), topology=topology,
             dump_freq=dump_freq, stimuli=stimuli, env=environment)
 
@@ -505,6 +505,6 @@ def steels_basic_experiment_GG(inc_category_treshold=0.95, classifier=None,
     ReactiveUnit.def_sigma = float(sigma)
     dg = DiscriminationGame(context_size, float(inc_category_treshold))
 
-    return steels_uniwersal_basic_experiment(num_iter, agents,
+    return steels_universal_basic_experiment(num_iter, agents,
         GuessingGame(dg), topology=topology, dump_freq=dump_freq,
         stimuli=stimuli, env=environment)
