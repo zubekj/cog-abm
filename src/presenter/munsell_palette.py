@@ -61,8 +61,8 @@ class AgentData(object):
                 #print "normal"
                 focal = self.find_focal_point(set)
             #elif (key <> None):
-        else:
-            focal = self.strength_find_focal_point(agent, key, 
+            else:
+                focal = self.strength_find_focal_point(agent, key, 
                     category_set, set)
 
             focals[focal] = None
@@ -276,11 +276,11 @@ class WCSPalette(object):
         self.pangolayout.set_font_description(pango.
                 FontDescription(PANGO_FONT))
 
-        def area_expose(self, area, event):
-            #self.style = self.area.get_style()
-            #self.gc = self.style.fg_gc[gtk.STATE_NORMAL]
-            #self.gc = self.area.window.new_gc()
-            self.paint_cellars()
+    def area_expose(self, area, event):
+        #self.style = self.area.get_style()
+        #self.gc = self.style.fg_gc[gtk.STATE_NORMAL]
+        #self.gc = self.area.window.new_gc()
+        self.paint_cellars()
 
     def show(self):
         self.area.show()
@@ -343,8 +343,8 @@ class WCSPalette(object):
                 self.area.window.draw_line(self.gc, 0, (1+i)*space, 
                         space-1, (1+i)*space)
 
-                def create_palette_labels(self):
-                    space = self.CELLAR_SIZE + self.CELLAR_SPACE
+    def create_palette_labels(self):
+        space = self.CELLAR_SIZE + self.CELLAR_SPACE
         self.gc.set_rgb_fg_color(gtk.gdk.color_parse("black"))
         for i in xrange(1, 41):
             col = (1 + i) * space
@@ -358,9 +358,9 @@ class WCSPalette(object):
             self.area.window.draw_layout(self.gc, space+2, i*space+2, 
                     self.pangolayout)
 
-            class WCSAgent(WCSPalette):
-                def __init__(self, colors):
-                    super(WCSAgent, self).__init__(colors)
+class WCSAgent(WCSPalette):
+    def __init__(self, colors):
+        super(WCSAgent, self).__init__(colors)
         self.current_iteration = 0
         self.agent_data = None
 
@@ -405,9 +405,9 @@ class WCSPalette(object):
                     CELLAR_SIZE + self.CELLAR_SPACE)+1, wheel_size, 
                     wheel_size, 0, 23040)
 
-                class WCSAgentWithLegend(WCSAgent):
-                    def __init__(self, colors):
-                        super(WCSAgentWithLegend, self).__init__(colors)
+class WCSAgentWithLegend(WCSAgent):
+    def __init__(self, colors):
+        super(WCSAgentWithLegend, self).__init__(colors)
         self.legend = gtk.DrawingArea()
         self.legend.connect("expose-event", self.legend_expose)
 
@@ -424,8 +424,8 @@ class WCSPalette(object):
         self.paint_legend(self.current_iteration, 
                 self.agent_data.focals[self.current_iteration])
 
-        def paint_legend(self, iter, focals = {}):
-            self.current_iteration = iter
+    def paint_legend(self, iter, focals = {}):
+        self.current_iteration = iter
         self.gc = self.legend.window.new_gc()
         self.legend.window.clear()
         column = 0
@@ -515,7 +515,6 @@ class MunsellPaletteInterface(object):
         (self.iterations, self.result_set) = zip(*zipped)
 
     def get_iteration_from_file(self, source):
-        print(source)
         with open(source, 'r') as file:
             tuple = cPickle.load(file)
 
@@ -555,8 +554,8 @@ class MunsellPaletteInterface(object):
         self.scrolled_window.set_size_request(MAIN_CONTAINER_REQUESTED_WIDTH, 
                 MAIN_CONTAINER_REQUESTED_HEIGHT)
 
-        def create_agent_panel(self, number):
-            combo = gtk.combo_box_new_text()
+    def create_agent_panel(self, number):
+        combo = gtk.combo_box_new_text()
         for i in xrange(self.agents_size):
             combo.append_text("Agent " + str(i))
 
@@ -631,9 +630,9 @@ class MunsellPaletteInterface(object):
             self.cat_size_labels[i].set_text("Number of categories: " + 
                     str(self.agent_WCSTable[i].get_number_of_categories(iter)))
 
-            def init_WCSTable_to_agent_data(self):
-                for tuple in zip(self.agents_data, self.agent_WCSTable):
-                    tuple[1].set_agent_data(tuple[0])
+    def init_WCSTable_to_agent_data(self):
+        for tuple in zip(self.agents_data, self.agent_WCSTable):
+            tuple[1].set_agent_data(tuple[0])
 
     def convert_to_RGB(self, color):
         #c1 = grapefruit.Color.NewFromLab(color.L, color.a/100, color.b/100, wref=grapefruit.Color.WHITE_REFERENCE['std_D50'])
@@ -644,8 +643,8 @@ class MunsellPaletteInterface(object):
                 color.a/100, color.b/100, wref=grapefruit.Color.
                 WHITE_REFERENCE['std_D65'])
 
-        def main(self):
-            gtk.main()
+    def main(self):
+        gtk.main()
 
 class MunsellPaletteInterfaceWithLanguage(MunsellPaletteInterface):
     def set_agents_data(self, find_focal):
@@ -738,9 +737,9 @@ class MunsellPaletteInterfaceWithLanguage(MunsellPaletteInterface):
         self.population_cat_label.set_text("Number of categories: " + str(self.
             population.get_number_of_categories(self.current_iteration)))
 
-        def init_WCSTable_to_agent_data(self):
-            super(MunsellPaletteInterfaceWithLanguage, self). \
-                    init_WCSTable_to_agent_data()
+    def init_WCSTable_to_agent_data(self):
+        super(MunsellPaletteInterfaceWithLanguage, self). \
+                init_WCSTable_to_agent_data()
         self.population_view.set_agent_data(self.population)
 
 if __name__ == "__main__":
@@ -772,4 +771,4 @@ if __name__ == "__main__":
         mpi = MunsellPaletteInterface(opts.directory, opts.agents, 
                 opts.find_focal)
 
-        mpi.main()
+    mpi.main()
