@@ -52,7 +52,7 @@ class Parser(object):
             sock = xml.dom.minidom.parse(file)
             return sock
 
-    def parse_agent(self, agent, network):
+    def parse_agent(self, agent, network, network2=None):
         """
         Parse agent properties when given as DOM object.
 
@@ -74,9 +74,11 @@ class Parser(object):
         agent = Agent()
         if network is not None:
             network.add_agent(agent, node_name)
+        if network2 is not None:
+            network2.add_agent(agent, node_name)
         return agent
 
-    def parse_agents(self, source, network):
+    def parse_agents(self, source, network, network2=None):
         """
         Parse agents when given in xml.
 
@@ -92,7 +94,7 @@ class Parser(object):
         sock = self.build_DOM(source)
         agent_sock = sock.getElementsByTagName("agent")
         for agent in agent_sock:
-            agents.append(self.parse_agent(agent, network))
+            agents.append(self.parse_agent(agent, network, network2))
 
         return agents
 
@@ -147,6 +149,10 @@ class Parser(object):
         "freq", int)
         dictionary["topology"] = self.parse_graph(self.return_if_exist
             (sock, "network", "source", str))
+        topology2 = self.parse_graph(self.return_if_exist(sock, "network2",
+                                                          "source", str))
+        if topology2 is not None:
+            dictionary["topology2"] = topology2
 
         environments = {}
         envs = sock.getElementsByTagName("environment")
@@ -158,7 +164,7 @@ class Parser(object):
         dictionary['stimuli'] = environments['global'].stimuli
         dictionary['environment'] = environments['global']
         dictionary["agents"] = self.parse_agents(self.return_if_exist
-            (sock, "agents", "source", str), dictionary["topology"])
+            (sock, "agents", "source", str), dictionary["topology"], topology2)
 
         #inters = sock.getElementsByTagName("interaction")
         inter = self.return_element_if_exist(sock, "interaction", False)
@@ -191,7 +197,7 @@ class Parser(object):
         if params is not None:
             dist = self.return_if_exist(params, "distance", "value", float)
             chooser = RandomStimuliChooser(use_distance=True, distance=dist)
-            
+
             word_naming_per_color = \
             self.return_if_exist(params, "word_naming_per_color", "value", str)
             if word_naming_per_color:

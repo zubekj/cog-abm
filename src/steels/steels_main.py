@@ -73,7 +73,7 @@ if __name__ == "__main__":
     sys.path.append('../')
     sys.path.append('')
     from steels.steels_experiment import steels_basic_experiment_DG, \
-        steels_basic_experiment_GG
+        steels_basic_experiment_GG, steels_experiment_GG_topology_shift
 
     params = load_params(opts.param_file)
 
@@ -86,6 +86,9 @@ if __name__ == "__main__":
         #r = steels_basic_experiment_DG
         r = steels_basic_experiment_DG(**params)
     elif interaction_type == "GG":
-        r = steels_basic_experiment_GG(**params)
+        if "topology2" in params:
+            r = steels_experiment_GG_topology_shift(**params)
+        else:
+            r = steels_basic_experiment_GG(**params)
 
     save_res((r, params), opts.file)

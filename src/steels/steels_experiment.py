@@ -257,7 +257,7 @@ class GuessingGame(Interaction):
     def learning_after_hearer_doesnt_know_word(self, topic, context, f,
             sp, hr, spctopic):
         #agent hr plays discrimination game on context and topic
-        #The game returns: succ (boolean whether the game ended in success) 
+        #The game returns: succ (boolean whether the game ended in success)
         #and hectopic (the category to which topic belongs)
         succ, hectopic = self.disc_game.play_save(hr, context, topic)
 
@@ -310,7 +310,7 @@ class GuessingGame(Interaction):
     def guess_game(self, speaker, hearer):
         """
         The most important method: the guessing game logic.
-        
+
         Each line explained by a comment.
         """
 
@@ -321,9 +321,9 @@ class GuessingGame(Interaction):
 
         #The first element of this context is topic:
         topic = context[0]
-        
-        #The speaker plays the discrimination game on the selected context and topic. 
-        #The game returns: succ (boolean whether the game ended in success) 
+
+        #The speaker plays the discrimination game on the selected context and topic.
+        #The game returns: succ (boolean whether the game ended in success)
         #and spctopic (the speaker's category to which topic belongs)
         succ, spctopic = self.disc_game.play_save(speaker, context, topic)
 
@@ -333,7 +333,7 @@ class GuessingGame(Interaction):
             self.learning_after_speaker_DG_fail(speaker, topic, spctopic)
             #do not proceed further:
             return False
-        
+
         #f = word that speaker uses to call the spctopic category
         f = speaker.state.word_for(spctopic)
         #if there is no word that speaker has for this category:
@@ -345,7 +345,7 @@ class GuessingGame(Interaction):
         hcategory = hearer.state.category_for(f)
         #if there is no category for word f in hearer's memory:
         if hcategory is None:
-            #the hearer learns a new word: 
+            #the hearer learns a new word:
             #if he discriminates topic from context, a new word is added
             #if he does not, he first learns to discriminate and only then learns a new word
             #=================================================================
@@ -356,22 +356,22 @@ class GuessingGame(Interaction):
                 context, f, speaker, hearer, spctopic)
             return False
 
-        #randomly shuffle the context: 
+        #randomly shuffle the context:
         random.shuffle(context)
-        #Choose a stimulus from context, which is most characteristic to the hcategory 
+        #Choose a stimulus from context, which is most characteristic to the hcategory
         max_hr_sample = self.find_best_matching_sample_to_category(hearer,
             context, hcategory)
 
         # checking game result: is the strongest activated stimulus same as topic?
         succ = max_hr_sample == topic
-        
+
         #if it is the same:
         if succ:
             #increase the confidence in word for topic in both speaker and hearer:
             #this is a symetric function from the perspective of speaker and hearer:
             self.learning_after_game_succeeded(f, topic, context,
                 speaker, spctopic, hearer, hcategory)
-            
+
         #if it is different:
         else:
             #decrease the confidence in word for topic in both speaker and hearer:
@@ -432,6 +432,19 @@ class SteelsAgentStateWithLexicon(SteelsAgentState):
 
 
 #Steels experiment main part
+
+
+def merge_experiment_results(res1, res2):
+    """
+    Merges results of two experiments into one results list preserving
+    consecutive indexing of iterations. For example, if res1 contains n1
+    iterations and res2 contains n2 iterations returned list will contain
+    iterations numbered from 0 to n1+n2.
+    """
+    n = res1[-1][0]
+    res2 = [(n+i, s) for i, s in res2]
+
+    return res1 + res2
 
 
 def steels_universal_basic_experiment(num_iter, agents,
@@ -508,3 +521,38 @@ def steels_basic_experiment_GG(inc_category_treshold=0.95, classifier=None,
     return steels_universal_basic_experiment(num_iter, agents,
         GuessingGame(dg), topology=topology, dump_freq=dump_freq,
         stimuli=stimuli, env=environment)
+
+
+def steels_experiment_GG_topology_shift(inc_category_treshold=0.95, classifier=None,
+        beta=1., context_size=4, stimuli=None,
+        agents=None, dump_freq=50, alpha=0.1, sigma=1., num_iter=1000,
+        topology=None, topology2=None, environment=None):
+    """
+    An experiment in which topology changes after some number of iterations.
+    """
+
+    classifier, classif_arg = SteelsClassifier, []
+    #agents = [Agent(SteelsAgentStateWithLexicon(classifier()), SimpleSensor())\
+
+    # FIX THIS !!
+    classif_arg = def_value(classif_arg, [])
+    for agent in agents:
+        agent.set_state(SteelsAgentStateWithLexicon(classifier(*classif_arg)))
+        agent.set_sensor(SimpleSensor())
+        agent.set_fitness_measure("DG", metrics.get_DS_fitness())
+        agent.set_fitness_measure("GG", metrics.get_CS_fitness())
+
+    AdaptiveNetwork.def_alpha = float(alpha)
+    AdaptiveNetwork.def_beta = float(beta)
+    ReactiveUnit.def_sigma = float(sigma)
+    dg = DiscriminationGame(context_size, float(inc_category_treshold))
+
+    r1 = steels_universal_basic_experiment(num_iter, agents,
+            GuessingGame(dg), topology=topology, dump_freq=dump_freq,
+            stimuli=stimuli, env=environment)
+
+    r2 = steels_universal_basic_experiment(num_iter, agents,
+            GuessingGame(dg), topology=topology2, dump_freq=dump_freq,
+            stimuli=stimuli, env=environment)
+
+    return merge_experiment_results(r1, r2)
