@@ -234,13 +234,14 @@ class GuessingGame(Interaction):
     # Based mostly on work "Colourful language and colour categories"
     # of Tony Belpaeme and Joris Bleys
 
-    def __init__(self, disc_game=None, context_size=None):
+    def __init__(self, disc_game=None, context_size=None, learning_mode=True):
         if disc_game is None:
             disc_game = DiscriminationGame()
             if context_size is not None:
                 disc_game.context_len = context_size
 
         self.disc_game = disc_game
+        self.learning_mode = learning_mode
 
     def num_agents(self):
         return 2
@@ -252,10 +253,14 @@ class GuessingGame(Interaction):
         agent.add_payoff("GG", int(result))
 
     def learning_after_speaker_DG_fail(self, speaker, topic, ctopic):
+        if not self.learning_mode:
+            return None
         self.disc_game.learning_after(speaker, topic, False, ctopic)
 
     def learning_after_hearer_doesnt_know_word(self, topic, context, f,
             sp, hr, spctopic):
+        if not self.learning_mode:
+            return None
         #agent hr plays discrimination game on context and topic
         #The game returns: succ (boolean whether the game ended in success)
         #and hectopic (the category to which topic belongs)
@@ -288,6 +293,8 @@ class GuessingGame(Interaction):
         hr - hearer
         hrc - category of hearer for topic
         """
+        if not self.learning_mode:
+            return None
         sp.state.lexicon.inc_dec_categories(spc, word)
         # ^^ as in 4.2 1.(a)
         hr.state.lexicon.inc_dec_words(hrc, word)
@@ -299,6 +306,8 @@ class GuessingGame(Interaction):
     def learning_after_agents_mismatched_words(self, topic,
             sp, spw, spc,
             hr, hrw, hrc):
+        if not self.learning_mode:
+            return None
         sp.state.lexicon.decrease(spc, spw)
         # ^^ as in 4.2 1.(b)
         hr.state.lexicon.decrease(hrc, hrw)
@@ -526,7 +535,8 @@ def steels_basic_experiment_GG(inc_category_treshold=0.95, classifier=None,
 def steels_experiment_GG_topology_shift(inc_category_treshold=0.95, classifier=None,
         beta=1., context_size=4, stimuli=None,
         agents=None, dump_freq=50, alpha=0.1, sigma=1., num_iter=1000,
-        topology=None, topology2=None, environment=None):
+        topology=None, environment=None, topology2=None, num_iter2=1000,
+                                        learning2=True):
     """
     An experiment in which topology changes after some number of iterations.
     """
@@ -551,8 +561,8 @@ def steels_experiment_GG_topology_shift(inc_category_treshold=0.95, classifier=N
             GuessingGame(dg), topology=topology, dump_freq=dump_freq,
             stimuli=stimuli, env=environment)
 
-    r2 = steels_universal_basic_experiment(num_iter, agents,
-            GuessingGame(dg), topology=topology2, dump_freq=dump_freq,
-            stimuli=stimuli, env=environment)
+    r2 = steels_universal_basic_experiment(num_iter2, agents,
+            GuessingGame(dg, learning_mode=learning2), topology=topology2,
+            dump_freq=dump_freq, stimuli=stimuli, env=environment)
 
     return merge_experiment_results(r1, r2)

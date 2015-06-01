@@ -238,6 +238,14 @@ class Parser(object):
 
         dictionary["num_iter"] = self.return_if_exist(params,
         "num_iter", "value", int)
+        num_iter2 = self.return_if_exist(params, "num_iter2", "value", int)
+        if num_iter2 is not None:
+            dictionary["num_iter2"] = num_iter2
+        learning2 = self.return_if_exist(params, "learning2", "value",
+                                         lambda x: x == "True")
+        if learning2 is not None:
+            dictionary["learning2"] = learning2
+
         dictionary["context_size"] = self.return_if_exist(params,
         "context_size", "value", int)
         dictionary["alpha"] = \
