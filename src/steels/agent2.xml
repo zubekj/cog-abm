@@ -139,4 +139,93 @@
 			<param>None</param>
 		</classifier>
 	</agent>
+
+	<agent>
+		<id>11</id>
+		<environment>global</environment>	
+		<node_name>10</node_name>
+		<sensor>
+			<type>SimpleSensor</type>
+			<param>None</param>
+		</sensor>
+		<classifier>
+			<type>SteelsClassifier</type>
+			<param>None</param>
+		</classifier>
+	</agent>
+
+	<agent>
+		<id>12</id>
+		<environment>global</environment>	
+		<node_name>11</node_name>
+		<sensor>
+			<type>SimpleSensor</type>
+			<param>None</param>
+		</sensor>
+		<classifier>
+			<type>SteelsClassifier</type>
+			<param>None</param>
+		</classifier>
+	</agent>
+
+	
+	<agent>
+		<id>13</id>
+		<environment>global</environment>	
+		<node_name>12</node_name>
+		<sensor>
+			<type>SimpleSensor</type>
+			<param>None</param>
+		</sensor>
+		<classifier>
+			<type>SteelsClassifier</type>
+			<param>None</param>
+		</classifier>
+	</agent>
+
+	
+	<agent>
+		<id>14</id>
+		<environment>global</environment>	
+		<node_name>13</node_name>
+		<sensor>
+			<type>SimpleSensor</type>
+			<param>None</param>
+		</sensor>
+		<classifier>
+			<type>SteelsClassifier</type>
+			<param>None</param>
+		</classifier>
+	</agent>
+
+	
+	<agent>
+		<id>15</id>
+		<environment>global</environment>	
+		<node_name>14</node_name>
+		<sensor>
+			<type>SimpleSensor</type>
+			<param>None</param>
+		</sensor>
+		<classifier>
+			<type>SteelsClassifier</type>
+			<param>None</param>
+		</classifier>
+	</agent>
+
+	<agent>
+		<id>16</id>
+		<environment>global</environment>	
+		<node_name>15</node_name>
+		<sensor>
+			<type>SimpleSensor</type>
+			<param>None</param>
+		</sensor>
+		<classifier>
+			<type>SteelsClassifier</type>
+			<param>None</param>
+		</classifier>
+	</agent>
+
+
 </agents>
