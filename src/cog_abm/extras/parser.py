@@ -207,14 +207,21 @@ class Parser(object):
 
         return Environment(list_of_stimuli, chooser, colour_order)
 
-    def parse_discrimination_game(self, inter):
+    def parse_game(self, dictionary, inter):
         params = self.return_element_if_exist(inter, "params", False)
         if params is None:
             return {}
-        dictionary = {"interaction_type": "DG"}
 
         dictionary["num_iter"] = self.return_if_exist(params, "num_iter",
         "value", int)
+        num_iter2 = self.return_if_exist(params, "num_iter2", "value", int)
+        if num_iter2 is not None:
+            dictionary["num_iter2"] = num_iter2
+        learning2 = self.return_if_exist(params, "learning2", "value",
+                                         lambda x: x == "True")
+        if learning2 is not None:
+            dictionary["learning2"] = learning2
+
         dictionary["context_size"] = self.return_if_exist(params,
         "context_size", "value", int)
         dictionary["alpha"] = self.return_if_exist(params, "alpha",
@@ -230,36 +237,13 @@ class Parser(object):
 
         return dictionary
 
+    def parse_discrimination_game(self, inter):
+        dictionary = {"interaction_type": "DG"}
+        return self.parse_game(dictionary, inter)
+
     def parse_guessing_game(self, inter):
-        params = self.return_element_if_exist(inter, "params", False)
-        if params is None:
-            return {}
         dictionary = {"interaction_type": "GG"}
-
-        dictionary["num_iter"] = self.return_if_exist(params,
-        "num_iter", "value", int)
-        num_iter2 = self.return_if_exist(params, "num_iter2", "value", int)
-        if num_iter2 is not None:
-            dictionary["num_iter2"] = num_iter2
-        learning2 = self.return_if_exist(params, "learning2", "value",
-                                         lambda x: x == "True")
-        if learning2 is not None:
-            dictionary["learning2"] = learning2
-
-        dictionary["context_size"] = self.return_if_exist(params,
-        "context_size", "value", int)
-        dictionary["alpha"] = \
-            self.return_if_exist(params, "alpha", "value", float)
-        dictionary["beta"] = \
-            self.return_if_exist(params, "beta", "value", float)
-        dictionary["sigma"] = \
-            self.return_if_exist(params, "sigma", "value", float)
-        dictionary["inc_category_treshold"] = self.return_if_exist(params,
-            "inc_category_treshold", "value", float)
-        dictionary["classifier"] = \
-            self.return_if_exist(params, "classifier", "name", str)
-
-        return dictionary
+        return self.parse_game(dictionary, inter)
 
     def return_if_exist(self, param, name, value, function=None):
         #print param.getElementsByTagName(name)

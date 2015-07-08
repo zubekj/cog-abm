@@ -39,7 +39,7 @@ class Simulation(object):
         kr = (iter_num, cc)
         self.statistic.append(kr)
         if self.dump_often:
-            f = open(str(iter_num) + ".pout", "wb")
+            f = open("../../results/" + str(iter_num) + ".pout", "wb")
             cPickle.dump(kr, f, PICKLE_PROTOCOL)
             f.close()
             if self.colour_order:
