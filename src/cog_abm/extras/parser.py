@@ -64,9 +64,9 @@ class Parser(object):
         @param simulation: Simulation object
         """
         #TODO:
-        id = self.return_element_if_exist(agent, "id")
-        env_name = self.return_element_if_exist(agent, "environment")
-        node_name = self.return_element_if_exist(agent, "node_name")
+        id = self.value_if_exist("id", agent)
+        env_name = self.value_if_exist("environment", agent)
+        node_name = self.value_if_exist("node_name", agent)
         #sensor = agent.getElementsByTagName("sensor")
         #sensor_type = sensor[0].getElementsByTagName("type")[0].firstChild.dat
         #lrn = agent.getElementsByTagName("classifier")
@@ -81,7 +81,7 @@ class Parser(object):
 
     def parse_agents(self, source, network, network2=None):
         """
-        Parse agents when given in xml.
+        Parse agents when given in json.
 
         @type simulation: simulation
         @param simulation: Simulation object
@@ -91,10 +91,13 @@ class Parser(object):
         """
         if source is None:
             return None
+
+        with open("../../examples/agents/" + source, 'r') as file:
+            agents_data = json.loads(file.read())
+
         agents = []
-        sock = self.build_DOM(source)
-        agent_sock = sock.getElementsByTagName("agent")
-        for agent in agent_sock:
+
+        for agent in agents_data:
             agents.append(self.parse_agent(agent, network, network2))
 
         return agents
@@ -150,6 +153,7 @@ class Parser(object):
 
         self.load_to_dictionary(dictionary, "dump_freq", source)
         self.load_to_dictionary(dictionary, "network", source, function=self.parse_graph)
+        print dictionary["network"]
         self.load_to_dictionary(dictionary, "network2", source, function=self.parse_graph)
 
         environments = {}
@@ -186,7 +190,6 @@ class Parser(object):
     def parse_munsell_environment(self, env, main_sock):
         list_of_stimuli = self.parse_munsell_chips(env.getElementsByTagName("munsell_chip"))
 
-        print(main_sock)
         params = self.value_if_exist("params", main_sock)
 
         chooser = None
