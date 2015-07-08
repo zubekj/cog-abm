@@ -16,7 +16,7 @@
     },
   "environment" : [{
     "name" : "global",
-    "source" : "../../data/wcs_input_data/1269_munsell_chips.xml",
+    "source" : "../../examples/environment/1269_munsell_chips.json",
     "params" : {"distance" : 50}
   }]
 }

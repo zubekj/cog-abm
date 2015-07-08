@@ -39,26 +39,12 @@ class Parser(object):
         self.interaction_parser_map["GuessingGame"] = self.parse_guessing_game
         #self.interaction_parser_map["3"] = self.parse_genetic_game
 
-    def build_DOM(self, source):
-        """
-        Open document from source and build DOM tree-structure.
-
-        @type source: String
-        @param source: XML document directory.
-
-        @rtype: DOM tree
-        @return: Returns DOM tree created from XML document.
-        """
-        with open(source, 'r') as file:
-            sock = xml.dom.minidom.parse(file)
-            return sock
-
     def parse_agent(self, agent, network, network2=None):
         """
         Parse agent properties when given as DOM object.
 
-        @type agent: DOM object
-        @param agent: DOM object representing agent.
+        @type agent: map
+        @param agent: map representing agent.
 
         @type simulation: simulation
         @param simulation: Simulation object
@@ -87,7 +73,7 @@ class Parser(object):
         @param simulation: Simulation object
 
         @type source: String
-        @param source: XML document for pygraph directory.
+        @param source: json document for pygraph directory.
         """
         if source is None:
             return None
@@ -104,17 +90,19 @@ class Parser(object):
 
     def parse_environment(self, doc, main_sock = None):
         """
-        Parse environment parameters given in xml document.
+        Parse environment parameters given in json document.
 
         @type doc: String
-        @param doc: XML document directory.
+        @param doc: JSON document directory.
 
         @rtype: Environment
         @return: Parsed environment
         """
-        sock = self.build_DOM(doc)
-        env = sock.firstChild
-        env_type = env.getAttribute("type")
+        with open(doc, 'r') as file:
+            data = json.loads(file.read())
+
+        env = self.value_if_exist("stimuli", data)
+        env_type = self.value_if_exist("type", data)
         environment = self.environment_parser_map[env_type](env, main_sock)
         return environment
 
@@ -185,17 +173,15 @@ class Parser(object):
 
         return dictionary
 
-    def parse_munsell_chips(self, chips):
-        list = []
-        for chip in chips:
-            L = float(chip.getElementsByTagName("L")[0].firstChild.data)
-            a = float(chip.getElementsByTagName("a")[0].firstChild.data)
-            b = float(chip.getElementsByTagName("b")[0].firstChild.data)
-            list.append(Color(L, a, b))
-        return list
 
     def parse_munsell_environment(self, env, main_sock):
-        list_of_stimuli = self.parse_munsell_chips(env.getElementsByTagName("munsell_chip"))
+        list_of_stimuli = []
+
+        for stimulus in env:
+            L = self.value_if_exist("L", stimulus)
+            a = self.value_if_exist("a", stimulus)
+            b = self.value_if_exist("b", stimulus)
+            list_of_stimuli.append(Color(L, a, b))
 
         params = self.value_if_exist("params", main_sock)
 
@@ -253,30 +239,3 @@ class Parser(object):
                 return function(source[key])
         else:
             return None
-
-    def return_if_exist(self, param, name, value, function=None):
-        #print param.getElementsByTagName(name)
-        if (len(param.getElementsByTagName(name)) == 0):
-            return None
-        elif (param.getElementsByTagName(name)[0].hasAttribute(value)):
-            if (function is None):
-                return param.getElementsByTagName(name)[0].getAttribute(value)
-            else:
-                return function(param.getElementsByTagName(name)[0].
-                                getAttribute(value))
-        else:
-            return None
-
-    def return_element_if_exist(self, sock, name, child=True, function=None):
-        if sock is None:
-            return None
-        elif (len(sock.getElementsByTagName(name)) == 0):
-            return None
-        else:
-            if child is not True:
-                return sock.getElementsByTagName(name)[0]
-            elif function is None:
-                return sock.getElementsByTagName(name)[0].firstChild.data
-            else:
-                return function(sock.getElementsByTagName(name)[0].
-                                firstChild.data)
