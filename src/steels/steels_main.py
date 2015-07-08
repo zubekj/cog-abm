@@ -80,7 +80,7 @@ if __name__ == "__main__":
     #print params
 
     if opts.game is not None:
-        params["interaction_type"] == opts.game
+        params["interaction_type"] = opts.game
     interaction_type = params.pop("interaction_type")
     if interaction_type == "DG":
         #r = steels_basic_experiment_DG

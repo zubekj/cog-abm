@@ -1,22 +1,22 @@
 {"history_freq" : 50,
  "network" : "graph2.xml",
- "agents"  : "agents2.xml",
+ "agents"  : "agent2.xml",
  "interaction" : 
     {"id" : 1,
      "type" : "GuessingGame",
      "params" : 
         {"alpha" : 0.1,
-	 "beta" : 1,
-	 "sigma" : 1,
-	 "num_iter" : 10000,
-	 "contex_size" : 4,
-	 "inc_category_treshold" : 0.95,
-	 "classifier" : "SteelsClassifier"
+         "beta" : 1,
+         "sigma" : 1,
+         "num_iter" : 10000,
+         "contex_size" : 4,
+         "inc_category_treshold" : 0.95,
+         "classifier" : "SteelsClassifier"
 	}
     },
-  "environment" : {
+  "environment" : [{
     "name" : "global",
     "source" : "../../data/wcs_input_data/1269_munsell_chips.xml",
     "params" : {"distance" : 50}
-  }
+  }]
 }

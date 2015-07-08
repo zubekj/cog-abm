@@ -1,7 +1,8 @@
 """
-Module provides parser for xml documents.
+Module provides parser for json documents.
 """
 import xml.dom.minidom
+import json
 from pygraph.readwrite import markup
 from cog_abm.core.network import Network
 from cog_abm.core.agent import *
@@ -14,7 +15,7 @@ class Parser(object):
     """
     Parser class.
 
-    Parser provides methods used to handle simulation input when given in xml.
+    Parser provides methods used to handle simulation input when given in json.
 
     @sort: __init__, open_document, parse_agent, parse_agents, parse_graph,
     parse_param
@@ -131,75 +132,70 @@ class Parser(object):
 
     def parse_simulation(self, source):
         """
-        Parse simulation parameters given in xml document.
+        Parse simulation parameters given in json document.
 
         @type source: String
-        @param source: Simulation XML document directory.
+        @param source: Simulation JSON document directory.
 
         @rtype: Dictionary
-        @return: Simulation params created from xml document.
+        @return: Simulation params created from json document.
         """
         if source is None:
             return None
 
-        sock = self.build_DOM(source)
+        with open(source, 'r') as file:
+            source = json.loads(file.read())
+
         dictionary = {}
 
-        dictionary["dump_freq"] = self.return_if_exist(sock, "history",
-        "freq", int)
-        dictionary["topology"] = self.parse_graph(self.return_if_exist
-            (sock, "network", "source", str))
-        topology2 = self.parse_graph(self.return_if_exist(sock, "network2",
-                                                          "source", str))
-        if topology2 is not None:
-            dictionary["topology2"] = topology2
+        self.load_to_dictionary(dictionary, "dump_freq", source)
+        self.load_to_dictionary(dictionary, "network", source, function=self.parse_graph)
+        self.load_to_dictionary(dictionary, "network2", source, function=self.parse_graph)
 
         environments = {}
-        envs = sock.getElementsByTagName("environment")
+        envs = self.value_if_exist("environment", source)
         for env in envs:
-            env_name = env.getAttribute("name")
-            env_source = env.getAttribute("source")
+            env_name = self.value_if_exist("name", env)
+            env_source = self.value_if_exist("source", env)
             environments[env_name] = self.parse_environment(env_source, env)
 
         dictionary['stimuli'] = environments['global'].stimuli
         dictionary['environment'] = environments['global']
-        dictionary["agents"] = self.parse_agents(self.return_if_exist
-            (sock, "agents", "source", str), dictionary["topology"], topology2)
+        dictionary["agents"] = self.parse_agents(self.value_if_exist("agents", source),
+                                                 dictionary["network"],
+                                                 self.value_if_exist("network2", source))
 
         #inters = sock.getElementsByTagName("interaction")
-        inter = self.return_element_if_exist(sock, "interaction", False)
+        #inter = self.return_element_if_exist(sock, "interaction", False)
         #for i in inters:
-        dictionary.update(self.interaction_parser_map[self.return_if_exist(
-                                sock, "interaction", "type", str)](inter))
+        inter = self.value_if_exist("interaction", source)
+        dictionary.update(self.interaction_parser_map[self.value_if_exist("type", inter)]
+                          (self.value_if_exist("params", inter)))
 
         return dictionary
 
     def parse_munsell_chips(self, chips):
         list = []
         for chip in chips:
-            list.append(self.parse_munsell_chip(chip))
+            L = float(chip.getElementsByTagName("L")[0].firstChild.data)
+            a = float(chip.getElementsByTagName("a")[0].firstChild.data)
+            b = float(chip.getElementsByTagName("b")[0].firstChild.data)
+            list.append(Color(L, a, b))
         return list
 
-    def parse_munsell_chip(self, chip):
-        L = float(chip.getElementsByTagName("L")[0].firstChild.data)
-        a = float(chip.getElementsByTagName("a")[0].firstChild.data)
-        b = float(chip.getElementsByTagName("b")[0].firstChild.data)
-        return Color(L, a, b)
-
     def parse_munsell_environment(self, env, main_sock):
-        list_of_stimuli = self.parse_munsell_chips(env.getElementsByTagName
-                                        ("munsell_chip"))
+        list_of_stimuli = self.parse_munsell_chips(env.getElementsByTagName("munsell_chip"))
 
-        params = self.return_element_if_exist(main_sock, "params", False)
+        print(main_sock)
+        params = self.value_if_exist("params", main_sock)
 
         chooser = None
         colour_order = None
         if params is not None:
-            dist = self.return_if_exist(params, "distance", "value", float)
+            dist = self.value_if_exist("distance", params)
             chooser = RandomStimuliChooser(use_distance=True, distance=dist)
 
-            word_naming_per_color = \
-            self.return_if_exist(params, "word_naming_per_color", "value", str)
+            word_naming_per_color = self.value_if_exist("word_naming_per_color", params)
             if word_naming_per_color:
                 colour_order = extract_colour_order(list_of_stimuli, word_naming_per_color)
         else:
@@ -208,32 +204,15 @@ class Parser(object):
         return Environment(list_of_stimuli, chooser, colour_order)
 
     def parse_game(self, dictionary, inter):
-        params = self.return_element_if_exist(inter, "params", False)
+        params = self.value_if_exist("params", inter)
         if params is None:
             return {}
 
-        dictionary["num_iter"] = self.return_if_exist(params, "num_iter",
-        "value", int)
-        num_iter2 = self.return_if_exist(params, "num_iter2", "value", int)
-        if num_iter2 is not None:
-            dictionary["num_iter2"] = num_iter2
-        learning2 = self.return_if_exist(params, "learning2", "value",
-                                         lambda x: x == "True")
-        if learning2 is not None:
-            dictionary["learning2"] = learning2
+        parameters = ["num_iter", "num_iter2", "learning2", "context_size",
+                      "alpha", "beta", "sigma", "inc_category_treshold", "classifier"]
 
-        dictionary["context_size"] = self.return_if_exist(params,
-        "context_size", "value", int)
-        dictionary["alpha"] = self.return_if_exist(params, "alpha",
-        "value", float)
-        dictionary["beta"] = self.return_if_exist(params, "beta",
-        "value", float)
-        dictionary["sigma"] = self.return_if_exist(params,
-        "sigma", "value", float)
-        dictionary["inc_category_treshold"] = self.return_if_exist(params,
-        "inc_category_treshold", "value", float)
-        dictionary["classifier"] = \
-            self.return_if_exist(params, "classifier", "name", str)
+        for p in parameters:
+            self.load_to_dictionary(dictionary, p, params)
 
         return dictionary
 
@@ -244,6 +223,26 @@ class Parser(object):
     def parse_guessing_game(self, inter):
         dictionary = {"interaction_type": "GG"}
         return self.parse_game(dictionary, inter)
+
+    @staticmethod
+    def load_to_dictionary(dictionary, key, source, obligatory=False, function=None):
+        if key in source:
+            if function is None:
+                dictionary[key] = source[key]
+            else:
+                dictionary[key] = function(source[key])
+        elif obligatory:
+            raise Exception("Information about " + key + " should be written in simulation file.")
+
+    @staticmethod
+    def value_if_exist(key, source, function=None):
+        if key in source:
+            if function is None:
+                return source[key]
+            else:
+                return function(source[key])
+        else:
+            return None
 
     def return_if_exist(self, param, name, value, function=None):
         #print param.getElementsByTagName(name)

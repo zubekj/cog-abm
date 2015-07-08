@@ -457,10 +457,10 @@ def merge_experiment_results(res1, res2):
 
 
 def steels_universal_basic_experiment(num_iter, agents,
-        interaction, stimuli, topology=None,
+        interaction, stimuli, network=None,
         dump_freq=50, chooser=None, env=None):
 
-    topology = topology or generate_simple_network(agents)
+    network = network or generate_simple_network(agents)
 
 #       if stimuli == None:
 #               stimuli = def_value(None, default_stimuli())
@@ -478,7 +478,7 @@ def steels_universal_basic_experiment(num_iter, agents,
             'chooser': str(chooser),
             'num agents': len(agents),
         }))
-    s = Simulation(topology, interaction, agents, colour_order=env.colour_order)
+    s = Simulation(network, interaction, agents, colour_order=env.colour_order)
     res = s.run(num_iter, dump_freq)
 
     return res
@@ -487,7 +487,7 @@ def steels_universal_basic_experiment(num_iter, agents,
 def steels_basic_experiment_DG(inc_category_treshold=0.95, classifier=None,
         beta=1., context_size=4, stimuli=None,
         agents=None, dump_freq=50, alpha=0.1, sigma=1., num_iter=1000,
-        topology=None, environment=None):
+        network=None, environment=None):
 
     classifier, classif_arg = SteelsClassifier, []
 
@@ -503,13 +503,13 @@ def steels_basic_experiment_DG(inc_category_treshold=0.95, classifier=None,
     inc_category_treshold = float(inc_category_treshold)
 
     return steels_universal_basic_experiment(num_iter, agents,
-        DiscriminationGame(context_size, inc_category_treshold), topology=topology,
+        DiscriminationGame(context_size, inc_category_treshold), network=network,
             dump_freq=dump_freq, stimuli=stimuli, env=environment)
 
 def steels_basic_experiment_GG(inc_category_treshold=0.95, classifier=None,
         beta=1., context_size=4, stimuli=None,
         agents=None, dump_freq=50, alpha=0.1, sigma=1., num_iter=1000,
-        topology=None, environment=None):
+        network=None, environment=None):
 
     classifier, classif_arg = SteelsClassifier, []
     #agents = [Agent(SteelsAgentStateWithLexicon(classifier()), SimpleSensor())\
@@ -528,14 +528,14 @@ def steels_basic_experiment_GG(inc_category_treshold=0.95, classifier=None,
     dg = DiscriminationGame(context_size, float(inc_category_treshold))
 
     return steels_universal_basic_experiment(num_iter, agents,
-        GuessingGame(dg), topology=topology, dump_freq=dump_freq,
+        GuessingGame(dg), network=network, dump_freq=dump_freq,
         stimuli=stimuli, env=environment)
 
 
 def steels_experiment_GG_topology_shift(inc_category_treshold=0.95, classifier=None,
         beta=1., context_size=4, stimuli=None,
         agents=None, dump_freq=50, alpha=0.1, sigma=1., num_iter=1000,
-        topology=None, environment=None, topology2=None, num_iter2=1000,
+        network=None, environment=None, network2=None, num_iter2=1000,
                                         learning2=True):
     """
     An experiment in which topology changes after some number of iterations.
@@ -558,11 +558,11 @@ def steels_experiment_GG_topology_shift(inc_category_treshold=0.95, classifier=N
     dg = DiscriminationGame(context_size, float(inc_category_treshold))
 
     r1 = steels_universal_basic_experiment(num_iter, agents,
-            GuessingGame(dg), topology=topology, dump_freq=dump_freq,
+            GuessingGame(dg), network=network, dump_freq=dump_freq,
             stimuli=stimuli, env=environment)
 
     r2 = steels_universal_basic_experiment(num_iter2, agents,
-            GuessingGame(dg, learning_mode=learning2), topology=topology2,
+            GuessingGame(dg, learning_mode=learning2), network=network2,
             dump_freq=dump_freq, stimuli=stimuli, env=environment)
 
     return merge_experiment_results(r1, r2)
