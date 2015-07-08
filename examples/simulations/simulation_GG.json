@@ -1,5 +1,5 @@
 {"dump_freq" : 50,
- "network" : "graph2.xml",
+ "network" : "graph2.json",
  "agents"  : "agent2.json",
  "interaction" : 
     {"id" : 1,

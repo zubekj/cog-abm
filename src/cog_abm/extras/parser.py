@@ -120,18 +120,26 @@ class Parser(object):
 
     def parse_graph(self, source):
         """
-        Parse graph when given as pygraph in xml.
+        Parse graph when given as pygraph in json.
 
         @type source: String
-        @param source: XML document for pygraph directory.
+        @param source: json document for pygraph directory.
 
         @rtype: pygraph
         @return: Returns graph from pygraph library.
         """
         if source is None:
             return None
-        with open(source, 'r') as file:
-            return Network(markup.read(file.read()))
+        with open("../../examples/networks/" + source, 'r') as file:
+            graph = json.loads(file.read())
+
+            x = '<?xml version="1.0" ?><graph>'
+            for node in graph["nodes"]:
+                x += '<node id="' + str(node) + '"/>'
+            for edge in graph["edges"]:
+                x += '<edge from="' + str(edge["from"]) + '" to="' + str(edge["to"]) + '" wt="' + str(edge["wt"]) + '"/>'
+            x += "</graph>"
+            return Network(markup.read(x))
 
     def parse_simulation(self, source):
         """
@@ -153,7 +161,6 @@ class Parser(object):
 
         self.load_to_dictionary(dictionary, "dump_freq", source)
         self.load_to_dictionary(dictionary, "network", source, function=self.parse_graph)
-        print dictionary["network"]
         self.load_to_dictionary(dictionary, "network2", source, function=self.parse_graph)
 
         environments = {}
