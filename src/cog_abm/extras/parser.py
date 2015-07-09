@@ -149,8 +149,12 @@ class Parser(object):
         dictionary = {}
 
         self.load_to_dictionary(dictionary, "dump_freq", source)
-        self.load_to_dictionary(dictionary, "network", source, function=self.parse_graph)
-        self.load_to_dictionary(dictionary, "network2", source, function=self.parse_graph)
+        networks_source = self.value_if_exist("networks", source)
+        networks = []
+        for net in networks_source:
+            graph = self.parse_graph(net["source"])
+            networks.append({"graph": graph, "start": net["start"]})
+        dictionary["networks"] = networks
 
         environments = {}
         envs = self.value_if_exist("environment", source)

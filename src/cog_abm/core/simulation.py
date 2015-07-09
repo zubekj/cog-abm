@@ -59,19 +59,21 @@ class Simulation(object):
 #               for r, a in izip(results, agents):
 #                       a.add_inter_result(r)
 
-    def _do_iterations(self, num_iter):
+    def _do_iterations(self, num_iter, counter):
         for _ in xrange(num_iter):
             agents = self._choose_agents()
             self._start_interaction(agents)
+            counter += 1
 
     def _do_main_loop(self, iterations, dump_freq):
         start_time = time()
         log.info("Simulation start...")
         it = xrange(iterations // dump_freq)
+        counter = 0
         if self.pb:
             it = get_progressbar()(it)
         for i in it:
-            self._do_iterations(dump_freq)
+            self._do_iterations(dump_freq, counter)
             self.dump_results((i + 1) * dump_freq)
 
         log.info("Simulation end. Total time: " + str(time() - start_time))
