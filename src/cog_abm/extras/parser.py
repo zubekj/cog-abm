@@ -1,7 +1,6 @@
 """
 Module provides parser for json documents.
 """
-import xml.dom.minidom
 import json
 from pygraph.readwrite import markup
 from cog_abm.core.network import Network
@@ -25,23 +24,23 @@ class Parser(object):
         """
         Initialize parser.
         """
+        self.environment_parser_map = {}
         self.init_environment_dictionary()
+        self.interaction_parser_map = {}
         self.init_interaction_dictionary()
 
     def init_environment_dictionary(self):
-        self.environment_parser_map = {}
         self.environment_parser_map["CIELab"] = self.parse_munsell_environment
 
     def init_interaction_dictionary(self):
-        self.interaction_parser_map = {}
         self.interaction_parser_map["DiscriminationGame"] = \
-        self.parse_discrimination_game
+            self.parse_discrimination_game
         self.interaction_parser_map["GuessingGame"] = self.parse_guessing_game
-        #self.interaction_parser_map["3"] = self.parse_genetic_game
+        # self.interaction_parser_map["3"] = self.parse_genetic_game
 
     def parse_agent(self, agent, network, network2=None):
         """
-        Parse agent properties when given as DOM object.
+        Parse agent properties when given as map.
 
         @type agent: map
         @param agent: map representing agent.
@@ -49,14 +48,14 @@ class Parser(object):
         @type simulation: simulation
         @param simulation: Simulation object
         """
-        #TODO:
-        id = self.value_if_exist("id", agent)
-        env_name = self.value_if_exist("environment", agent)
+        # TODO:
+        # id = self.value_if_exist("id", agent)
+        # env_name = self.value_if_exist("environment", agent)
         node_name = self.value_if_exist("node_name", agent)
-        #sensor = agent.getElementsByTagName("sensor")
-        #sensor_type = sensor[0].getElementsByTagName("type")[0].firstChild.dat
-        #lrn = agent.getElementsByTagName("classifier")
-        #lrn_type = lrn[0].getElementsByTagName("type")[0].firstChild.data
+        # sensor = agent.getElementsByTagName("sensor")
+        # sensor_type = sensor[0].getElementsByTagName("type")[0].firstChild.dat
+        # lrn = agent.getElementsByTagName("classifier")
+        # lrn_type = lrn[0].getElementsByTagName("type")[0].firstChild.data
 
         agent = Agent()
         if network is not None:
@@ -69,8 +68,8 @@ class Parser(object):
         """
         Parse agents when given in json.
 
-        @type simulation: simulation
-        @param simulation: Simulation object
+        @type network: Network
+        @param network: agents topology
 
         @type source: String
         @param source: json document for pygraph directory.
@@ -78,8 +77,8 @@ class Parser(object):
         if source is None:
             return None
 
-        with open("../../examples/agents/" + source, 'r') as file:
-            agents_data = json.loads(file.read())
+        with open("../../examples/agents/" + source, 'r') as f:
+            agents_data = json.loads(f.read())
 
         agents = []
 
@@ -88,7 +87,7 @@ class Parser(object):
 
         return agents
 
-    def parse_environment(self, doc, main_sock = None):
+    def parse_environment(self, doc, main_sock=None):
         """
         Parse environment parameters given in json document.
 
@@ -98,15 +97,16 @@ class Parser(object):
         @rtype: Environment
         @return: Parsed environment
         """
-        with open(doc, 'r') as file:
-            data = json.loads(file.read())
+        with open(doc, 'r') as f:
+            data = json.loads(f.read())
 
         env = self.value_if_exist("stimuli", data)
         env_type = self.value_if_exist("type", data)
         environment = self.environment_parser_map[env_type](env, main_sock)
         return environment
 
-    def parse_graph(self, source):
+    @staticmethod
+    def parse_graph(source):
         """
         Parse graph when given as pygraph in json.
 
@@ -118,14 +118,15 @@ class Parser(object):
         """
         if source is None:
             return None
-        with open("../../examples/networks/" + source, 'r') as file:
-            graph = json.loads(file.read())
+        with open("../../examples/networks/" + source, 'r') as f:
+            graph = json.loads(f.read())
 
             x = '<?xml version="1.0" ?><graph>'
             for node in graph["nodes"]:
                 x += '<node id="' + str(node) + '"/>'
             for edge in graph["edges"]:
-                x += '<edge from="' + str(edge["from"]) + '" to="' + str(edge["to"]) + '" wt="' + str(edge["wt"]) + '"/>'
+                x += '<edge from="' + str(edge["from"]) + \
+                     '" to="' + str(edge["to"]) + '" wt="' + str(edge["wt"]) + '"/>'
             x += "</graph>"
             return Network(markup.read(x))
 
@@ -142,8 +143,8 @@ class Parser(object):
         if source is None:
             return None
 
-        with open(source, 'r') as file:
-            source = json.loads(file.read())
+        with open("../../examples/simulations/" + source, 'r') as f:
+            source = json.loads(f.read())
 
         dictionary = {}
 
@@ -164,28 +165,26 @@ class Parser(object):
                                                  dictionary["network"],
                                                  self.value_if_exist("network2", source))
 
-        #inters = sock.getElementsByTagName("interaction")
-        #inter = self.return_element_if_exist(sock, "interaction", False)
-        #for i in inters:
+        # inters = sock.getElementsByTagName("interaction")
+        # inter = self.return_element_if_exist(sock, "interaction", False)
+        # for i in inters:
         inter = self.value_if_exist("interaction", source)
         dictionary.update(self.interaction_parser_map[self.value_if_exist("type", inter)]
                           (self.value_if_exist("params", inter)))
 
         return dictionary
 
-
     def parse_munsell_environment(self, env, main_sock):
         list_of_stimuli = []
 
         for stimulus in env:
-            L = self.value_if_exist("L", stimulus)
+            l = self.value_if_exist("L", stimulus)
             a = self.value_if_exist("a", stimulus)
             b = self.value_if_exist("b", stimulus)
-            list_of_stimuli.append(Color(L, a, b))
+            list_of_stimuli.append(Color(l, a, b))
 
         params = self.value_if_exist("params", main_sock)
 
-        chooser = None
         colour_order = None
         if params is not None:
             dist = self.value_if_exist("distance", params)

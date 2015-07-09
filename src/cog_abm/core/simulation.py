@@ -29,7 +29,7 @@ class Simulation(object):
         self.agents = tuple(agents)
         self.statistic = []
         self.dump_often = True
-        self.pb = pb
+        self.pb = True
         self.colour_order = colour_order
         print colour_order
 
