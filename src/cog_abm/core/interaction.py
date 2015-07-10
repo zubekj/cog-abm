@@ -13,3 +13,9 @@ class Interaction(object):
         Does interaction with given agents
         """
         pass
+
+    def change_environment(self, environment):
+        """
+        Changes environment of interaction
+        """
+        pass

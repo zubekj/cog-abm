@@ -47,8 +47,6 @@ if __name__ == "__main__":
 
     optp.add_option('-v', '--verbose', dest='verbose', action='count',
         help="Increase verbosity (specify multiple times for more)")
-    optp.add_option('-g', '--game', action="store", type="string", dest="game",
-        help="Which type of game agents play", default="DG")
     optp.add_option('-f', '--file', action="store", dest='file', type="string",
         help="output file with results")
     optp.add_option('-p', '--params_file', action="store", dest='param_file',
@@ -67,28 +65,27 @@ if __name__ == "__main__":
     # Set up basic configuration, out to stderr with a reasonable default format.
     logging.basicConfig(level=log_level)
 
-    #if opts.game not in ["DG","GG"]:
-    #       optp.error("Wrong or no game specified. Allowed: DG, GG")
 
     sys.path.append('../')
     sys.path.append('')
-    from steels.steels_experiment import steels_basic_experiment_DG, \
-        steels_basic_experiment_GG, steels_experiment_GG_topology_shift
+    from steels.steels_experiment import steels_advanced_experiment
 
     params = load_params(opts.param_file)
 
     #print params
 
-    if opts.game is not None:
-        params["interaction_type"] = opts.game
-    interaction_type = params.pop("interaction_type")
-    if interaction_type == "DG":
-        #r = steels_basic_experiment_DG
-        r = steels_basic_experiment_DG(**params)
-    elif interaction_type == "GG":
-        if "topology2" in params:
-            r = steels_experiment_GG_topology_shift(**params)
-        else:
-            r = steels_basic_experiment_GG(**params)
+    r = steels_advanced_experiment(**params)
+
+    # if opts.game is not None:
+    #     params["interaction_type"] = opts.game
+    # interaction_type = params.pop("interaction_type")
+    # if interaction_type == "DG":
+    #     #r = steels_basic_experiment_DG
+    #     r = steels_basic_experiment_DG(**params)
+    # elif interaction_type == "GG":
+    #     if "topology2" in params:
+    #         r = steels_experiment_GG_topology_shift(**params)
+    #     else:
+    #         r = steels_basic_experiment_GG(**params)
 
     save_res((r, params), opts.file)

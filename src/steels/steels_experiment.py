@@ -146,9 +146,13 @@ class SteelsClassifier(Classifier):
 
 class DiscriminationGame(Interaction):
 
-    def __init__(self, context_len=4, inc_category_treshold=0.95):
+    def __init__(self, context_len=4, inc_category_treshold=0.95, environment=None):
         self.context_len = context_len
         self.inc_category_treshold = inc_category_treshold
+        self.environment = environment
+
+    def change_environment(self, environment):
+        self.environment = environment
 
     def num_agents(self):
         return 2
@@ -203,22 +207,21 @@ class DiscriminationGame(Interaction):
         self.save_result(agent, succ)
         return succ, ctopic, topic, context
 
-    def get_setup(self, agent):
-        env = agent.get_environment()
-        context = env.get_stimuli(self.context_len)
+    def get_setup(self):
+        context = self.environment.get_stimuli(self.context_len)
         topic = context[0]
         # ^^^^ they are already shuffled - and needed when different classes
         return (context, topic)
 
     def interact_one_agent(self, agent, context=None, topic=None):
         if context is None or topic is None:
-            context, topic = self.get_setup(agent)
+            context, topic = self.get_setup()
         succ, _, _, _ = self.play_with_learning(agent, context, topic)
         self.save_result(agent, succ)
         return succ
 
     def interact(self, agent1, agent2):
-        context, topic = self.get_setup(agent1)
+        context, topic = self.get_setup()
         return (
             ("DG", self.interact_one_agent(agent1, context, topic)),
             ("DG", self.interact_one_agent(agent2, context, topic))
@@ -234,7 +237,7 @@ class GuessingGame(Interaction):
     # Based mostly on work "Colourful language and colour categories"
     # of Tony Belpaeme and Joris Bleys
 
-    def __init__(self, disc_game=None, context_size=None, learning_mode=True):
+    def __init__(self, disc_game=None, context_size=None, learning_mode=True, environment=None):
         if disc_game is None:
             disc_game = DiscriminationGame()
             if context_size is not None:
@@ -242,6 +245,12 @@ class GuessingGame(Interaction):
 
         self.disc_game = disc_game
         self.learning_mode = learning_mode
+        self.environment = environment
+        self.disc_game.change_environment(environment)
+
+    def change_environment(self, environment):
+        self.environment = environment
+        self.disc_game.change_environment(environment)
 
     def num_agents(self):
         return 2
@@ -323,10 +332,8 @@ class GuessingGame(Interaction):
         Each line explained by a comment.
         """
 
-        #Get list of stimuli known by the speaker:
-        env = speaker.get_environment()
-        #Get a random list of stimuli from env of size self.disc_game.context_len:
-        context = env.get_stimuli(self.disc_game.context_len)
+        #Get a random list of stimuli from ironment of size self.disc_game.context_len:
+        context = self.environment.get_stimuli(self.disc_game.context_len)
 
         #The first element of this context is topic:
         topic = context[0]
@@ -457,10 +464,10 @@ def merge_experiment_results(res1, res2):
 
 
 def steels_universal_basic_experiment(num_iter, agents,
-        interaction, stimuli, network=None,
+        interaction, stimuli, networks=None,
         dump_freq=50, chooser=None, env=None):
 
-    network = network or generate_simple_network(agents)
+    networks = networks or [{"graph": generate_simple_network(agents), "start": 1}]
 
 #       if stimuli == None:
 #               stimuli = def_value(None, default_stimuli())
@@ -478,7 +485,7 @@ def steels_universal_basic_experiment(num_iter, agents,
             'chooser': str(chooser),
             'num agents': len(agents),
         }))
-    s = Simulation(network, interaction, agents, colour_order=env.colour_order)
+    s = Simulation(networks, interaction, agents, colour_order=env.colour_order)
     res = s.run(num_iter, dump_freq)
 
     return res
@@ -487,7 +494,7 @@ def steels_universal_basic_experiment(num_iter, agents,
 def steels_basic_experiment_DG(inc_category_treshold=0.95, classifier=None,
         beta=1., context_size=4, stimuli=None,
         agents=None, dump_freq=50, alpha=0.1, sigma=1., num_iter=1000,
-        network=None, environment=None):
+        networks=None, environment=None):
 
     classifier, classif_arg = SteelsClassifier, []
 
@@ -503,13 +510,13 @@ def steels_basic_experiment_DG(inc_category_treshold=0.95, classifier=None,
     inc_category_treshold = float(inc_category_treshold)
 
     return steels_universal_basic_experiment(num_iter, agents,
-        DiscriminationGame(context_size, inc_category_treshold), network=network,
+        DiscriminationGame(context_size, inc_category_treshold), networks=networks,
             dump_freq=dump_freq, stimuli=stimuli, env=environment)
 
 def steels_basic_experiment_GG(inc_category_treshold=0.95, classifier=None,
         beta=1., context_size=4, stimuli=None,
         agents=None, dump_freq=50, alpha=0.1, sigma=1., num_iter=1000,
-        network=None, environment=None):
+        networks=None, environment=None):
 
     classifier, classif_arg = SteelsClassifier, []
     #agents = [Agent(SteelsAgentStateWithLexicon(classifier()), SimpleSensor())\
@@ -528,7 +535,7 @@ def steels_basic_experiment_GG(inc_category_treshold=0.95, classifier=None,
     dg = DiscriminationGame(context_size, float(inc_category_treshold))
 
     return steels_universal_basic_experiment(num_iter, agents,
-        GuessingGame(dg), network=network, dump_freq=dump_freq,
+        GuessingGame(dg), network=networks, dump_freq=dump_freq,
         stimuli=stimuli, env=environment)
 
 
@@ -566,3 +573,54 @@ def steels_experiment_GG_topology_shift(inc_category_treshold=0.95, classifier=N
             dump_freq=dump_freq, stimuli=stimuli, env=environment)
 
     return merge_experiment_results(r1, r2)
+
+
+def steels_advanced_experiment(num_iter=1000, dump_freq=50, learning=None, agents=None,
+                               stimuli=None, environments=None, environment=None, networks=None, interactions=None):
+    """
+    An experiment in which topology, type and learning can change after some number of iterations.
+    """
+
+    classifier, classif_arg = SteelsClassifier, []
+    classif_arg = def_value(classif_arg, [])
+
+    has_GG = False
+    for i in interactions:
+        if i["interaction"]["interaction_type"] is "GG":
+            has_GG = True
+            break
+
+    for agent in agents:
+        agent.set_state(SteelsAgentStateWithLexicon(classifier(*classif_arg)))
+        agent.set_sensor(SimpleSensor())
+        agent.set_fitness_measure("DG", metrics.get_DS_fitness())
+        if has_GG:
+            agent.set_fitness_measure("GG", metrics.get_CS_fitness())
+
+    AdaptiveNetwork.def_alpha = float(learning["alpha"])
+    AdaptiveNetwork.def_beta = float(learning["beta"])
+    ReactiveUnit.def_sigma = float(learning["sigma"])
+
+    networks = networks or [{"graph": generate_simple_network(agents), "start": 1}]
+
+    interaction_list = []
+
+    for interaction in interactions:
+        i = interaction["interaction"]
+        dg = DiscriminationGame(i["context_size"], float(i["inc_category_treshold"]))
+        if i["interaction_type"] is "DG":
+            inter = GuessingGame(dg)
+        else:
+            inter = dg
+        interaction_list.append({"start": interaction["start"], "interaction": inter})
+
+
+    log.info("Running steels experiment with: %s", str({
+            'stimuli num': len(stimuli),
+            'num agents': len(agents)
+        }))
+    print environments
+    s = Simulation(networks, interaction_list, agents=agents, environments=environments, colour_order=environment.colour_order)
+    res = s.run(num_iter, dump_freq)
+
+    return res

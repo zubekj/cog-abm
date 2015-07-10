@@ -38,7 +38,7 @@ class Parser(object):
         self.interaction_parser_map["GuessingGame"] = self.parse_guessing_game
         # self.interaction_parser_map["3"] = self.parse_genetic_game
 
-    def parse_agent(self, agent, network, network2=None):
+    def parse_agent(self, agent, networks):
         """
         Parse agent properties when given as map.
 
@@ -58,13 +58,11 @@ class Parser(object):
         # lrn_type = lrn[0].getElementsByTagName("type")[0].firstChild.data
 
         agent = Agent()
-        if network is not None:
-            network.add_agent(agent, node_name)
-        if network2 is not None:
-            network2.add_agent(agent, node_name)
+        for network in networks:
+            network["graph"].add_agent(agent, node_name)
         return agent
 
-    def parse_agents(self, source, network, network2=None):
+    def parse_agents(self, source, networks):
         """
         Parse agents when given in json.
 
@@ -83,7 +81,7 @@ class Parser(object):
         agents = []
 
         for agent in agents_data:
-            agents.append(self.parse_agent(agent, network, network2))
+            agents.append(self.parse_agent(agent, networks))
 
         return agents
 
@@ -149,6 +147,9 @@ class Parser(object):
         dictionary = {}
 
         self.load_to_dictionary(dictionary, "dump_freq", source)
+        self.load_to_dictionary(dictionary, "num_iter", source)
+        self.load_to_dictionary(dictionary, "learning", source)
+
         networks_source = self.value_if_exist("networks", source)
         networks = []
         for net in networks_source:
@@ -156,25 +157,28 @@ class Parser(object):
             networks.append({"graph": graph, "start": net["start"]})
         dictionary["networks"] = networks
 
-        environments = {}
-        envs = self.value_if_exist("environment", source)
+        environments = []
+        envs = self.value_if_exist("environments", source)
         for env in envs:
             env_name = self.value_if_exist("name", env)
             env_source = self.value_if_exist("source", env)
-            environments[env_name] = self.parse_environment(env_source, env)
+            environment = self.parse_environment(env_source, env)
+            if env_name == "global":
+                dictionary['stimuli'] = environment.stimuli
+                dictionary['environment'] = environment
+            environments.append({"start": env["start"], "environment": environment})
 
-        dictionary['stimuli'] = environments['global'].stimuli
-        dictionary['environment'] = environments['global']
-        dictionary["agents"] = self.parse_agents(self.value_if_exist("agents", source),
-                                                 dictionary["network"],
-                                                 self.value_if_exist("network2", source))
+        dictionary['environments'] = environments
+        dictionary["agents"] = self.parse_agents(self.value_if_exist("agents", source), dictionary["networks"])
 
-        # inters = sock.getElementsByTagName("interaction")
-        # inter = self.return_element_if_exist(sock, "interaction", False)
-        # for i in inters:
-        inter = self.value_if_exist("interaction", source)
-        dictionary.update(self.interaction_parser_map[self.value_if_exist("type", inter)]
-                          (self.value_if_exist("params", inter)))
+        interactions_source = self.value_if_exist("interactions", source)
+        interactions = []
+        for i in interactions_source:
+            int_type = self.value_if_exist("type", i)
+            inter = self.interaction_parser_map[int_type](i)
+            interactions.append({"start": i["start"], "interaction": inter})
+
+        dictionary["interactions"] = interactions
 
         return dictionary
 
@@ -207,8 +211,7 @@ class Parser(object):
         if params is None:
             return {}
 
-        parameters = ["num_iter", "num_iter2", "learning2", "context_size",
-                      "alpha", "beta", "sigma", "inc_category_treshold", "classifier"]
+        parameters = ["context_size", "learning", "inc_category_treshold"]
 
         for p in parameters:
             self.load_to_dictionary(dictionary, p, params)

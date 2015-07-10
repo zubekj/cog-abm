@@ -19,13 +19,16 @@ class Simulation(object):
     This class defines what happens and when.
     """
 
-    def __init__(self, graph=None, interaction=None, agents=None, pb=False, 
+    def __init__(self, graphs=None, interactions=None, environments=None, agents=None, pb=False,
                  colour_order=None):
         ''' pb - show progress bar
             colour_order - list of colours in the order used when storing agents words
         '''
-        self.graph = graph
-        self.interaction = interaction
+        self.environments = environments
+        self.graph = None
+        self.graphs = graphs
+        self.interaction = None
+        self.interactions = interactions
         self.agents = tuple(agents)
         self.statistic = []
         self.dump_often = True
@@ -45,6 +48,23 @@ class Simulation(object):
             if self.colour_order:
                 store_words(self.agents, self.colour_order, str(iter_num)+"words.pout")
 
+    def _change_graph(self, counter):
+        for graph in self.graphs:
+            if graph["start"] is counter:
+                self.graph = graph["graph"]
+                break
+
+    def _change_interaction(self, counter):
+        for interaction in self.interactions:
+            if interaction["start"] is counter:
+                self.interaction = interaction["interaction"]
+                break
+
+    def _change_environment(self, counter):
+        for env in self.environments:
+            if env["start"] is counter:
+                self.interaction.change_environment(env["environment"])
+
     def _choose_agents(self):
         if self.interaction.num_agents() == 2:
             a = random.choice(self.agents)
@@ -61,6 +81,9 @@ class Simulation(object):
 
     def _do_iterations(self, num_iter, counter):
         for _ in xrange(num_iter):
+            self._change_graph(counter)
+            self._change_interaction(counter)
+            self._change_environment(counter)
             agents = self._choose_agents()
             self._start_interaction(agents)
             counter += 1
@@ -69,7 +92,7 @@ class Simulation(object):
         start_time = time()
         log.info("Simulation start...")
         it = xrange(iterations // dump_freq)
-        counter = 0
+        counter = 1
         if self.pb:
             it = get_progressbar()(it)
         for i in it:
