@@ -45,32 +45,33 @@ class Parser(object):
         @type agent: map
         @param agent: map representing agent.
 
-        @type simulation: simulation
-        @param simulation: Simulation object
-        """
-        # TODO:
-        # id = self.value_if_exist("id", agent)
-        # env_name = self.value_if_exist("environment", agent)
-        node_name = self.value_if_exist("node_name", agent)
-        # sensor = agent.getElementsByTagName("sensor")
-        # sensor_type = sensor[0].getElementsByTagName("type")[0].firstChild.dat
-        # lrn = agent.getElementsByTagName("classifier")
-        # lrn_type = lrn[0].getElementsByTagName("type")[0].firstChild.data
+        @type networks: list of Networks
+        @param networks: list of networks in which agent is set
 
+        @rtype: Agent
+        @return: Parsed agent
+        """
+
+        node_name = self.value_if_exist("node_name", agent)
         agent = Agent()
+
         for network in networks:
             network["graph"].add_agent(agent, node_name)
+
         return agent
 
     def parse_agents(self, source, networks):
         """
         Parse agents when given in json.
 
-        @type network: Network
-        @param network: agents topology
-
         @type source: String
         @param source: json document for pygraph directory.
+
+        @type networks: Networks
+        @param networks: list of networks in which agents are set
+
+        @rtype: list of Agent
+        @return: list of parsed agents
         """
         if source is None:
             return None
@@ -85,12 +86,15 @@ class Parser(object):
 
         return agents
 
-    def parse_environment(self, doc, main_sock=None):
+    def parse_environment(self, doc, source_map):
         """
         Parse environment parameters given in json document.
 
         @type doc: String
         @param doc: JSON document directory.
+
+        @type doc: map
+        @param doc: map with enviroment attributes described in simulation file
 
         @rtype: Environment
         @return: Parsed environment
@@ -100,7 +104,7 @@ class Parser(object):
 
         env = self.value_if_exist("stimuli", data)
         env_type = self.value_if_exist("type", data)
-        environment = self.environment_parser_map[env_type](env, main_sock)
+        environment = self.environment_parser_map[env_type](env, source_map)
         return environment
 
     @staticmethod
@@ -116,17 +120,18 @@ class Parser(object):
         """
         if source is None:
             return None
+
         with open("../../examples/networks/" + source, 'r') as f:
             graph = json.loads(f.read())
 
-            x = '<?xml version="1.0" ?><graph>'
+            graph_s = '<?xml version="1.0" ?><graph>'
             for node in graph["nodes"]:
-                x += '<node id="' + str(node) + '"/>'
+                graph_s += '<node id="%d"/>' % node
             for edge in graph["edges"]:
-                x += '<edge from="' + str(edge["from"]) + \
-                     '" to="' + str(edge["to"]) + '" wt="' + str(edge["wt"]) + '"/>'
-            x += "</graph>"
-            return Network(markup.read(x))
+                graph_s += '<edge from="%d" to="%d" wt="%d"/>' % (edge["from"], edge["to"], edge["wt"])
+
+            graph_s += "</graph>"
+            return Network(markup.read(graph_s))
 
     def parse_simulation(self, source):
         """
@@ -146,9 +151,9 @@ class Parser(object):
 
         dictionary = {}
 
-        self.load_to_dictionary(dictionary, "dump_freq", source)
-        self.load_to_dictionary(dictionary, "num_iter", source)
-        self.load_to_dictionary(dictionary, "learning", source)
+        parameters = ["dump_freq", "num_iter", "learning"]
+        for p in parameters:
+            self.load_to_dictionary(dictionary, p, source)
 
         networks_source = self.value_if_exist("networks", source)
         networks = []
@@ -182,7 +187,19 @@ class Parser(object):
 
         return dictionary
 
-    def parse_munsell_environment(self, env, main_sock):
+    def parse_munsell_environment(self, env, parameters):
+        """
+        Parse environment given in map.
+
+        @type env: map
+        @param env: map with environments stimuli
+
+        @type parameters: map
+        @param parameters: All environment attributes given in simulation.
+
+        @rtype: Environment
+        @return: Parsed Environment.
+        """
         list_of_stimuli = []
 
         for stimulus in env:
@@ -191,7 +208,7 @@ class Parser(object):
             b = self.value_if_exist("b", stimulus)
             list_of_stimuli.append(Color(l, a, b))
 
-        params = self.value_if_exist("params", main_sock)
+        params = self.value_if_exist("params", parameters)
 
         colour_order = None
         if params is not None:
@@ -207,6 +224,18 @@ class Parser(object):
         return Environment(list_of_stimuli, chooser, colour_order)
 
     def parse_game(self, dictionary, inter):
+        """
+        Parse standard steels game parameters.
+
+        @type dictionary: Map
+        @param dictionary: Map with already read parameters.
+
+        @type inter: Map
+        @param inter: Map with other parameters.
+
+        @rtype: Map
+        @return: Map which contains all game parameters.
+        """
         params = self.value_if_exist("params", inter)
         if params is None:
             return {}

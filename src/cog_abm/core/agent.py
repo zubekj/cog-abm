@@ -14,11 +14,10 @@ class Agent(object):
     AID = 10 ** 8
     AID_lock = Lock()
 
-    def __init__(self, aid=None, state=None, sensor=None, environment=None):
+    def __init__(self, aid=None, state=None, sensor=None):
         self.id = aid or Agent.get_next_id()
         self.sensor = sensor
         self.state = state
-        self.env = environment
         self.inter_res = []
         self.fitness = {}
 
@@ -47,14 +46,6 @@ class Agent(object):
 
     def add_payoff(self, f_id, payoff, weight=1.):
         self.fitness[f_id].add_payoff(payoff, weight)
-
-    def get_environment(self):
-        """
-        Gives environment where given agent "lives"
-        """
-        return self.env
-
-    environment = property(get_environment)
 
     def sense(self,  stimulus):
         """
