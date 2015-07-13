@@ -16,8 +16,7 @@ class Parser(object):
 
     Parser provides methods used to handle simulation input when given in json.
 
-    @sort: __init__, open_document, parse_agent, parse_agents, parse_graph,
-    parse_param
+    @sort: __init__
     """
 
     def __init__(self):
@@ -36,20 +35,19 @@ class Parser(object):
         self.interaction_parser_map["DiscriminationGame"] = \
             self.parse_discrimination_game
         self.interaction_parser_map["GuessingGame"] = self.parse_guessing_game
-        # self.interaction_parser_map["3"] = self.parse_genetic_game
 
     def parse_agent(self, agent, networks):
         """
         Parse agent properties when given as map.
 
-        @type agent: map
-        @param agent: map representing agent.
+        @type agent: Map
+        @param agent: Map representing Agent.
 
-        @type networks: list of Networks
-        @param networks: list of networks in which agent is set
+        @type networks: List of Networks
+        @param networks: List of Networks in which agent is set.
 
         @rtype: Agent
-        @return: Parsed agent
+        @return: Parsed Agent.
         """
 
         node_name = self.value_if_exist("node_name", agent)
@@ -65,13 +63,13 @@ class Parser(object):
         Parse agents when given in json.
 
         @type source: String
-        @param source: json document for pygraph directory.
+        @param source: Json document for pygraph directory.
 
         @type networks: Networks
-        @param networks: list of networks in which agents are set
+        @param networks: List of Networks in which Agents are set.
 
-        @rtype: list of Agent
-        @return: list of parsed agents
+        @rtype: List of Agent
+        @return: List of parsed Agents.
         """
         if source is None:
             return None
@@ -93,13 +91,13 @@ class Parser(object):
         @type doc: String
         @param doc: JSON document directory.
 
-        @type doc: map
-        @param doc: map with enviroment attributes described in simulation file
+        @type doc: Map
+        @param doc: Map with environment attributes described in simulation file.
 
         @rtype: Environment
-        @return: Parsed environment
+        @return: Parsed Environment.
         """
-        with open(doc, 'r') as f:
+        with open("../../examples/environment/" + doc, 'r') as f:
             data = json.loads(f.read())
 
         env = self.value_if_exist("stimuli", data)
@@ -113,9 +111,9 @@ class Parser(object):
         Parse graph when given as pygraph in json.
 
         @type source: String
-        @param source: json document for pygraph directory.
+        @param source: Json document for pygraph directory.
 
-        @rtype: pygraph
+        @rtype: Pygraph
         @return: Returns graph from pygraph library.
         """
         if source is None:
@@ -125,12 +123,15 @@ class Parser(object):
             graph = json.loads(f.read())
 
             graph_s = '<?xml version="1.0" ?><graph>'
+
             for node in graph["nodes"]:
                 graph_s += '<node id="%d"/>' % node
+
             for edge in graph["edges"]:
                 graph_s += '<edge from="%d" to="%d" wt="%d"/>' % (edge["from"], edge["to"], edge["wt"])
 
             graph_s += "</graph>"
+
             return Network(markup.read(graph_s))
 
     def parse_simulation(self, source):
@@ -151,10 +152,12 @@ class Parser(object):
 
         dictionary = {}
 
+        # Read standard simulation parameters.
         parameters = ["dump_freq", "num_iter", "learning"]
         for p in parameters:
             self.load_to_dictionary(dictionary, p, source)
 
+        # Read Networks.
         networks_source = self.value_if_exist("networks", source)
         networks = []
         for net in networks_source:
@@ -162,6 +165,7 @@ class Parser(object):
             networks.append({"graph": graph, "start": net["start"]})
         dictionary["networks"] = networks
 
+        # Read Environments and stimuli.
         environments = []
         envs = self.value_if_exist("environments", source)
         for env in envs:
@@ -174,8 +178,12 @@ class Parser(object):
             environments.append({"start": env["start"], "environment": environment})
 
         dictionary['environments'] = environments
-        dictionary["agents"] = self.parse_agents(self.value_if_exist("agents", source), dictionary["networks"])
 
+        # Read Agents.
+        agents = self.value_if_exist("agents", source)
+        dictionary["agents"] = self.parse_agents(agents, dictionary["networks"])
+
+        # Read Interactions.
         interactions_source = self.value_if_exist("interactions", source)
         interactions = []
         for i in interactions_source:
@@ -191,10 +199,10 @@ class Parser(object):
         """
         Parse environment given in map.
 
-        @type env: map
-        @param env: map with environments stimuli
+        @type env: Map
+        @param env: Map with environments stimuli.
 
-        @type parameters: map
+        @type parameters: Map
         @param parameters: All environment attributes given in simulation.
 
         @rtype: Environment
@@ -248,15 +256,51 @@ class Parser(object):
         return dictionary
 
     def parse_discrimination_game(self, inter):
+        """
+        Parse discrimination game parameters.
+
+        @type inter: Map
+        @param inter: Map with game parameters.
+
+        @rtype: Map
+        @return: Map which contains all discrimination game parameters.
+        """
         dictionary = {"interaction_type": "DG"}
         return self.parse_game(dictionary, inter)
 
     def parse_guessing_game(self, inter):
+        """
+        Parse guessing game parameters.
+
+        @type inter: Map
+        @param inter: Map with game parameters.
+
+        @rtype: Map
+        @return: Map which contains all guessing game parameters.
+        """
         dictionary = {"interaction_type": "GG"}
         return self.parse_game(dictionary, inter)
 
     @staticmethod
     def load_to_dictionary(dictionary, key, source, obligatory=False, function=None):
+        """
+        Loads value from key in source to key in dictionary.
+
+        @type dictionary: Map
+        @param dictionary: Map which is loaded value.
+
+        @type key: String
+        @param key: Key of value loaded.
+
+        @type source: Map
+        @param source: Map with value.
+
+        @type obligatory: Bool
+        @param obligatory: Key have to be in source.
+
+        @type obligatory: Function
+        @param obligatory: Function that have to be used on value before loading into dictionary.
+        """
         if key in source:
             if function is None:
                 dictionary[key] = source[key]
@@ -267,6 +311,21 @@ class Parser(object):
 
     @staticmethod
     def value_if_exist(key, source, function=None):
+        """
+        Reads value assigned to key from source. If source doesn't contain key return None.
+
+        @type key: String
+        @param key: Key of value read.
+
+        @type source: Map
+        @param source: Map with value.
+
+        @type function: function
+        @param function: Function that have to be used on value after reading.
+
+        @rtype: Any
+        @return: Value assigned to key in source or None.
+        """
         if key in source:
             if function is None:
                 return source[key]

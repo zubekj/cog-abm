@@ -25,12 +25,12 @@
   "environments" : [{
     "start" : 1,
     "name" : "global",
-    "source" : "../../examples/environment/1269_munsell_chips.json",
+    "source" : "1269_munsell_chips.json",
     "params" : {"distance" : 50}
   },{
     "start" : 30,
     "name" : "local",
-    "source" : "../../examples/environment/1269_munsell_chips.json",
+    "source" : "1269_munsell_chips.json",
     "params" : {"distance" : 50}
   }
   ]
