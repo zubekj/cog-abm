@@ -474,8 +474,13 @@ def steels_advanced_experiment(num_iter=1000, dump_freq=50, learning=None, agent
              str({'stimuli num': len(stimuli),
                   'num agents': len(agents)}))
 
+    if environment is None:
+        colour_order = None
+    else:
+        colour_order = environment.colour_order
+
     s = Simulation(networks, interaction_list, agents=agents,
-                   environments=environments, colour_order=environment.colour_order)
+                   environments=environments, colour_order=colour_order)
     res = s.run(num_iter, dump_freq)
 
     return res

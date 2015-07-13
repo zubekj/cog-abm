@@ -4,7 +4,7 @@ the Stimulus' interfaces.
 """
 import os
 
-from cog_abm.ML.core import Sample, euclidean_distance
+from src.cog_abm.ML.core import Sample, euclidean_distance
 
 
 class Color(Sample):
@@ -12,30 +12,29 @@ class Color(Sample):
     Color represented in CIE L*a*b* space
     """
 
-    def __init__(self,  L, a, b):
+    def __init__(self,  l, a, b):
         """
         Initialize Color
 
         http://en.wikipedia.org/wiki/Lab_color_space
         section: Range_of_L.2Aa.2Ab.2A_coordinates
 
-        @param L: lightness - should be in [0,100]
+        @param l: lightness - should be in [0,100]
         @param a: can be negative
         @param b: can be negative
         """
-        super(Color, self).__init__([L, a, b], dist_fun=euclidean_distance)
-        self.L = L
+        super(Color, self).__init__([l, a, b], dist_fun=euclidean_distance)
+        self.L = l
         self.a = a
         self.b = b
 
 
 def get_WCS_colors():
-    from cog_abm.extras.parser import Parser
+    from src.cog_abm.extras.parser import Parser
     return Parser().parse_environment(
         os.path.join(os.path.dirname(__file__), "../../../data/wcs_input_data/330WCS.xml")).stimuli
 
 
 def get_1269Munsell_chips():
-    from cog_abm.extras.parser import Parser
-    return Parser().parse_environment(os.path.join(os.path.dirname(__file__),
-        "../../../data/wcs_input_data/1269_munsell_chips.xml")).stimuli
+    from src.cog_abm.extras.parser import Parser
+    return Parser().parse_environment("1269_munsell_chips.json", {}).stimuli

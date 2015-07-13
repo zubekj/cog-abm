@@ -2,6 +2,7 @@ import sys
 import logging
 import cPickle
 from time import localtime, strftime
+from src.cog_abm.core.environment import *
 
 
 def save_res(results, f_name=None):
@@ -31,12 +32,12 @@ def load_params(simulation):
     if simulation is None:
         return default_params()
 
-    from cog_abm.extras.parser import Parser
+    from src.cog_abm.extras.parser import Parser
     return Parser().parse_simulation(simulation)
 
 
 def default_params():
-    from cog_abm.extras.color import get_1269Munsell_chips
+    from src.cog_abm.extras.color import get_1269Munsell_chips
     return {
         'dump_freq': 100,
         'num_iter': 1000,
@@ -46,6 +47,9 @@ def default_params():
             'sigma': 10.
         },
         'stimuli': get_1269Munsell_chips(),
+        'environments': [{'start': 1,
+                          'environment': Environment(get_1269Munsell_chips(), RandomStimuliChooser(), None)}],
+        'environment': Environment(get_1269Munsell_chips(), RandomStimuliChooser(), None),
         'interactions': [
             {'start': 1,
              'interaction': {
@@ -60,20 +64,19 @@ def default_params():
 
 if __name__ == "__main__":
 
-    #import analyzer
     import optparse
 
-    optp = optparse.OptionParser()
+    opt_p = optparse.OptionParser()
 
-    optp.add_option('-v', '--verbose', dest='verbose', action='count',
-        help="Increase verbosity (specify multiple times for more)")
-    optp.add_option('-f', '--file', action="store", dest='file', type="string",
-        help="output file with results")
-    optp.add_option('-p', '--params_file', action="store", dest='param_file',
-        type="string", help="file with parameters")
+    opt_p.add_option('-v', '--verbose', dest='verbose', action='count',
+                     help="Increase verbosity (specify multiple times for more)")
+    opt_p.add_option('-f', '--file', action="store", dest='file', type="string",
+                     help="output file with results")
+    opt_p.add_option('-p', '--params_file', action="store", dest='param_file',
+                     type="string", help="file with parameters")
 
     # Parse the arguments (defaults to parsing sys.argv).
-    opts, args = optp.parse_args()
+    opts, args = opt_p.parse_args()
 
     log_level = logging.DEBUG  # default logging.WARNING
 
@@ -87,24 +90,9 @@ if __name__ == "__main__":
 
     sys.path.append('../')
     sys.path.append('')
-    from steels.steels_experiment import steels_advanced_experiment
+    from src.steels.steels_experiment import steels_advanced_experiment
 
     params = load_params(opts.param_file)
 
-    #print params
-
     r = steels_advanced_experiment(**params)
-
-    # if opts.game is not None:
-    #     params["interaction_type"] = opts.game
-    # interaction_type = params.pop("interaction_type")
-    # if interaction_type == "DG":
-    #     #r = steels_basic_experiment_DG
-    #     r = steels_basic_experiment_DG(**params)
-    # elif interaction_type == "GG":
-    #     if "topology2" in params:
-    #         r = steels_experiment_GG_topology_shift(**params)
-    #     else:
-    #         r = steels_basic_experiment_GG(**params)
-
-    save_res((r, params), opts.file)
+    save_res((r, params), "../../results/" + opts.file)
