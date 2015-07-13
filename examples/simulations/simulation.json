@@ -13,14 +13,14 @@
      "start" : 1,
      "params" : {"context_size" : 4,
                  "learning" : true,
-                 "inc_category_treshold" : 0.95}
+                 "inc_category_threshold" : 0.95}
     },
     {"id" : 2,
      "type" : "GuessingGame",
      "start" : 1501,
      "params" : {"context_size" : 4,
                  "learning" : true,
-                 "inc_category_treshold" : 0.95}
+                 "inc_category_threshold" : 0.95}
     }],
   "environments" : [{
     "start" : 1,

@@ -1,14 +1,13 @@
 """
-This module implements Steels exepriment.
+This module implements Steels experiment.
 """
 import logging
 import random
 
 import numpy as np
 
-from cog_abm.core import Environment, Simulation
+from cog_abm.core import Environment, Simulation, Agent
 from cog_abm.core.interaction import Interaction
-from cog_abm.core.environment import RandomStimuliChooser
 from cog_abm.agent.sensor import SimpleSensor
 from cog_abm.ML.core import Classifier
 from cog_abm.extras.additional_tools import generate_simple_network
@@ -23,21 +22,19 @@ log.level = logging.INFO
 
 
 class ReactiveUnit(object):
-    """ Reactive units are used in adaptive networks
-    """
+    """ Reactive units are used in adaptive networks. """
 
     def_sigma = 1.
 
     def __init__(self, central_value, sigma=None):
         self.central_value = central_value
         sigma = sigma or ReactiveUnit.def_sigma
-        self.mdub_sqr_sig = np.longdouble(-0.5 / (sigma ** 2.))
+        self.sqr_sig = np.longdouble(-0.5 / (sigma ** 2.))
 
     def value_for(self, x):
-        """ Calculate reaction for given vector
-        """
+        """ Calculate reaction for given vector """
         a = self.central_value.distance(x) ** 2.
-        w = np.exp(a * self.mdub_sqr_sig)
+        w = np.exp(a * self.sqr_sig)
         return w
 
     def __eq__(self,  other):
@@ -48,22 +45,21 @@ class ReactiveUnit(object):
 
 
 class AdaptiveNetwork(object):
-    """ Adaptive network is some kind of classifier
-    """
+    """ Adaptive network is some kind of classifier. """
 
     def_alpha = 0.1
     def_beta = 1.
 
     def __init__(self,  reactive_units=None, alpha=None, beta=None):
-        """ Must be with weights !
-        """
+        """ Must be with weights ! """
         self.units = reactive_units or []
         self.alpha = np.longdouble(alpha or AdaptiveNetwork.def_alpha)
         self.beta = np.longdouble(beta or AdaptiveNetwork.def_beta)
 
     def _index_of(self, unit):
-        """ Finds index of given unit.
-        Returns -1 if there is no such unit in this network
+        """
+        Finds index of given unit.
+        Returns -1 if there is no such unit in this network.
         """
         for i, (u, _) in enumerate(self.units):
             if u == unit:
@@ -81,23 +77,21 @@ class AdaptiveNetwork(object):
     def reaction(self, data):
         return sum((w * u.value_for(data) for u, w in self.units))
 
-    def _update_units(self, fun):
-        tmp = [fun(u, w) for u, w in self.units]
+    def _update_units(self, update):
+        tmp = [update(u, w) for u, w in self.units]
         self.units = filter(lambda x: x is not None,  tmp)
 
     def remove_low_units(self, threshold=0.1 ** 30):
         self.units = [(u, w) for u, w in self.units if w >= threshold]
 
     def increase_sample(self, sample):
-        self._update_units(lambda u, w:
-            (u, min(np.longdouble(1.), w + self.beta * u.value_for(sample))))
-                                # because we don't want to exceed 1
+        update = lambda u, w: (u,
+                               # We don't want weight to exceed 1.
+                               min(np.longdouble(1.), w + self.beta * u.value_for(sample)))
+        self._update_units(update)
 
-    #TODO: rewrite it to be in time O(1)
     def forgetting(self):
         self._update_units(lambda u, w: (u, self.alpha * w))
-#               self.remove_low_units(0.1**50)
-#               TODO: think about ^^^^^
 
 
 class SteelsClassifier(Classifier):
@@ -111,7 +105,6 @@ class SteelsClassifier(Classifier):
             class_id = self.new_category_id
             self.new_category_id += 1
             adaptive_network = AdaptiveNetwork()
-
         else:
             adaptive_network = self.categories[class_id]
 
@@ -129,8 +122,10 @@ class SteelsClassifier(Classifier):
     def classify(self, sample):
         if len(self.categories) == 0:
             return None
-        return max(self.categories.iteritems(),
-            key=lambda kr: kr[1].reaction(sample))[0]
+        return max(
+            self.categories.iteritems(),
+            key=lambda kr: kr[1].reaction(sample)
+        )[0]
 
     def increase_samples_category(self, sample):
         category_id = self.classify(sample)
@@ -146,79 +141,81 @@ class SteelsClassifier(Classifier):
 
 class DiscriminationGame(Interaction):
 
-    def __init__(self, context_len=4, inc_category_treshold=0.95, environment=None):
+    def __init__(self, context_len=4, inc_category_threshold=0.95, environment=None):
         self.context_len = context_len
-        self.inc_category_treshold = inc_category_treshold
+        self.inc_category_threshold = inc_category_threshold
         self.environment = environment
 
     def change_environment(self, environment):
         self.environment = environment
 
-    def num_agents(self):
+    @staticmethod
+    def num_agents():
         return 2
 
-    def set_inc_category_treshold(self, new_inc_category_threshold):
-        self.inc_category_treshold = new_inc_category_threshold
+    def set_inc_category_threshold(self, new_inc_category_threshold):
+        self.inc_category_threshold = new_inc_category_threshold
 
-    def save_result(self, agent, result):
+    @staticmethod
+    def save_result(agent, result):
         agent.add_payoff("DG", int(result))
 
-    def disc_game(self, agent, context, topic):
-        ctopic = agent.sense_and_classify(topic)
-        # no problem if ctopic is None => count>1 so it will add new category
+    @staticmethod
+    def disc_game(agent, context, topic):
+        """
+        Checking whether agent can discriminate topic from context.
+        Topic is element of context.
+        """
+        c_topic = agent.sense_and_classify(topic)
+        # No problem if c_topic is None => count>1 so it will add new category.
 
-        ccontext = [agent.sense_and_classify(c) for c in context]
-        count = ccontext.count(ctopic)
-        return (count == 1, ctopic)
+        c_context = [agent.sense_and_classify(c) for c in context]
+        count = c_context.count(c_topic)
+        return count == 1, c_topic
 
-    def learning_after(self, agent, topic, succ, ctopic=None):
-        succ_rate = DS_A(agent)
+    def learning_after(self, agent, topic, success, c_topic=None):
+        success_rate = DS_A(agent)
         sensed_topic = agent.sense(topic)
 
-        if succ:
+        if success:
             agent.state.classifier.increase_samples_category(sensed_topic)
-        elif succ_rate >= self.inc_category_treshold:
-            #agent.state.incrase_samples_category(topic)
-            if ctopic is None:
-                ctopic = agent.state.classifier.classify(sensed_topic)
-            agent.state.classifier.add_category(sensed_topic, ctopic)
-
+        elif success_rate >= self.inc_category_threshold:
+            if c_topic is None:
+                c_topic = agent.state.classifier.classify(sensed_topic)
+            agent.state.classifier.add_category(sensed_topic, c_topic)
         else:
             agent.state.classifier.add_category(sensed_topic)
 
-        # lower strength of memory
+        # Lower strength of memory.
         agent.state.classifier.forgetting()
 
     def play_with_learning(self, agent, context, topic):
-        succ, ctopic = self.disc_game(agent, context, topic)
-        self.learning_after(agent, topic, succ, ctopic)
-        return succ, ctopic, topic, context
+        success, c_topic = self.disc_game(agent, context, topic)
+        self.learning_after(agent, topic, success, c_topic)
+        return success, c_topic, topic, context
 
     def play_save(self, agent, context, topic):
-        succ, ctopic = self.disc_game(agent, context, topic)
-        self.save_result(agent, succ)
-        return succ, ctopic
+        success, c_topic = self.disc_game(agent, context, topic)
+        self.save_result(agent, success)
+        return success, c_topic
 
     def play_learn_save(self, agent, context, topic):
-        succ, ctopic, topic, context = \
-                self.play_with_learning(agent, context, topic)
-
-        #agent.add_inter_result(("DG", succ))
-        self.save_result(agent, succ)
-        return succ, ctopic, topic, context
+        success, c_topic, topic, context = self.play_with_learning(agent, context, topic)
+        self.save_result(agent, success)
+        return success, c_topic, topic, context
 
     def get_setup(self):
         context = self.environment.get_stimuli(self.context_len)
         topic = context[0]
-        # ^^^^ they are already shuffled - and needed when different classes
-        return (context, topic)
+        # ^^^^ They are already shuffled - and needed when different classes.
+        return context, topic
 
     def interact_one_agent(self, agent, context=None, topic=None):
         if context is None or topic is None:
             context, topic = self.get_setup()
-        succ, _, _, _ = self.play_with_learning(agent, context, topic)
-        self.save_result(agent, succ)
-        return succ
+        success, _, _, _ = self.play_with_learning(agent, context, topic)
+        self.save_result(agent, success)
+        return success
 
     def interact(self, agent1, agent2):
         context, topic = self.get_setup()
@@ -229,101 +226,40 @@ class DiscriminationGame(Interaction):
 
     def __repr__(self):
         return "DiscriminationGame: context_len=%s;" \
-            " inc_category_treshold=%s" % \
-            (self.context_len, self.inc_category_treshold)
+               " inc_category_threshold=%s" % \
+               (self.context_len, self.inc_category_threshold)
 
 
 class GuessingGame(Interaction):
-    # Based mostly on work "Colourful language and colour categories"
-    # of Tony Belpaeme and Joris Bleys
+    """
+    Based mostly on work "Colourful language and colour categories"
+    of Tony Belpaeme and Joris Bleys.
+    """
 
     def __init__(self, disc_game=None, context_size=None, learning_mode=True, environment=None):
         if disc_game is None:
-            disc_game = DiscriminationGame()
+            disc_game = DiscriminationGame(environment=environment)
             if context_size is not None:
                 disc_game.context_len = context_size
 
         self.disc_game = disc_game
         self.learning_mode = learning_mode
         self.environment = environment
-        self.disc_game.change_environment(environment)
 
     def change_environment(self, environment):
         self.environment = environment
         self.disc_game.change_environment(environment)
 
-    def num_agents(self):
+    @staticmethod
+    def num_agents():
         return 2
 
-    def set_inc_category_treshold(self, new_inc_category_threshold):
-        self.disc_game.set_inc_category_treshold(new_inc_category_threshold)
+    def set_inc_category_threshold(self, new_inc_category_threshold):
+        self.disc_game.set_inc_category_threshold(new_inc_category_threshold)
 
-    def save_result(self, agent, result):
+    @staticmethod
+    def save_result(agent, result):
         agent.add_payoff("GG", int(result))
-
-    def learning_after_speaker_DG_fail(self, speaker, topic, ctopic):
-        if not self.learning_mode:
-            return None
-        self.disc_game.learning_after(speaker, topic, False, ctopic)
-
-    def learning_after_hearer_doesnt_know_word(self, topic, context, f,
-            sp, hr, spctopic):
-        if not self.learning_mode:
-            return None
-        #agent hr plays discrimination game on context and topic
-        #The game returns: succ (boolean whether the game ended in success)
-        #and hectopic (the category to which topic belongs)
-        succ, hectopic = self.disc_game.play_save(hr, context, topic)
-
-        #if hr succesfuly played discrimination game:
-        if succ:
-            #add word f to category hectopic
-            #=================================================================
-            #MAYBE HERE IS A GOOD PLACE TO PUT ADDITIONAL CONDITION
-            #=================================================================
-            hr.state.lexicon.add_element(hectopic, f)
-        #if hr does not discriminate the topic from context:
-        else:
-            #hr learns to discriminate:
-            self.disc_game.learning_after(hr, topic, succ, hectopic)
-            #get the category of hr to which topic belongs to after learning:
-            class_id = hr.sense_and_classify(topic)
-            #add word f to category hectopic in agent hr
-            #=================================================================
-            #MAYBE HERE IS A GOOD PLACE TO PUT ADDITIONAL CONDITION?
-            #=================================================================
-            hr.state.lexicon.add_element(class_id, f)
-
-    def learning_after_game_succeeded(self, word, topic, context,
-            sp, spc, hr, hrc):
-        """
-        sp - speaker
-        spc - category of speaker for topic
-        hr - hearer
-        hrc - category of hearer for topic
-        """
-        if not self.learning_mode:
-            return None
-        sp.state.lexicon.inc_dec_categories(spc, word)
-        # ^^ as in 4.2 1.(a)
-        hr.state.lexicon.inc_dec_words(hrc, word)
-        # ^^ as in 4.2 2.(a)
-
-        for a in [sp, hr]:
-            a.state.classifier.increase_samples_category(a.sense(topic))
-
-    def learning_after_agents_mismatched_words(self, topic,
-            sp, spw, spc,
-            hr, hrw, hrc):
-        if not self.learning_mode:
-            return None
-        sp.state.lexicon.decrease(spc, spw)
-        # ^^ as in 4.2 1.(b)
-        hr.state.lexicon.decrease(hrc, hrw)
-        # ^^ as in 4.2 2.(b)
-
-        # TODO: Not lexicon related:
-        self.disc_game.learning_after(hr, topic, False)
 
     def guess_game(self, speaker, hearer):
         """
@@ -332,75 +268,116 @@ class GuessingGame(Interaction):
         Each line explained by a comment.
         """
 
-        #Get a random list of stimuli from ironment of size self.disc_game.context_len:
+        # Get a random list of stimuli from environment of size self.disc_game.context_len:
         context = self.environment.get_stimuli(self.disc_game.context_len)
 
-        #The first element of this context is topic:
+        # The first element of this context is topic:
         topic = context[0]
 
-        #The speaker plays the discrimination game on the selected context and topic.
-        #The game returns: succ (boolean whether the game ended in success)
-        #and spctopic (the speaker's category to which topic belongs)
-        succ, spctopic = self.disc_game.play_save(speaker, context, topic)
+        """
+        The speaker plays the discrimination game on the selected context and topic.
+        The game returns: success (boolean whether the game ended in success)
+        and s_category (the speaker's category to which topic belongs)
+        """
+        success, s_category = self.disc_game.play_save(speaker, context, topic)
 
-        #If the speaker did not discriminate the topic from the rest of the context himself:
-        if not succ:
-            #learn by himself this discrimination:
-            self.learning_after_speaker_DG_fail(speaker, topic, spctopic)
-            #do not proceed further:
+        # If the speaker did not discriminate the topic from the rest of the context himself:
+        if not success:
+            # If agents can learn:
+            if self.learning_mode:
+                # Learn by himself this discrimination:
+                self.disc_game.learning_after(speaker, topic, False, s_category)
+            # Do not proceed further:
             return False
 
-        #f = word that speaker uses to call the spctopic category
-        f = speaker.state.word_for(spctopic)
-        #if there is no word that speaker has for this category:
-        if f is None:
-            #a random word is chosen for this category and added:
-            f = speaker.state.lexicon.add_element(spctopic)
+        # word = word that speaker uses to call the s_category category.
+        word = speaker.state.word_for(s_category)
+        # If there is no word that speaker has for this category:
+        if word is None:
+            # A random word is chosen for this category and added:
+            word = speaker.state.lexicon.add_element(s_category)
 
-        #hcategory = a category that hearer thinks of when using the word f:
-        hcategory = hearer.state.category_for(f)
-        #if there is no category for word f in hearer's memory:
-        if hcategory is None:
-            #the hearer learns a new word:
-            #if he discriminates topic from context, a new word is added
-            #if he does not, he first learns to discriminate and only then learns a new word
-            #=================================================================
-            #MAYBE HERE IS A GOOD PLACE TO PUT THE CONDITION: INSIDE THE METHOD:
-            #learning_after_hearer_doesnt_know_word
-            #=================================================================
-            self.learning_after_hearer_doesnt_know_word(topic,
-                context, f, speaker, hearer, spctopic)
+        # h_word_category = a category that hearer thinks of when using the word:
+        h_word_category = hearer.state.category_for(word)
+        # If there is no category for word in hearer's memory:
+        if h_word_category is None:
+            """
+            The hearer learns a new word:
+            If he discriminates topic from context, a new word is added.
+            If he does not, he first learns to discriminate and only then learns a new word.
+            """
+
+            # If agents can learn:
+            if self.learning_mode:
+                """
+                Agent hearer plays discrimination game on context and topic.
+                The game returns: success (boolean whether the game ended in success)
+                and h_category (the category to which topic belongs).
+                """
+                success, h_category = self.disc_game.play_save(hearer, context, topic)
+
+                # If hearer successfully played discrimination game:
+                if success:
+                    # Add word to category h_category.
+                    hearer.state.lexicon.add_element(h_category, word)
+                # If hearer does not discriminate the topic from context:
+                else:
+                    # Hearer learns to discriminate:
+                    self.disc_game.learning_after(hearer, topic, success, h_category)
+                    # Get the category of hr to which topic belongs to after learning:
+                    class_id = hearer.sense_and_classify(topic)
+                    # Add word to category h_category in agent hr.
+                    hearer.state.lexicon.add_element(class_id, word)
             return False
 
-        #randomly shuffle the context:
+        # Randomly shuffle the context:
         random.shuffle(context)
-        #Choose a stimulus from context, which is most characteristic to the hcategory
-        max_hr_sample = self.find_best_matching_sample_to_category(hearer,
-            context, hcategory)
+        # Choose a stimulus from context, which is most characteristic to the h_word_category
+        max_hr_sample = self.find_best_matching_sample_to_category(hearer, context, h_word_category)
 
-        # checking game result: is the strongest activated stimulus same as topic?
-        succ = max_hr_sample == topic
+        # Checking game result: is the strongest activated stimulus same as topic?
+        success = max_hr_sample == topic
 
-        #if it is the same:
-        if succ:
-            #increase the confidence in word for topic in both speaker and hearer:
-            #this is a symetric function from the perspective of speaker and hearer:
-            self.learning_after_game_succeeded(f, topic, context,
-                speaker, spctopic, hearer, hcategory)
+        # If it is the same:
+        if success:
+            """
+            Increase the confidence in word for topic in both speaker and hearer:
+            This is a symmetric function from the perspective of speaker and hearer:
+            """
 
-        #if it is different:
+            # If agents can learn:
+            if self.learning_mode:
+                speaker.state.lexicon.inc_dec_categories(s_category, word)
+                # ^^ as in 4.2 1.(a)
+                hearer.state.lexicon.inc_dec_words(h_word_category, word)
+                # ^^ as in 4.2 2.(a)
+
+                for a in [speaker, hearer]:
+                    a.state.classifier.increase_samples_category(a.sense(topic))
+
+        # If it is different:
         else:
-            #decrease the confidence in word for topic in both speaker and hearer:
-            #further, learning on hearer performed but without use of word f
-            self.learning_after_agents_mismatched_words(topic,
-                speaker, f, spctopic, hearer, f, hcategory)
-        return succ
+            """
+            Decrease the confidence in word for topic in both speaker and hearer:
+            Further, learning on hearer performed but without use of word.
+            """
 
-    def find_best_matching_sample_to_category(self, agent, samples, category):
+            # If agents can learn:
+            if not self.learning_mode:
+                speaker.state.lexicon.decrease(s_category, word)
+                # ^^ as in 4.2 1.(b)
+                hearer.state.lexicon.decrease(h_word_category, word)
+                # ^^ as in 4.2 2.(b)
+
+                self.disc_game.learning_after(hearer, topic, False)
+
+        return success
+
+    @staticmethod
+    def find_best_matching_sample_to_category(agent, samples, category):
         max_reaction, max_sample = float("-inf"), None
         for sample in samples:
-            strength = agent.state.sample_strength(category,
-                agent.sense(sample))
+            strength = agent.state.sample_strength(category, agent.sense(sample))
             if strength > max_reaction:
                 max_reaction, max_sample = strength, sample
         return max_sample
@@ -409,13 +386,13 @@ class GuessingGame(Interaction):
         r = self.guess_game(speaker, hearer)
         self.save_result(speaker, r)
         self.save_result(hearer, r)
-        return (("GG", r), ("GG", r))
+        return ("GG", r), ("GG", r)
 
     def __repr__(self):
         return "GuessingGame: %s" % self.disc_game
 
 
-#class SteelsAgentState(AgentState):
+# class SteelsAgentState(AgentState):
 class SteelsAgentState(object):
 
     def __init__(self, classifier):
@@ -424,8 +401,8 @@ class SteelsAgentState(object):
     def classify(self, sample):
         return self.classifier.classify(sample)
 
-    def classify_pval(self, sample):
-        return self.classifier.classify_pval(sample)
+    def classify_p_val(self, sample):
+        return self.classifier.classify_p_val(sample)
 
     def class_probabilities(self, sample):
         return self.classifier.class_probabilities(sample)
@@ -447,154 +424,33 @@ class SteelsAgentStateWithLexicon(SteelsAgentState):
         return self.lexicon.word_for(category)
 
 
-#Steels experiment main part
-
-
-def merge_experiment_results(res1, res2):
-    """
-    Merges results of two experiments into one results list preserving
-    consecutive indexing of iterations. For example, if res1 contains n1
-    iterations and res2 contains n2 iterations returned list will contain
-    iterations numbered from 0 to n1+n2.
-    """
-    n = res1[-1][0]
-    res2 = [(n+i, s) for i, s in res2]
-
-    return res1 + res2
-
-
-def steels_universal_basic_experiment(num_iter, agents,
-        interaction, stimuli, networks=None,
-        dump_freq=50, chooser=None, env=None):
-
-    networks = networks or [{"graph": generate_simple_network(agents), "start": 1}]
-
-#       if stimuli == None:
-#               stimuli = def_value(None, default_stimuli())
-
-    if env is None:
-        chooser = chooser or RandomStimuliChooser(use_distance=True, distance=distance)
-        env = Environment(stimuli, chooser)
-
-    for agent in agents:
-        agent.env = env
-
-    log.info("Running steels experiment with: %s", str({
-            'interaction': str(interaction),
-            'stimuli num': len(stimuli),
-            'chooser': str(chooser),
-            'num agents': len(agents),
-        }))
-    s = Simulation(networks, interaction, agents, colour_order=env.colour_order)
-    res = s.run(num_iter, dump_freq)
-
-    return res
-
-
-def steels_basic_experiment_DG(inc_category_treshold=0.95, classifier=None,
-        beta=1., context_size=4, stimuli=None,
-        agents=None, dump_freq=50, alpha=0.1, sigma=1., num_iter=1000,
-        networks=None, environment=None):
-
-    classifier, classif_arg = SteelsClassifier, []
-
-    # FIX THIS !!
-    for agent in agents:
-        agent.set_state(SteelsAgentStateWithLexicon(classifier(*classif_arg)))
-        agent.set_sensor(SimpleSensor())
-        agent.set_fitness_measure("DG", metrics.get_DS_fitness())
-
-    AdaptiveNetwork.def_alpha = float(alpha)
-    AdaptiveNetwork.def_beta = float(beta)
-    ReactiveUnit.def_sigma = float(sigma)
-    inc_category_treshold = float(inc_category_treshold)
-
-    return steels_universal_basic_experiment(num_iter, agents,
-        DiscriminationGame(context_size, inc_category_treshold), networks=networks,
-            dump_freq=dump_freq, stimuli=stimuli, env=environment)
-
-def steels_basic_experiment_GG(inc_category_treshold=0.95, classifier=None,
-        beta=1., context_size=4, stimuli=None,
-        agents=None, dump_freq=50, alpha=0.1, sigma=1., num_iter=1000,
-        networks=None, environment=None):
-
-    classifier, classif_arg = SteelsClassifier, []
-    #agents = [Agent(SteelsAgentStateWithLexicon(classifier()), SimpleSensor())\
-
-    # FIX THIS !!
-    classif_arg = def_value(classif_arg, [])
-    for agent in agents:
-        agent.set_state(SteelsAgentStateWithLexicon(classifier(*classif_arg)))
-        agent.set_sensor(SimpleSensor())
-        agent.set_fitness_measure("DG", metrics.get_DS_fitness())
-        agent.set_fitness_measure("GG", metrics.get_CS_fitness())
-
-    AdaptiveNetwork.def_alpha = float(alpha)
-    AdaptiveNetwork.def_beta = float(beta)
-    ReactiveUnit.def_sigma = float(sigma)
-    dg = DiscriminationGame(context_size, float(inc_category_treshold))
-
-    return steels_universal_basic_experiment(num_iter, agents,
-        GuessingGame(dg), network=networks, dump_freq=dump_freq,
-        stimuli=stimuli, env=environment)
-
-
-def steels_experiment_GG_topology_shift(inc_category_treshold=0.95, classifier=None,
-        beta=1., context_size=4, stimuli=None,
-        agents=None, dump_freq=50, alpha=0.1, sigma=1., num_iter=1000,
-        network=None, environment=None, network2=None, num_iter2=1000,
-                                        learning2=True):
-    """
-    An experiment in which topology changes after some number of iterations.
-    """
-
-    classifier, classif_arg = SteelsClassifier, []
-    #agents = [Agent(SteelsAgentStateWithLexicon(classifier()), SimpleSensor())\
-
-    # FIX THIS !!
-    classif_arg = def_value(classif_arg, [])
-    for agent in agents:
-        agent.set_state(SteelsAgentStateWithLexicon(classifier(*classif_arg)))
-        agent.set_sensor(SimpleSensor())
-        agent.set_fitness_measure("DG", metrics.get_DS_fitness())
-        agent.set_fitness_measure("GG", metrics.get_CS_fitness())
-
-    AdaptiveNetwork.def_alpha = float(alpha)
-    AdaptiveNetwork.def_beta = float(beta)
-    ReactiveUnit.def_sigma = float(sigma)
-    dg = DiscriminationGame(context_size, float(inc_category_treshold))
-
-    r1 = steels_universal_basic_experiment(num_iter, agents,
-            GuessingGame(dg), network=network, dump_freq=dump_freq,
-            stimuli=stimuli, env=environment)
-
-    r2 = steels_universal_basic_experiment(num_iter2, agents,
-            GuessingGame(dg, learning_mode=learning2), network=network2,
-            dump_freq=dump_freq, stimuli=stimuli, env=environment)
-
-    return merge_experiment_results(r1, r2)
-
-
-def steels_advanced_experiment(num_iter=1000, dump_freq=50, learning=None, agents=None,
+# Steels experiment main part
+def steels_advanced_experiment(num_iter=1000, dump_freq=50, learning=None, agents=None, num_agents=10,
                                stimuli=None, environments=None, environment=None, networks=None, interactions=None):
     """
     An experiment in which topology, type and learning can change after some number of iterations.
     """
 
-    classifier, classif_arg = SteelsClassifier, []
-    classif_arg = def_value(classif_arg, [])
+    classifier, classifier_arg = SteelsClassifier, []
+    classifier_arg = def_value(classifier_arg, [])
 
-    has_GG = False
+    has_gg = False
     for i in interactions:
         if i["interaction"]["interaction_type"] is "GG":
-            has_GG = True
+            has_gg = True
             break
 
+    if agents is None:
+        agents = []
+        for _ in range(0, num_agents):
+            agents.append(Agent())
+
     for agent in agents:
-        agent.set_state(SteelsAgentStateWithLexicon(classifier(*classif_arg)))
+        state = SteelsAgentStateWithLexicon(classifier(*classifier_arg))
+        agent.set_state(state)
         agent.set_sensor(SimpleSensor())
         agent.set_fitness_measure("DG", metrics.get_DS_fitness())
-        if has_GG:
+        if has_gg:
             agent.set_fitness_measure("GG", metrics.get_CS_fitness())
 
     AdaptiveNetwork.def_alpha = float(learning["alpha"])
@@ -607,20 +463,19 @@ def steels_advanced_experiment(num_iter=1000, dump_freq=50, learning=None, agent
 
     for interaction in interactions:
         i = interaction["interaction"]
-        dg = DiscriminationGame(i["context_size"], float(i["inc_category_treshold"]))
-        if i["interaction_type"] is "DG":
+        dg = DiscriminationGame(i["context_size"], float(i["inc_category_threshold"]))
+        if i["interaction_type"] is "GG":
             inter = GuessingGame(dg)
         else:
             inter = dg
         interaction_list.append({"start": interaction["start"], "interaction": inter})
 
+    log.info("Running steels experiment with: %s",
+             str({'stimuli num': len(stimuli),
+                  'num agents': len(agents)}))
 
-    log.info("Running steels experiment with: %s", str({
-            'stimuli num': len(stimuli),
-            'num agents': len(agents)
-        }))
-    print environments
-    s = Simulation(networks, interaction_list, agents=agents, environments=environments, colour_order=environment.colour_order)
+    s = Simulation(networks, interaction_list, agents=agents,
+                   environments=environments, colour_order=environment.colour_order)
     res = s.run(num_iter, dump_freq)
 
     return res

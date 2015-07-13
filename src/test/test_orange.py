@@ -49,7 +49,7 @@ class TestOrange(unittest.TestCase):
         samples.extend([Sample([1, 0, 0], self.meta), Sample([2, 1, 0], self.meta)])
         for e, s in izip(expected, samples):
             self.assertEqual(e, classifier.classify(s))
-            k, p = classifier.classify_pval(s)
+            k, p = classifier.classify_p_val(s)
             self.assertTrue(0. <= p <= 1.)
             self.assertEqual(k, classifier.classify(s))
             p2 = classifier.class_probabilities(s)

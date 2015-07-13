@@ -15,8 +15,6 @@ def generate_simple_network(agents):
 
     for i, a in enumerate(agents):
         network.add_agent(a, i)
-#        network.add_agent(a, i, a)
-#        network.add_agent(a, i, str(i))
     return network
 
 

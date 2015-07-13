@@ -4,15 +4,14 @@ from cog_abm.ML.core import normalize_sample_on_nconfig
 
 
 class Sensor(object):
-    """ Basic sensor.
-    """
+    """ Basic sensor. """
 
     def sense(self, item):
         abstract()
 
 
 class SimpleSensor(Sensor):
-    """ Just gives back what he got """
+    """ Just gives back what he got. """
 
     def __init__(self, mask=None):
         self.mask = mask

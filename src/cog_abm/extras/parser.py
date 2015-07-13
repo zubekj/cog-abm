@@ -248,7 +248,7 @@ class Parser(object):
         if params is None:
             return {}
 
-        parameters = ["context_size", "learning", "inc_category_treshold"]
+        parameters = ["context_size", "learning", "inc_category_threshold"]
 
         for p in parameters:
             self.load_to_dictionary(dictionary, p, params)

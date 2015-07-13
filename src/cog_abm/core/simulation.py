@@ -21,9 +21,31 @@ class Simulation(object):
 
     def __init__(self, graphs=None, interactions=None, environments=None, agents=None, pb=False,
                  colour_order=None):
-        ''' pb - show progress bar
-            colour_order - list of colours in the order used when storing agents words
-        '''
+        """
+        @type graphs: List of Maps
+        @param graphs: List of Maps with two keys:
+            'graph' - Network
+            'start' - number of iteration when this Network begin to be used
+
+        @type interactions: List of Maps
+        @param interactions: List of Maps with two keys:
+            'interaction' - Interaction
+            'start' - number of iteration when this Interaction begin to be used
+
+        @type environments: List of Maps
+        @param environments: List of Maps with two keys:
+            'environment' - Environment
+            'start' - number of iteration when this Environment begin to be used
+
+        @type agents: List of Agents
+        @param agents: Agents used in simulation.
+
+        @type pb: Bool
+        @param pb: Show progress bar.
+
+        @type environments: List of Colours
+        @param colour_order: List of Colours in the order used when storing Agents words.
+        """
         self.environments = environments
         self.graph = None
         self.graphs = graphs
@@ -32,13 +54,12 @@ class Simulation(object):
         self.agents = tuple(agents)
         self.statistic = []
         self.dump_often = True
-        self.pb = True
+        self.pb = pb
         self.colour_order = colour_order
         print colour_order
 
     def dump_results(self, iter_num):
         cc = copy.deepcopy(self.agents)
-        #cc = [a.deepcopy() for a in self.agents]
         kr = (iter_num, cc)
         self.statistic.append(kr)
         if self.dump_often:
@@ -75,9 +96,6 @@ class Simulation(object):
 
     def _start_interaction(self, agents):
         self.interaction.interact(*agents)
-#               results = self.interaction.interact(*agents)
-#               for r, a in izip(results, agents):
-#                       a.add_inter_result(r)
 
     def _do_iterations(self, num_iter, counter):
         for _ in xrange(num_iter):
@@ -106,11 +124,7 @@ class Simulation(object):
         return self.statistic
 
     def run(self, iterations=1000, dump_freq=10):
-        """
-        Begins simulation.
-
-        iterations
-        """
+        """ Begins simulation. """
         self.dump_results(0)
         self._do_main_loop(iterations, dump_freq)
         return self.statistic

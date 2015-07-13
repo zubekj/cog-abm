@@ -5,6 +5,15 @@ from time import localtime, strftime
 
 
 def save_res(results, f_name=None):
+    """
+    Write results to file.
+
+    @type results: Object
+    @param results: Object to be saved.
+
+    @type f_name: String
+    @param f_name: Name of file we want to save results in.
+    """
     if f_name is None:
         f_name = strftime("experiment_%Y%m%d_%H_%M_%S.result", localtime())
     f = open(f_name, "w")
@@ -12,29 +21,40 @@ def save_res(results, f_name=None):
     f.close()
 
 
-def load_params(pfile):
-    if pfile is None:
+def load_params(simulation):
+    """
+    Loads parameters from simulation file or set default.
+
+    @type simulation: String
+    @param simulation: Path to simulation file.
+    """
+    if simulation is None:
         return default_params()
 
     from cog_abm.extras.parser import Parser
-    return Parser().parse_simulation(pfile)
+    return Parser().parse_simulation(simulation)
 
 
 def default_params():
     from cog_abm.extras.color import get_1269Munsell_chips
     return {
-        'interaction_type': "DG",
-        'stimuli': get_1269Munsell_chips(),
-        'num_agents': 10,
-        'context_size': 4,
-        'num_iter': 1000,
         'dump_freq': 100,
-        'topology': None,
-        'classifier': None,
-        'alpha': 0.1,
-        'beta': 1.,
-        'sigma': 10.,
-        'inc_category_treshold': 0.95,
+        'num_iter': 1000,
+        'learning': {
+            'alpha': 0.1,
+            'beta': 1.,
+            'sigma': 10.
+        },
+        'stimuli': get_1269Munsell_chips(),
+        'interactions': [
+            {'start': 1,
+             'interaction': {
+                 'interaction_type': 'DG',
+                 'context_size': 4,
+                 'inc_category_threshold': 0.95
+             }}
+        ],
+        'num_agents': 10
     }
 
 
@@ -64,7 +84,6 @@ if __name__ == "__main__":
         log_level = logging.DEBUG
     # Set up basic configuration, out to stderr with a reasonable default format.
     logging.basicConfig(level=log_level)
-
 
     sys.path.append('../')
     sys.path.append('')

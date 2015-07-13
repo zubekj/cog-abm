@@ -57,8 +57,8 @@ class Agent(object):
     def sense_and_classify(self, stimulus):
         return self.state.classify(self.sense(stimulus))
 
-    def sense_and_classify_pval(self, stimulus):
-        return self.state.classify_pval(self.sense(stimulus))
+    def sense_and_classify_p_val(self, stimulus):
+        return self.state.classify_p_val(self.sense(stimulus))
 
     def sense_and_class_probabilities(self, stimulus):
         return self.state.class_probabilities(self.sense(stimulus))
