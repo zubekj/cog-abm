@@ -1,8 +1,13 @@
 import sys
+sys.path.append('../../')
+sys.path.append('../')
+sys.path.append('')
 import logging
 import cPickle
 from time import localtime, strftime
-from src.cog_abm.core.environment import *
+
+from cog_simulations.cog_abm.core import Environment
+from cog_simulations.cog_abm.core.environment import RandomStimuliChooser
 
 
 def save_res(results, f_name=None):
@@ -32,12 +37,12 @@ def load_params(simulation):
     if simulation is None:
         return default_params()
 
-    from src.cog_abm.extras.parser import Parser
+    from cog_simulations.cog_abm.extras.parser import Parser
     return Parser().parse_simulation(simulation)
 
 
 def default_params():
-    from src.cog_abm.extras.color import get_1269Munsell_chips
+    from cog_simulations.cog_abm.extras.color import get_1269Munsell_chips
     return {
         'dump_freq': 100,
         'num_iter': 1000,
@@ -88,9 +93,7 @@ if __name__ == "__main__":
     # Set up basic configuration, out to stderr with a reasonable default format.
     logging.basicConfig(level=log_level)
 
-    sys.path.append('../')
-    sys.path.append('')
-    from src.steels.steels_experiment import steels_advanced_experiment
+    from steels_experiment import steels_advanced_experiment
 
     params = load_params(opts.param_file)
 

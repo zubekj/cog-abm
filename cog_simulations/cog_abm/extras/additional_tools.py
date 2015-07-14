@@ -4,7 +4,7 @@ import os
 from ..core.network import Network
 from ..core.interaction import Interaction
 from ..core.agent import Agent
-from cog_abm.ML.core import Classifier
+from cog_simulations.cog_abm.ML.core import Classifier
 
 from pygraph.algorithms.generators import generate
 

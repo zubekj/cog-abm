@@ -9,7 +9,7 @@ from math import fsum
 
 from scipy.io.arff import loadarff
 
-from src.cog_abm.extras.tools import flatten
+from cog_simulations.cog_abm.extras.tools import flatten
 
 
 class Classifier(object):

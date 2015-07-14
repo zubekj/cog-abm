@@ -6,7 +6,7 @@ import math
 
 from itertools import combinations, imap
 
-from cog_abm.extras.fitness import get_buffered_average
+from cog_simulations.cog_abm.extras.fitness import get_buffered_average
 
 #WINDOW_SIZE = 20
 WINDOW_SIZE = 50

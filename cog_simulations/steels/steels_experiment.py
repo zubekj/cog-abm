@@ -6,15 +6,16 @@ import random
 
 import numpy as np
 
-from cog_abm.core import Environment, Simulation, Agent
-from cog_abm.core.interaction import Interaction
-from cog_abm.agent.sensor import SimpleSensor
-from cog_abm.ML.core import Classifier
-from cog_abm.extras.additional_tools import generate_simple_network
-from cog_abm.extras.lexicon import Lexicon
-from cog_abm.extras.tools import def_value
+from cog_simulations.cog_abm.ML.core import Classifier
+from cog_simulations.cog_abm.core.interaction import Interaction
+from cog_simulations.cog_abm.extras.tools import def_value
+from cog_simulations.cog_abm.core.agent import Agent
+from cog_simulations.cog_abm.extras.lexicon import Lexicon
+from cog_simulations.cog_abm.agent.sensor import SimpleSensor
+from cog_simulations.cog_abm.extras.additional_tools import generate_simple_network
+from cog_simulations.cog_abm.core import Simulation
 
-from steels import metrics
+import metrics
 from metrics import DS_A
 
 log = logging.getLogger('steels')
@@ -155,6 +156,7 @@ class DiscriminationGame(Interaction):
 
     def set_inc_category_threshold(self, new_inc_category_threshold):
         self.inc_category_threshold = new_inc_category_threshold
+
 
     @staticmethod
     def save_result(agent, result):

@@ -1,6 +1,6 @@
-from src.cog_abm.extras.tools import abstract
-from src.cog_abm.ML.diversity import new_sample_specified_attributes
-from src.cog_abm.ML.core import normalize_sample_on_nconfig
+from cog_simulations.cog_abm.extras.tools import abstract
+from cog_simulations.cog_abm.ML.diversity import new_sample_specified_attributes
+from cog_simulations.cog_abm.ML.core import normalize_sample_on_nconfig
 
 
 class Sensor(object):

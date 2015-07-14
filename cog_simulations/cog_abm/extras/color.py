@@ -4,7 +4,7 @@ the Stimulus' interfaces.
 """
 import os
 
-from src.cog_abm.ML.core import Sample, euclidean_distance
+from cog_simulations.cog_abm.ML.core import Sample, euclidean_distance
 
 
 class Color(Sample):
@@ -30,11 +30,11 @@ class Color(Sample):
 
 
 def get_WCS_colors():
-    from src.cog_abm.extras.parser import Parser
+    from cog_simulations.cog_abm.extras.parser import Parser
     return Parser().parse_environment(
         os.path.join(os.path.dirname(__file__), "../../../data/wcs_input_data/330WCS.xml")).stimuli
 
 
 def get_1269Munsell_chips():
-    from src.cog_abm.extras.parser import Parser
+    from cog_simulations.cog_abm.extras.parser import Parser
     return Parser().parse_environment("1269_munsell_chips.json", {}).stimuli

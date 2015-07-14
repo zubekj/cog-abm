@@ -3,11 +3,11 @@ Module provides parser for json documents.
 """
 import json
 from pygraph.readwrite import markup
-from cog_abm.core.network import Network
-from cog_abm.core.agent import *
-from cog_abm.core.environment import *
-from cog_abm.extras.color import Color
-from cog_abm.extras.extract_colour_order import extract_colour_order
+from cog_simulations.cog_abm.core.network import Network
+from cog_simulations.cog_abm.core.agent import *
+from cog_simulations.cog_abm.core.environment import *
+from cog_simulations.cog_abm.extras.color import Color
+from cog_simulations.cog_abm.extras.extract_colour_order import extract_colour_order
 
 
 class Parser(object):
