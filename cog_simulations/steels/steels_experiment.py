@@ -157,7 +157,6 @@ class DiscriminationGame(Interaction):
     def set_inc_category_threshold(self, new_inc_category_threshold):
         self.inc_category_threshold = new_inc_category_threshold
 
-
     @staticmethod
     def save_result(agent, result):
         agent.add_payoff("DG", int(result))

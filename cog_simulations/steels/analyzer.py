@@ -1,5 +1,3 @@
-
-
 import sys
 import logging
 import cPickle
@@ -9,6 +7,7 @@ from itertools import imap
 from time import time
 
 sys.path.append('../')
+sys.path.append('../../')
 
 from cog_abm.extras.tools import get_progressbar
 
@@ -150,7 +149,7 @@ def main():
     # Set up basic configuration, out to stderr with a reasonable default format.
     logging.basicConfig(level=log_level)
 
-    f = open(opts.file)
+    f = open("../../results" + opts.file)
     res, params = cPickle.load(f)
     f.close()
 

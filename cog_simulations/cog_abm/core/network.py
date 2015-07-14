@@ -26,7 +26,7 @@ class Node(object):
         """
         self.name = name
         self.agents = []
-        if (agents is not None):
+        if agents is not None:
             self.agents.append(agents)
 
     def __len__(self):

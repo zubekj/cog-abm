@@ -9,6 +9,24 @@ from cog_simulations.cog_abm.ML.core import Classifier
 from pygraph.algorithms.generators import generate
 
 
+def parse_to_json_graph(file_name):
+    f = open(file_name, 'r')
+
+    nodes = f.readline().split()
+    edges = []
+    for line in f:
+        edge = line.split()
+        edges.append({"to": edge[0], "from": edge[1], "wt": 1})
+
+    f.close()
+    f = open(file_name + '.json', 'w')
+
+    import json
+
+    json.dump({"nodes": nodes, "edges": edges}, f)
+    f.close()
+
+
 def generate_simple_network(agents):
     n = len(agents)
     network = Network(generate(n, n * (n - 1) // 2, directed=False))
