@@ -8,6 +8,8 @@ from cog_simulations.cog_abm.core.agent import *
 from cog_simulations.cog_abm.core.environment import *
 from cog_simulations.cog_abm.extras.color import Color
 from cog_simulations.cog_abm.extras.extract_colour_order import extract_colour_order
+from cog_simulations.cog_abm.extras.additional_tools import generate_clique_network, generate_hub_network,\
+    generate_line_network, generate_ring_network
 
 
 class Parser(object):
@@ -27,6 +29,8 @@ class Parser(object):
         self.init_environment_dictionary()
         self.interaction_parser_map = {}
         self.init_interaction_dictionary()
+        self.graph_parser_map = {}
+        self.init_graph_dictionary()
 
     def init_environment_dictionary(self):
         self.environment_parser_map["CIELab"] = self.parse_munsell_environment
@@ -35,6 +39,12 @@ class Parser(object):
         self.interaction_parser_map["DiscriminationGame"] = \
             self.parse_discrimination_game
         self.interaction_parser_map["GuessingGame"] = self.parse_guessing_game
+
+    def init_graph_dictionary(self):
+        self.graph_parser_map["Line"] = generate_line_network
+        self.graph_parser_map["Hub"] = generate_hub_network
+        self.graph_parser_map["Ring"] = generate_ring_network
+        self.graph_parser_map["Clique"] = generate_clique_network
 
     def parse_agent(self, agent, networks):
         """
@@ -134,6 +144,18 @@ class Parser(object):
 
             return Network(markup.read(graph_s))
 
+    def parse_graphs(self, graphs_data, n=None):
+        networks = []
+        for net in graphs_data:
+            source = self.value_if_exist("source", net)
+            if source is None:
+                graph = self.graph_parser_map[net["Type"]](n)
+            else:
+                graph = self.parse_graph(source)
+            networks.append({"graph": graph, "start": net["start"]})
+
+        return networks
+
     def parse_simulation(self, source):
         """
         Parse simulation parameters given in json document.
@@ -157,13 +179,15 @@ class Parser(object):
         for p in parameters:
             self.load_to_dictionary(dictionary, p, source)
 
+        # Read Agents.
+        agents = self.value_if_exist("agents", source)
+
         # Read Networks.
         networks_source = self.value_if_exist("networks", source)
-        networks = []
-        for net in networks_source:
-            graph = self.parse_graph(net["source"])
-            networks.append({"graph": graph, "start": net["start"]})
-        dictionary["networks"] = networks
+        dictionary["networks"] = self.parse_graphs(networks_source)
+
+        # Bind agents to network.
+        dictionary["agents"] = self.parse_agents(agents, dictionary["networks"])
 
         # Read Environments and stimuli.
         environments = []
@@ -178,10 +202,6 @@ class Parser(object):
             environments.append({"start": env["start"], "environment": environment})
 
         dictionary['environments'] = environments
-
-        # Read Agents.
-        agents = self.value_if_exist("agents", source)
-        dictionary["agents"] = self.parse_agents(agents, dictionary["networks"])
 
         # Read Interactions.
         interactions_source = self.value_if_exist("interactions", source)

@@ -149,7 +149,7 @@ def main():
     # Set up basic configuration, out to stderr with a reasonable default format.
     logging.basicConfig(level=log_level)
 
-    f = open("../../results" + opts.file)
+    f = open("../../results/" + opts.file)
     res, params = cPickle.load(f)
     f.close()
 

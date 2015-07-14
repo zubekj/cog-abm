@@ -12,7 +12,7 @@ from cog_simulations.cog_abm.extras.tools import def_value
 from cog_simulations.cog_abm.core.agent import Agent
 from cog_simulations.cog_abm.extras.lexicon import Lexicon
 from cog_simulations.cog_abm.agent.sensor import SimpleSensor
-from cog_simulations.cog_abm.extras.additional_tools import generate_simple_network
+from cog_simulations.cog_abm.extras.additional_tools import generate_clique_network
 from cog_simulations.cog_abm.core import Simulation
 
 import metrics
@@ -458,7 +458,11 @@ def steels_advanced_experiment(num_iter=1000, dump_freq=50, learning=None, agent
     AdaptiveNetwork.def_beta = float(learning["beta"])
     ReactiveUnit.def_sigma = float(learning["sigma"])
 
-    networks = networks or [{"graph": generate_simple_network(agents), "start": 1}]
+    if networks is None:
+        network = generate_clique_network(len(agents))
+        for i, a in enumerate(agents):
+            network.add_agent(a, i)
+        networks = [{"graph": network, "start": 1}]
 
     interaction_list = []
 

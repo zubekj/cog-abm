@@ -5,8 +5,8 @@ from ..core.network import Network
 from ..core.interaction import Interaction
 from ..core.agent import Agent
 from cog_simulations.cog_abm.ML.core import Classifier
-
 from pygraph.algorithms.generators import generate
+from pygraph.classes.graph import graph
 
 
 def parse_to_json_graph(file_name):
@@ -27,18 +27,47 @@ def parse_to_json_graph(file_name):
     f.close()
 
 
-def generate_simple_network(agents):
-    n = len(agents)
+def generate_clique_network(n):
     network = Network(generate(n, n * (n - 1) // 2, directed=False))
-
-    for i, a in enumerate(agents):
-        network.add_agent(a, i)
     return network
 
+def generate_line_network(n):
+    g = graph()
+
+    for i in range(0, n):
+        g.add_node(i)
+    for i in range(0, n-1):
+        g.add_edge((i, i+1))
+
+    network = Network(graph)
+    return network
+
+def generate_ring_network(n):
+    g = graph()
+
+    for i in range(0, n):
+        g.add_node(i)
+    for i in range(0, n-1):
+        g.add_edge((i, i+1))
+    g.add_edge((0, n-1))
+
+    network = Network(graph)
+    return network
+
+def generate_hub_network(n):
+    g = graph()
+
+    for i in range(0, n):
+        g.add_node(i)
+    for i in range(1, n):
+        g.add_edge((0, i))
+
+    network = Network(graph)
+    return network
 
 def generate_network_with_agents(n):
     agents = [Agent(aid=i) for i in xrange(n)]
-    return (generate_simple_network(agents), agents)
+    return generate_clique_network(agents), agents
 
 
 class SimpleInteraction(Interaction):
