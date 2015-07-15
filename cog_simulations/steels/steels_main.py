@@ -12,13 +12,13 @@ from cog_simulations.cog_abm.core.environment import RandomStimuliChooser
 
 def save_res(results, f_name=None):
     """
-    Write results to file.
+    Write results_of_simulation to file.
 
     @type results: Object
     @param results: Object to be saved.
 
     @type f_name: String
-    @param f_name: Name of file we want to save results in.
+    @param f_name: Name of file we want to save results_of_simulation in.
     """
     if f_name is None:
         f_name = strftime("experiment_%Y%m%d_%H_%M_%S.result", localtime())
@@ -98,4 +98,4 @@ if __name__ == "__main__":
     params = load_params(opts.param_file)
 
     r = steels_advanced_experiment(**params)
-    save_res((r, params), "../../results/" + opts.file)
+    save_res((r, params), "../../results_of_simulation/" + opts.file)

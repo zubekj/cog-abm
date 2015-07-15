@@ -9,7 +9,7 @@ class ResultHandler(object):
     """
     ResultHandler class.
 
-    Provide methods used to handle any type of operation results.
+    Provide methods used to handle any type of operation results_of_simulation.
 
     @sort: __init__, add_result, export_to_file, get_results, pickle, save,
     save_synchronized, unpickle

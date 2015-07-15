@@ -44,7 +44,7 @@ def gather_repeated_simulation_statistics(clab_fname, coordinate, cat):
     #list statistics for each file, gathering info from all catalogues:
     for fname in sorted(files, key=lambda x: string2prefix_num(x)):
         mode_bigger[fname] = [0, 0]
-        #all results for left and all results for right
+        #all results_of_simulation for left and all results_of_simulation for right
         all_results_modes = []
         all_results_words = []
         for cat in cats:
