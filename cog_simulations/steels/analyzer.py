@@ -1,9 +1,7 @@
 import sys
 import logging
 import cPickle
-import math
 
-from itertools import imap
 from time import time
 
 sys.path.append('../')
@@ -59,7 +57,7 @@ def count_categ(agents, params, it):
 
 
 
-from metrics import *
+from cog_simulations.steels.core.metrics import *
 
 #def avg_cc(agents, params, it):
 #       return [float(sum(count_categ(agents, params, it))) / len(agents)]

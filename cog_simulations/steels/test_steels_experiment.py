@@ -3,10 +3,9 @@ import random
 
 import numpy as np
 
-from steels_experiment import (ReactiveUnit,
+from cog_simulations.steels.core.steels_experiment import (ReactiveUnit,
     AdaptiveNetwork, SteelsClassifier)
 from cog_abm.ML.core import Sample
-
 
 S = Sample
 

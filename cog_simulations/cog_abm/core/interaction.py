@@ -2,7 +2,8 @@
 
 class Interaction(object):
 
-    def num_agents(self):
+    @staticmethod
+    def num_agents():
         """
         Should return number of agents taking part in interaction
         """

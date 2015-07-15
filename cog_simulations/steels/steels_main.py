@@ -8,7 +8,7 @@ sys.path.append('../')
 sys.path.append('')
 
 from cog_simulations.parser import Parser
-from steels_experiment import steels_advanced_experiment
+from cog_simulations.steels.core.steels_experiment import steels_experiment
 
 if __name__ == "__main__":
 
@@ -62,7 +62,7 @@ if __name__ == "__main__":
     params = Parser().parse_simulation(source_file)
 
     # Main part - running steels experiment.
-    r = steels_advanced_experiment(**params)
+    r = steels_experiment(**params)
 
     # Saving results of simulation.
     path_to_results = "../../results_of_simulation/"
