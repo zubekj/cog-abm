@@ -7,34 +7,32 @@ from time import time
 sys.path.append('../')
 sys.path.append('../../')
 
-from cog_abm.extras.tools import get_progressbar
-
+from cog_simulations.cog_abm.extras.tools import get_progressbar
 
 
 def compose(fun_out, fun_in):
+
     def composition(*args, **kwargs):
         return fun_out(fun_in(*args, **kwargs))
 
     return composition
 
 
-
-def avg(lista):
-    return [math.fsum(lista)/len(lista)]
-
-
-def wmin(lista):
-    return [min(lista)]
+def avg(n_list):
+    return [math.fsum(n_list)/len(n_list)]
 
 
-def wmax(lista):
-    return [max(lista)]
+def v_min(n_list):
+    return [min(n_list)]
 
 
+def v_max(n_list):
+    return [max(n_list)]
 
 cc_computed = {}
 
-def count_categ(agents, params, it):
+
+def count_category(agents, params, it):
 
     global cc_computed
     try:
@@ -42,100 +40,90 @@ def count_categ(agents, params, it):
     except:
         stimuli = params['STIMULI']
 
-    def pom(a):
-        Z = {}
+    def number_of_categories(agent):
+        agents_set = {}
         for s in stimuli:
-            Z[a.sense_and_classify(s)]=1
-        return len(Z)
+            agents_set[agent.sense_and_classify(s)] = 1
+        return len(agents_set)
 
-    tmpr = cc_computed.get(it, None)
-    if tmpr is None:
-        tmpr = [pom(a) for a in agents]
-        cc_computed[it] = tmpr
+    tmp_r = cc_computed.get(it, None)
+    if tmp_r is None:
+        tmp_r = [number_of_categories(a) for a in agents]
+        cc_computed[it] = tmp_r
 
-    return tmpr
-
+    return tmp_r
 
 
 from cog_simulations.steels.core.metrics import *
 
-#def avg_cc(agents, params, it):
-#       return [float(sum(count_categ(agents, params, it))) / len(agents)]
+# def avg_cc(agents, params, it):
+#       return [float(sum(count_category(agents, params, it))) / len(agents)]
+fun_map =\
+    {
+        'cc': count_category,
+        'it': lambda ag, par, it: [it],
+        'DSA': lambda ag, par, it: map(DS_A, ag),
+        'DS': lambda ag, par, it: [DS(ag, it)],
+        'CSA': lambda ag, par, it: map(CS_A, ag),
+        'CS': lambda ag, par, it: [CS(ag, it)],
+        'cv': lambda ag, par, it: [cv(ag, it)]
+    }
+
+pref_fun_map =\
+    {
+        'avg': avg,
+        'min': v_min,
+        'max': v_max
+    }
 
 
-
-fun_map = {
-                'cc':count_categ,
-                'it': lambda ag, par, it : [it],
-                'DSA': lambda ag, par, it: map(DS_A, ag),
-                'DS': lambda ag, par, it: [DS(ag, it)],
-                'CSA': lambda ag, par, it: map(CS_A, ag),
-                'CS': lambda ag, par, it: [CS(ag, it)],
-                'cv': lambda ag, par, it:[cv(ag, it)]
-                }
-
-
-
-pref_fun_map = {
-                'avg':avg,
-                'min':wmin,
-                'max':wmax
-                }
-
-
-
-def gen_res(results, params, funs):
+def gen_res(results, params, functions):
     start_time = time()
     logging.info("Calculating stats...")
 
     pb = get_progressbar()
-    retv = [[x for f in funs for x in f(agents, params, it)]
-                                    for it, agents in pb(results)]
+    ret_v = [[x for f in functions for x in f(agents, params, it)]
+             for it, agents in pb(results)]
 
     logging.info("Calculating stats finished. Total time: "+str(time()-start_time))
-    return retv
+    return ret_v
 
 
 def main():
 
     import optparse
 
-    usage = "%prog [-c] [-v] -f FILE statistic1 statistic2 ...\n"+\
-                    "where statistic in {"+";".join(fun_map.keys())+"}"
-    optp = optparse.OptionParser(usage = usage)
+    usage = "%prog [-c] [-v] -f FILE statistic1 statistic2 ...\n" + \
+            "where statistic in {"+";".join(fun_map.keys())+"}"
+    options = optparse.OptionParser(usage=usage)
 
-    optp.add_option('-v', '--verbose', dest='verbose', action='count',
-                    help="increase verbosity (specify multiple times for more)")
+    options.add_option('-v', '--verbose', dest='verbose', action='count',
+                       help="increase verbosity (specify multiple times for more)")
 
-    optp.add_option('-c','--chart', action="store_true", dest='chart',
-                    help="specifies output to be a chart")
+    options.add_option('-c', '--chart', action="store_true", dest='chart',
+                       help="specifies output to be a chart")
 
-    optp.add_option('-f','--file', action="store", dest='file', type="string",
-                    help="input file with results. THIS OPTION IS NECESSARY!")
+    options.add_option('-f', '--file', action="store", dest='file', type="string",
+                       help="input file with results. THIS OPTION IS NECESSARY!")
 
-    optp.add_option('--xlabel', action="store", dest='xlabel', type="string",
-                    help="Label of x-axis")
+    options.add_option('--x_label', action="store", dest='x_label', type="string",
+                       help="Label of x-axis")
 
-    optp.add_option('--ylabel', action="store", dest='ylabel', type="string",
-                    help="Label of y-axis")
+    options.add_option('--y_label', action="store", dest='y_label', type="string",
+                       help="Label of y-axis")
 
-
-    opts, args = optp.parse_args()
+    opts, args = options.parse_args()
 
     if len(args) == 0:
-        optp.error("No argument given!")
-
+        options.error("No argument given!")
 
     if opts.file is None or opts.file == "":
-        optp.error("No or wrong file specified (option -f)")
+        options.error("No or wrong file specified (option -f)")
 
-    if opts.chart == True and len(args)<2:
-        optp.error("Can't draw a chart with one dimension data")
+    if opts.chart and len(args) < 2:
+        options.error("Can't draw a chart with one dimension data")
 
-
-
-    log_level = logging.INFO #logging.DEBUG # default logging.WARNING
-
+    log_level = logging.INFO  # logging.DEBUG # default logging.WARNING
 
     if opts.verbose == 1:
         log_level = logging.INFO
@@ -143,8 +131,7 @@ def main():
     elif opts.verbose >= 2:
         log_level = logging.DEBUG
 
-
-    # Set up basic configuration, out to stderr with a reasonable default format.
+    # Set up basic configuration, out to std err with a reasonable default format.
     logging.basicConfig(level=log_level)
 
     f = open("../../results_of_simulation/" + opts.file)
@@ -155,14 +142,13 @@ def main():
     for arg in args:
         ind = arg.find("_")
         fun = None
-        if  ind != -1:
+        if ind != -1:
             p_fun = pref_fun_map.get(arg[0:ind])
 
             m_fun = fun_map.get(arg[ind+1:len(arg)])
 
             if p_fun is not None and m_fun is not None:
                 fun = compose(p_fun, m_fun)
-
 
         if fun is None:
             fun = fun_map.get(arg, None)
@@ -175,17 +161,14 @@ def main():
     wyn = gen_res(res, params, funcs)
 
     if opts.chart is not None:
-        from presenter.charts import wykres
+        from cog_simulations.presenter.charts import wykres
         data = []
-        #print wyn
-        map(lambda x: data.append((x[0], x[1:])), wyn)
+        map(lambda y: data.append((y[0], y[1:])), wyn)
         wykres(data, opts.xlabel, opts.ylabel)
 
     else:
         for r in wyn:
             print "\t".join(imap(str, r))
-
-
 
 
 if __name__ == "__main__":
