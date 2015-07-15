@@ -149,7 +149,7 @@ class Parser(object):
         for net in graphs_data:
             source = self.value_if_exist("source", net)
             if source is None:
-                graph = self.graph_parser_map[net["Type"]](n)
+                graph = self.graph_parser_map[net["type"]](n)
             else:
                 graph = self.parse_graph(source)
             networks.append({"graph": graph, "start": net["start"]})
@@ -179,15 +179,26 @@ class Parser(object):
         for p in parameters:
             self.load_to_dictionary(dictionary, p, source)
 
-        # Read Agents.
-        agents = self.value_if_exist("agents", source)
-
         # Read Networks.
         networks_source = self.value_if_exist("networks", source)
-        dictionary["networks"] = self.parse_graphs(networks_source)
+        num_agents = self.value_if_exist("num_agents", source)
+        dictionary["num_agents"] = num_agents
+        dictionary["networks"] = self.parse_graphs(networks_source, num_agents)
 
-        # Bind agents to network.
-        dictionary["agents"] = self.parse_agents(agents, dictionary["networks"])
+        # Read Agents.
+        agents = self.value_if_exist("agents", source)
+        # Create Agents if they weren't declared.
+        if agents is None:
+            agents = []
+            for node_name in range(0, num_agents):
+                agent = Agent()
+                agents.append(agent)
+                dictionary["agents"] = agents
+                # Bind agents to network.
+                for network in dictionary["networks"]:
+                    network["graph"].add_agent(agent, node_name)
+        else:
+            dictionary["agents"] = self.parse_agents(agents, dictionary["networks"])
 
         # Read Environments and stimuli.
         environments = []

@@ -26,7 +26,6 @@ def parse_to_json_graph(file_name):
     json.dump({"nodes": nodes, "edges": edges}, f)
     f.close()
 
-
 def generate_clique_network(n):
     network = Network(generate(n, n * (n - 1) // 2, directed=False))
     return network
@@ -39,7 +38,7 @@ def generate_line_network(n):
     for i in range(0, n-1):
         g.add_edge((i, i+1))
 
-    network = Network(graph)
+    network = Network(g)
     return network
 
 def generate_ring_network(n):
@@ -51,7 +50,7 @@ def generate_ring_network(n):
         g.add_edge((i, i+1))
     g.add_edge((0, n-1))
 
-    network = Network(graph)
+    network = Network(g)
     return network
 
 def generate_hub_network(n):
@@ -62,13 +61,15 @@ def generate_hub_network(n):
     for i in range(1, n):
         g.add_edge((0, i))
 
-    network = Network(graph)
+    network = Network(g)
     return network
 
 def generate_network_with_agents(n):
     agents = [Agent(aid=i) for i in xrange(n)]
     return generate_clique_network(agents), agents
 
+def extract_classes(samples):
+    return list(set((s.get_cls() for s in samples)))
 
 class SimpleInteraction(Interaction):
     """ Very simple interaction. Just prints agents involved and takes time.
@@ -84,10 +85,6 @@ class SimpleInteraction(Interaction):
         for i in xrange(10 ** 5):
             i ** 0.5
         return [i ** 0.1 for i in xrange(len(agents))]
-
-
-def extract_classes(samples):
-    return list(set((s.get_cls() for s in samples)))
 
 
 class SimpleClassifier(Classifier):
