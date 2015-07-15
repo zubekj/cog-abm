@@ -46,7 +46,7 @@ class ClassifierSubsetOfAttrs(Classifier):
         sample = new_sample_specified_attributes(sample, self.attrs_mask)
         return self.classifier.classify(sample)
 
-    def classify_pval(self, sample):
+    def classify_p_val(self, sample):
         sample = new_sample_specified_attributes(sample, self.attrs_mask)
         return self.classifier.classify_p_val(sample)
 
@@ -88,7 +88,7 @@ class ClassifierSubsetOfTraining(Classifier):
     def classify(self, sample):
         return self.classifier.classify(sample)
 
-    def classify_pval(self, sample):
+    def classify_p_val(self, sample):
         return self.classifier.classify_p_val(sample)
 
     def class_probabilities(self, sample):

@@ -7,9 +7,8 @@ sys.path.append('../../')
 sys.path.append('../')
 sys.path.append('')
 
-from cog_simulations.cog_abm.extras.parser import Parser
+from cog_simulations.parser import Parser
 from steels_experiment import steels_advanced_experiment
-
 
 if __name__ == "__main__":
 
@@ -30,16 +29,16 @@ if __name__ == "__main__":
                              'It will be write in directory cog_abm/results_of_simulation. '
                              'Default: experiment_date.result')
 
+    parser.add_argument('-l', '--log_file', dest='log_file', action='store',
+                        help='Name of file in which will be stored log information.'
+                             'It will be write in directory cog_abm/logs.'
+                             'Default: no file will be writen.')
+
     parser.add_argument('-v', '--verbose', dest='verbose', action='count',
                         help='Increase verbosity. '
                              '-v - INFO level'
                              '-vv - DEBUG level'
                              'Default: WARNING level')
-
-    parser.add_argument('-l', '--log_file', dest='log_file', action='store',
-                        help='Name of file in which will be stored log informations.'
-                             'It will be write in directory cog_abm/logs.'
-                             'Default: no file will be writen.')
 
     args = parser.parse_args()
 
@@ -67,7 +66,7 @@ if __name__ == "__main__":
 
     # Saving results of simulation.
     path_to_results = "../../results_of_simulation/"
-    results_name = args.results_file
+    results_name = path_to_results + args.results_file
 
     f = open(results_name, "w")
     cPickle.dump((r, params), f)

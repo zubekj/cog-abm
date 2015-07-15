@@ -1,12 +1,9 @@
 """Makes tests and simple simulations easier"""
 import os
+import time
 
-from ..core.network import Network
 from ..core.interaction import Interaction
-from ..core.agent import Agent
 from cog_simulations.cog_abm.ML.core import Classifier
-from pygraph.algorithms.generators import generate
-from pygraph.classes.graph import graph
 
 
 def parse_to_json_graph(file_name):
@@ -26,50 +23,10 @@ def parse_to_json_graph(file_name):
     json.dump({"nodes": nodes, "edges": edges}, f)
     f.close()
 
-def generate_clique_network(n):
-    network = Network(generate(n, n * (n - 1) // 2, directed=False))
-    return network
-
-def generate_line_network(n):
-    g = graph()
-
-    for i in range(0, n):
-        g.add_node(i)
-    for i in range(0, n-1):
-        g.add_edge((i, i+1))
-
-    network = Network(g)
-    return network
-
-def generate_ring_network(n):
-    g = graph()
-
-    for i in range(0, n):
-        g.add_node(i)
-    for i in range(0, n-1):
-        g.add_edge((i, i+1))
-    g.add_edge((0, n-1))
-
-    network = Network(g)
-    return network
-
-def generate_hub_network(n):
-    g = graph()
-
-    for i in range(0, n):
-        g.add_node(i)
-    for i in range(1, n):
-        g.add_edge((0, i))
-
-    network = Network(g)
-    return network
-
-def generate_network_with_agents(n):
-    agents = [Agent(aid=i) for i in xrange(n)]
-    return generate_clique_network(agents), agents
 
 def extract_classes(samples):
     return list(set((s.get_cls() for s in samples)))
+
 
 class SimpleInteraction(Interaction):
     """ Very simple interaction. Just prints agents involved and takes time.
@@ -82,14 +39,16 @@ class SimpleInteraction(Interaction):
 
     def interact(self, *agents):
         print "Interaction with: " + str(agents) + "  in: " + str(os.getpid())
-        for i in xrange(10 ** 5):
-            i ** 0.5
+        time.sleep(0.01)
         return [i ** 0.1 for i in xrange(len(agents))]
 
 
 class SimpleClassifier(Classifier):
 
-    def classify_pval(self, sample):
+    def __init__(self):
+        self.classes = []
+
+    def classify_p_val(self, sample):
         return self.classify(sample), 1.
 
     def class_probabilities(self, sample):
@@ -103,7 +62,7 @@ class SimpleClassifier(Classifier):
         self.classes = extract_classes(samples)
 
 
-class PerfectClassifer(SimpleClassifier):
+class PerfectClassifier(SimpleClassifier):
     """ If given sample has class, it returns it
     """
 
@@ -111,11 +70,12 @@ class PerfectClassifer(SimpleClassifier):
         return sample.get_cls()
 
 
-class StupidClassifer(SimpleClassifier):
+class StupidClassifier(SimpleClassifier):
     """ Always returns the same class
     """
 
     def __init__(self, cls=0):
+        SimpleClassifier.__init__(self)
         self.cls = str(cls)
 
     def classify(self, sample):

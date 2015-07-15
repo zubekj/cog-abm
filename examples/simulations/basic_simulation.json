@@ -16,23 +16,17 @@
     }
   ],
   "num_agents": 5,
-  "learning" :
-  {
-    "alpha" : 0.1,
-    "beta" : 1,
-    "sigma" : 1
-  },
+  "alpha" : 0.1,
+  "beta" : 1,
+  "sigma" : 1,
   "interactions" :[
       {
         "id": 1,
         "type": "GuessingGame",
         "start": 1,
-        "params":
-        {
-          "context_size": 4,
-          "learning": true,
-          "inc_category_threshold": 0.95
-        }
+        "context_size": 4,
+        "learning": true,
+        "inc_category_threshold": 0.95
       }
   ],
   "environments" : [
@@ -40,7 +34,7 @@
       "start" : 1,
       "name" : "global",
       "source" : "1269_munsell_chips.json",
-      "params" : {"distance" : 50}
+      "distance" : 50
     }
   ]
 }

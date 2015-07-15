@@ -17,7 +17,7 @@ class Classifier(object):
     def classify(self, sample):
         pass
 
-    def classify_pval(self, sample):
+    def classify_p_val(self, sample):
         """
         Returns tuple with class and probability of sample belonging to it
         """

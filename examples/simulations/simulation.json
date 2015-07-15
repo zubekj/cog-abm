@@ -2,36 +2,40 @@
  "num_iter" : 10000,
  "networks" : [{"source":"graph2.json","start":1},{"source":"graph2.json","start":1001},{"source":"graph2.json","start":2001}],
  "agents"  : "agent2.json",
- "learning" : {
-   "alpha" : 0.1,
-   "beta" : 1,
-   "sigma" : 1
-  },
+ "alpha" : 0.1,
+ "beta" : 1,
+ "sigma" : 1,
  "interactions" :
-    [{"id" : 1,
-     "type" : "GuessingGame",
-     "start" : 1,
-     "params" : {"context_size" : 4,
-                 "learning" : true,
-                 "inc_category_threshold" : 0.95}
+    [
+      {
+        "id" : 1,
+        "type" : "GuessingGame",
+        "start" : 1,
+        "context_size" : 4,
+        "learning" : true,
+        "inc_category_threshold" : 0.95
+      },
+      {
+        "id" : 2,
+        "type" : "GuessingGame",
+        "start" : 1501,
+        "context_size" : 4,
+        "learning" : true,
+        "inc_category_threshold" : 0.95
+      }
+    ],
+  "environments" : [
+    {
+      "start" : 1,
+      "name" : "global",
+      "source" : "1269_munsell_chips.json",
+      "distance" : 50
     },
-    {"id" : 2,
-     "type" : "GuessingGame",
-     "start" : 1501,
-     "params" : {"context_size" : 4,
-                 "learning" : true,
-                 "inc_category_threshold" : 0.95}
-    }],
-  "environments" : [{
-    "start" : 1,
-    "name" : "global",
-    "source" : "1269_munsell_chips.json",
-    "params" : {"distance" : 50}
-  },{
-    "start" : 30,
-    "name" : "local",
-    "source" : "1269_munsell_chips.json",
-    "params" : {"distance" : 50}
-  }
+    {
+      "start" : 30,
+      "name" : "local",
+      "source" : "1269_munsell_chips.json",
+      "distance" : 50
+    }
   ]
 }

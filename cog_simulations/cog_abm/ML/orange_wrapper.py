@@ -98,7 +98,7 @@ class OrangeClassifier(core.Classifier):
 #    def clone(self):
 #        return None
 
-    def classify_pval(self, sample):
+    def classify_p_val(self, sample):
         if self.domain_with_cls is None:
             return None, 0.
         s = convert_sample(self.domain_with_cls, sample)
