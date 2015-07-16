@@ -11,7 +11,7 @@ class Agent(object):
     In most cases you shouldn't change or redefine this class.
     There is special class for that: AgentState
     """
-    AID = 10 ** 8
+    AID = 0
     AID_lock = Lock()
 
     def __init__(self, aid=None, state=None, sensor=None):
@@ -24,10 +24,13 @@ class Agent(object):
     @classmethod
     def get_next_id(cls):
         cls.AID_lock.acquire()
-        cls.AID += 1
         w = cls.AID
+        cls.AID += 1
         cls.AID_lock.release()
         return w
+
+    def get_id(self):
+        return self.id
 
     def set_state(self, state):
         self.state = state

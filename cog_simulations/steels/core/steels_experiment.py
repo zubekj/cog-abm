@@ -71,7 +71,7 @@ def load_and_bind_agents(agents, networks, guessing_game):
         # Bind agents to networks.
         for wrapped_network in networks:
             network = wrapped_network["graph"]
-            network.add_agent(true_agent, agent["node_name"])
+            network.add_agent(true_agent)
 
     return true_agents
 

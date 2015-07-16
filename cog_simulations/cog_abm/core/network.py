@@ -2,7 +2,7 @@
 Module represents agent allocation in cognitive system.
 """
 from random import choice
-
+import logging
 
 class Node(object):
     """
@@ -109,28 +109,22 @@ class Network(object):
     #       for node_name in node_name_list:
     #               self.add_agent(agent, node_name)
 
-    def add_agent(self, agent, node_name, agent_name=None):
+    def add_agent(self, agent):
         """
         Add agent to the node of network.
 
-        @attention: It is required to specify agent name if Agent is
-        non-hashable object.
-
         @type agent: agent
         @param agent: Agent to be added to the network.
-
-        @type agent: String
-        @param agent: Optional name, identifier of Agent.
-
-        @type node_name: string
-        @param node_name_list: Name of node that agent has to be assigned to.
         """
-        self.nodes[node_name].add_agent(agent)
+        agent_id = agent.get_id()
 
-        if (agent_name is None):
-            self.agents[agent] = node_name
-        else:
-            self.agents[agent_name] = node_name
+        logging.debug("Add agent")
+        logging.debug("Nodes available: " + str(self.nodes))
+        logging.debug("Agent id: " + str(agent_id))
+
+        self.nodes[agent_id].add_agent(agent)
+
+        self.agents[agent] = agent_id
 
     def get_neighbour_nodes(self, node_name):
         """

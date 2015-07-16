@@ -83,6 +83,8 @@ class Simulation(object):
         for graph in self.graphs:
             if graph["start"] is self.iteration_counter:
                 self.graph = graph["graph"]
+                for agent in self.agents:
+                    self.graph.add_agent(agent)
                 break
 
     def _change_interaction(self):
