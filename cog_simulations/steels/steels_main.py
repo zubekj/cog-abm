@@ -74,6 +74,8 @@ if __name__ == "__main__":
     else:
         logging.basicConfig(level=log_level)
 
+    # Check whether start new simulation or continue old.
+
     # Loading parameters from given or default simulation file.
     path_to_simulations = "../../results_of_simulation/simulations/"
     open_simulation = args.load_simulation

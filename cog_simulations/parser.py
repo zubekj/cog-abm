@@ -80,12 +80,8 @@ class Parser(object):
         networks = []
         for network in networks_source:
             g_type = self.value_if_exist("type", network)
-            if g_type is None:
-                network_file = self.value_if_exist("source", network)
-                g = self.parse_graph(network_file)
-            else:
-                n = self.value_if_exist("num_agents", source)
-                g = graph_generator(g_type, n)
+            n = self.value_if_exist("num_agents", source)
+            g = graph_generator(g_type, n, self.value_if_exist("source", network))
             networks.append({"start": network["start"], "graph": Network(g)})
 
         dictionary["networks"] = networks
@@ -102,35 +98,6 @@ class Parser(object):
             environments.append(environment)
 
         dictionary["environments"] = environments
-
-    @staticmethod
-    def parse_graph(source):
-        """
-        Parse graph when given as pygraph in json.
-
-        @type source: String
-        @param source: Json document for pygraph directory.
-
-        @rtype: Pygraph
-        @return: Returns graph from pygraph library.
-        """
-        if source is None:
-            return None
-
-        with open("../../examples/networks/" + source, 'r') as f:
-            graph = json.loads(f.read())
-
-            graph_s = '<?xml version="1.0" ?><graph>'
-
-            for node in graph["nodes"]:
-                graph_s += '<node id="%d"/>' % node
-
-            for edge in graph["edges"]:
-                graph_s += '<edge from="%d" to="%d" wt="%d"/>' % (edge["from"], edge["to"], edge["wt"])
-
-            graph_s += "</graph>"
-
-            return markup.read(graph_s)
 
     @staticmethod
     def parse_environment(doc):
