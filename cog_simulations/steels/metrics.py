@@ -8,53 +8,52 @@ from itertools import combinations, imap
 
 from cog_simulations.cog_abm.extras.fitness import get_buffered_average
 
-#WINDOW_SIZE = 20
 WINDOW_SIZE = 50
 
 
-def get_DS_fitness():
+def get_ds_fitness():
     return get_buffered_average(WINDOW_SIZE)
 
 
-def get_CS_fitness():
+def get_cs_fitness():
     return get_buffered_average(WINDOW_SIZE)
 
 
-def DS_A(agent):
+def ds_a(agent):
     return agent.get_fitness("DG")
 
 
-def DS(agents, it):
+def ds(agents, it):
     if it == 0:
         return 0
-    return math.fsum(imap(DS_A, agents)) / len(agents)
+    return math.fsum(imap(ds_a, agents)) / len(agents)
 
 
-def CS_A(agent):
+def cs_a(agent):
     return agent.get_fitness("GG")
 
 
-def CS(agents, it):
+def cs(agents, it):
     if it == 0:
         return 0
-    return math.fsum(imap(CS_A, agents)) / len(agents)
+    return math.fsum(imap(cs_a, agents)) / len(agents)
 
 
 def ru_dist(ru1, ru2):
-    #print math.log(ru1[1], 0.8), math.log(ru2[1], 0.8)
-    #return math.log(ru1[1], 0.001)*math.log(ru2[1], 0.001)*ru1[0].dist(ru2[0])
-    #return ru1[1]*ru2[1]*ru1[0].dist(ru2[0])
-    #what was in Steels:
+    # print math.log(ru1[1], 0.8), math.log(ru2[1], 0.8)
+    # return math.log(ru1[1], 0.001)*math.log(ru2[1], 0.001)*ru1[0].dist(ru2[0])
+    # return ru1[1]*ru2[1]*ru1[0].dist(ru2[0])
+    # what was in Steels:
     return ru1[0].dist(ru2[0])
 
 
-def d(A, B, m):
+def d(list_a, list_b, m):
 
-    s1 = math.fsum([min([m(a, b) for b in B]) for a in A])
-    s2 = math.fsum([min([m(a, b) for a in A]) for b in B])
+    s1 = math.fsum([min([m(a, b) for b in list_b]) for a in list_a])
+    s2 = math.fsum([min([m(a, b) for a in list_a]) for b in list_b])
 
-    return (s1 + s2) / (len(A) * len(B))
-    #/math.log((len(A) * len(B))+1)
+    return (s1 + s2) / (len(list_a) * len(list_b))
+    # /math.log((len(A) * len(B))+1)
 
 
 # c & cp are lists of (ReactiveUnit, weight)
@@ -62,7 +61,7 @@ def d_category(c, cp):
     return d(c, cp, ru_dist)
 
 
-# normaly there would be agents
+# normally there would be agents
 # a & ap are lists of lists of (ReactiveUnit, weight) - each inner list represents one adaptive network
 def D(a, ap):
     return d(a, ap, d_category)
@@ -78,22 +77,18 @@ def cv(agents, it):
 #                                               for _, an in a.state.classifier.categories.iteritems()]
 #                               ) for a in agents]
 #       ag_centres = tuple(ag_centres)
-    ag_centres = [
-                        [           [wru for wru in an.units]
-                                            for _, an in a.state.classifier.categories.iteritems()]
-                             for a in agents]
+    ag_centres = [[[wru for wru in an.units] for _, an in a.state.classifier.categories.iteritems()]
+                  for a in agents]
 
-
-    suma = math.fsum(D(a1, a2) for a1, a2 in combinations(ag_centres, 2) if len(a1)>0 and len(a2)>0)
-    #return suma
-    #return suma*2/(len(agents) * (len(agents)-1))
-    return suma*2/(len(agents) * (len(agents)-1))
-#       return (len(agents) * (len(agents)-1))/(suma*2)
-
+    sum_d = math.fsum(D(a1, a2) for a1, a2 in combinations(ag_centres, 2) if len(a1) > 0 and len(a2) > 0)
+    # return sum_d
+    # return sum_d*2/(len(agents) * (len(agents)-1))
+    return sum_d*2/(len(agents) * (len(agents)-1))
+#       return (len(agents) * (len(agents)-1))/(sum_d*2)
 
 
 def mcv(agents_centres):
-    """ calculates the category varianve between agents categorical split
+    """ calculates the category variance between agents categorical split
     @agents_centres: list of lists of centre value = list of classes:
             e.g.: [[c1, c2, c3], [c1, c2], [c1], [c1, c2, c3, c4]]
     @return: number denoting the variance value
@@ -115,9 +110,8 @@ def cv_prim(agents_centres1, agents_centres2):
             e.g.: [[c1, c2, c3], [c1, c2], [c1], [c1, c2, c3, c4]]
     @return: number denoting the variance value
     """
-    cat_var = 0.
-    cat_var = math.fsum([cat_dist(x,y) for x in
-                agents_centres1 for y in agents_centres2])
+    cat_var = math.fsum([cat_dist(center1, center2) for center1 in
+                        agents_centres1 for center2 in agents_centres2])
     cat_var /= len(agents_centres1) * (len(agents_centres2))
     return cat_var
 
@@ -140,15 +134,15 @@ def cat_dist(set1, set2):
 def basic_dist(set1, set2):
     """
     """
-    return math.sqrt( sum((e1 - e2)**2 \
-            for e1, e2 in zip(set1, set2)))
+    return math.sqrt(sum((e1 - e2)**2
+                     for e1, e2 in zip(set1, set2)))
 
 
 if __name__ == '__main__':
-        #To test some new distances - should use weights!
+    # To test some new distances - should use weights!
     import sys
     sys.path.append("../")
-    from steels.steels_experiment import *
+    from reactive_unit import ReactiveUnit
     rus = [(ReactiveUnit([x, x, x]), 1./(x+1)) for x in xrange(3)]
     rus2 = [(ReactiveUnit([x+1, x+1, x+1]), 1./(x+1)) for x in xrange(3)]
     print rus

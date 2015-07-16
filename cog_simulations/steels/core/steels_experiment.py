@@ -4,7 +4,6 @@ This module implements Steels experiment.
 import logging
 
 from cog_simulations.cog_abm.core import Simulation
-
 from reactive_unit import ReactiveUnit
 from adaptative_network import AdaptiveNetwork
 from steels_classifier import SteelsClassifier
@@ -37,13 +36,13 @@ def steels_experiment(num_iter=1000, dump_freq=50, alpha=0.1, beta=1, sigma=10, 
                    environments=environments, colour_order=colour_order)
     res = s.run(num_iter, dump_freq)
 
-    return res
+    return res, s
 
 
 def has_guessing_game(interactions):
     has_gg = False
     for i in interactions:
-        if i["type"] is "GuessingGame":
+        if i["type"] == "GuessingGame":
             has_gg = True
             break
     return has_gg
@@ -51,9 +50,9 @@ def has_guessing_game(interactions):
 
 def load_and_bind_agents(agents, networks, guessing_game):
     from cog_simulations.cog_abm.core.agent import Agent
-    from steels_agent_state_with_lexicon import SteelsAgentStateWithLexicon
+    from cog_simulations.steels.core.steels_agent_state_with_lexicon import SteelsAgentStateWithLexicon
     from cog_simulations.cog_abm.agent.sensor import SimpleSensor
-    from cog_simulations.steels.core import metrics
+    from cog_simulations.steels import metrics
     from cog_simulations.cog_abm.extras.tools import def_value
 
     classifier, classifier_arg = SteelsClassifier, []
@@ -63,9 +62,9 @@ def load_and_bind_agents(agents, networks, guessing_game):
     for agent in agents:
         state = SteelsAgentStateWithLexicon(classifier(*classifier_arg))
         true_agent = Agent(state=state, sensor=SimpleSensor())
-        true_agent.set_fitness_measure("DG", metrics.get_DS_fitness())
+        true_agent.set_fitness_measure("DG", metrics.get_ds_fitness())
         if guessing_game:
-            metric = metrics.get_CS_fitness()
+            metric = metrics.get_cs_fitness()
             true_agent.set_fitness_measure("GG", metric)
         true_agents.append(true_agent)
 

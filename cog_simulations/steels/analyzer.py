@@ -37,7 +37,7 @@ def count_category(agents, params, it):
     global cc_computed
     try:
         stimuli = params['environments']['global'].stimuli
-    except:
+    except KeyError:
         stimuli = params['STIMULI']
 
     def number_of_categories(agent):
@@ -54,7 +54,7 @@ def count_category(agents, params, it):
     return tmp_r
 
 
-from cog_simulations.steels.core.metrics import *
+from cog_simulations.steels.metrics import *
 
 # def avg_cc(agents, params, it):
 #       return [float(sum(count_category(agents, params, it))) / len(agents)]
@@ -62,10 +62,10 @@ fun_map =\
     {
         'cc': count_category,
         'it': lambda ag, par, it: [it],
-        'DSA': lambda ag, par, it: map(DS_A, ag),
-        'DS': lambda ag, par, it: [DS(ag, it)],
-        'CSA': lambda ag, par, it: map(CS_A, ag),
-        'CS': lambda ag, par, it: [CS(ag, it)],
+        'DSA': lambda ag, par, it: map(ds_a, ag),
+        'DS': lambda ag, par, it: [ds(ag, it)],
+        'CSA': lambda ag, par, it: map(cs_a, ag),
+        'CS': lambda ag, par, it: [cs(ag, it)],
         'cv': lambda ag, par, it: [cv(ag, it)]
     }
 

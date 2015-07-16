@@ -1,4 +1,4 @@
-from cog_simulations.steels.core.metrics import DS_A
+from cog_simulations.steels.metrics import ds_a
 from cog_simulations.cog_abm.core.interaction import Interaction
 
 
@@ -37,7 +37,7 @@ class DiscriminationGame(Interaction):
         return count == 1, c_topic
 
     def learning_after(self, agent, topic, success, c_topic=None):
-        success_rate = DS_A(agent)
+        success_rate = ds_a(agent)
         sensed_topic = agent.sense(topic)
 
         if success:

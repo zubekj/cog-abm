@@ -46,6 +46,7 @@ class Simulation(object):
         @type environments: List of Colours
         @param colour_order: List of Colours in the order used when storing Agents words.
         """
+        self.iteration_counter = 1
         self.environments = environments
         self.graph = None
         self.graphs = graphs
@@ -69,21 +70,30 @@ class Simulation(object):
             if self.colour_order:
                 store_words(self.agents, self.colour_order, str(iter_num)+"words.pout")
 
-    def _change_graph(self, counter):
+    def get_iteration_counter(self):
+        return self.iteration_counter
+
+    def set_networks(self, networks):
+        self.graphs = networks
+
+    def get_agents(self):
+        return self.agents
+
+    def _change_graph(self):
         for graph in self.graphs:
-            if graph["start"] is counter:
+            if graph["start"] is self.iteration_counter:
                 self.graph = graph["graph"]
                 break
 
-    def _change_interaction(self, counter):
+    def _change_interaction(self):
         for interaction in self.interactions:
-            if interaction["start"] is counter:
+            if interaction["start"] is self.iteration_counter:
                 self.interaction = interaction["interaction"]
                 break
 
-    def _change_environment(self, counter):
+    def _change_environment(self):
         for env in self.environments:
-            if env["start"] is counter:
+            if env["start"] is self.iteration_counter:
                 self.interaction.change_environment(env["environment"])
 
     def _choose_agents(self):
@@ -97,24 +107,23 @@ class Simulation(object):
     def _start_interaction(self, agents):
         self.interaction.interact(*agents)
 
-    def _do_iterations(self, num_iter, counter):
+    def _do_iterations(self, num_iter):
         for _ in xrange(num_iter):
-            self._change_graph(counter)
-            self._change_interaction(counter)
-            self._change_environment(counter)
+            self._change_graph()
+            self._change_interaction()
+            self._change_environment()
             agents = self._choose_agents()
             self._start_interaction(agents)
-            counter += 1
+            self.iteration_counter += 1
 
     def _do_main_loop(self, iterations, dump_freq):
         start_time = time()
         log.info("Simulation start...")
         it = xrange(iterations // dump_freq)
-        counter = 1
         if self.pb:
             it = get_progressbar()(it)
         for i in it:
-            self._do_iterations(dump_freq, counter)
+            self._do_iterations(dump_freq)
             self.dump_results((i + 1) * dump_freq)
 
         log.info("Simulation end. Total time: " + str(time() - start_time))
