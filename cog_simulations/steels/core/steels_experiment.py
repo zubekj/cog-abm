@@ -15,7 +15,8 @@ log.level = logging.INFO
 
 # Steels experiment main part
 def steels_experiment(num_iter=1000, dump_freq=50, alpha=0.1, beta=1, sigma=10, agents=None,
-                      environments=None,  networks=None, interactions=None):
+                      environments=None,  networks=None, interactions=None, num_agents=None):
+    # Don't remove num_agents
     """
     An experiment in which topology, type and learning can change after some number of iterations.
     """
@@ -36,9 +37,6 @@ def steels_experiment(num_iter=1000, dump_freq=50, alpha=0.1, beta=1, sigma=10, 
                    environments=environments, colour_order=colour_order)
     res = s.run(num_iter, dump_freq)
 
-    for agent in s.get_agents():
-        logging.debug("Agent CS measure: " + str(agent.get_fitness_measure("GG").get_fitness()))
-
     return res, s
 
 
@@ -48,7 +46,7 @@ def has_guessing_game(interactions):
         if i["type"] == "GuessingGame":
             has_gg = True
             break
-    logging.debug("Has guessing game: " + str(has_gg))
+
     return has_gg
 
 
@@ -68,7 +66,6 @@ def load_agents(agents, guessing_game):
         true_agent = Agent(state=state, sensor=SimpleSensor())
         true_agent.set_fitness_measure("DG", metrics.get_ds_fitness())
         if guessing_game:
-            logging.debug("Added GG metric to agent.")
             metric = metrics.get_cs_fitness()
             true_agent.set_fitness_measure("GG", metric)
         true_agents.append(true_agent)
@@ -88,9 +85,7 @@ def load_interactions(interactions):
         start = interaction["start"]
         inc_category_threshold = interaction["inc_category_threshold"]
         dg = DiscriminationGame(context_size, float(inc_category_threshold))
-        logging.debug("Interaction type: " + interaction["type"])
         if interaction["type"] == "GuessingGame":
-            logging.debug("Loaded guessing game.")
             inter = GuessingGame(dg, learning_mode=learning)
         else:
             inter = dg

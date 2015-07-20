@@ -2,12 +2,9 @@ from pygraph.algorithms.generators import generate
 from pygraph.classes.graph import graph
 from pygraph.classes.digraph import digraph
 import json
-import logging
 
 
 def graph_generator(g_type='Clique', n=10, source=None):
-
-    logging.debug(g_type)
 
     if g_type == "Source":
         return generate_source_graph(source)
@@ -53,9 +50,7 @@ def generate_hub_graph(n):
 
 def generate_source_graph(source):
 
-    logging.debug(source)
-
-    with open("../../examples/networks/" + source, 'r') as f:
+    with open(source, 'r') as f:
         g = json.loads(f.read())
 
     new_graph = digraph()

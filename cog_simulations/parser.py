@@ -33,7 +33,7 @@ class Parser(object):
         if source is None:
             return None
 
-        with open("../../examples/simulations/" + source, 'r') as f:
+        with open(source, 'r') as f:
             source = json.loads(f.read())
 
         dictionary = {}
@@ -46,25 +46,26 @@ class Parser(object):
 
         return dictionary
 
-    def parse_simulation_continuation(self, old_simulation, networks):
+    def parse_simulation_continuation(self, old_simulation, networks, environments):
 
-        path_to_simulations = "../../results_of_simulation/simulations/"
-        with open(path_to_simulations + old_simulation, 'r') as f:
+        with open(old_simulation, 'r') as f:
             (old_simulation, parameters) = cPickle.load(f)
 
-        path_to_networks = "../../examples/simulations/"
-        with open(path_to_networks + networks, 'r') as f:
+        with open(networks, 'r') as f:
             networks_source = json.load(f)
 
-        path_to_parameters = "../../examples/simulations/"
-        with open(path_to_parameters + networks, 'r') as f:
+        with open(networks, 'r') as f:
             parameters_source = json.load(f)
+
+        with open(environments, 'r') as f:
+            environments_source = json.load(f)
 
         dictionary = {}
 
         self.load_parameters(dictionary, parameters_source)
         networks_source["num_agents"] = parameters["num_agents"]
         self.load_networks(dictionary, networks_source)
+        self.load_environments(dictionary, environments_source)
 
         return old_simulation, parameters, dictionary
 
@@ -82,13 +83,15 @@ class Parser(object):
         agents = []
 
         if agents_source is not None:
-            with open("../../examples/agents/" + agents_source, 'r') as f:
+            with open(agents_source, 'r') as f:
                 agents_data = json.loads(f.read())
             source["num_agents"] = len(agents_data)
+            dictionary["num_agents"] = source["num_agents"]
             for agent in agents_data:
                 agents.append(agent)
         else:
             num_agents = self.value_if_exist("num_agents", source)
+            dictionary["num_agents"] = num_agents
             for i in range(num_agents):
                 agents.append({"node_name": i})
 
@@ -124,7 +127,7 @@ class Parser(object):
     @staticmethod
     def parse_environment(doc):
         """ Parse environment parameters given in json document. """
-        with open("../../examples/environment/" + doc, 'r') as f:
+        with open(doc, 'r') as f:
             environment = json.loads(f.read())
 
         return environment

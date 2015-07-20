@@ -33,7 +33,7 @@
     {
       "start" : 1,
       "name" : "global",
-      "source" : "1269_munsell_chips.json",
+      "source" : "../../examples/environment/1269_munsell_chips.json",
       "distance" : 50
     }
   ]

@@ -57,14 +57,13 @@ class Simulation(object):
         self.dump_often = True
         self.pb = pb
         self.colour_order = colour_order
-        print colour_order
 
     def dump_results(self, iter_num):
         cc = copy.deepcopy(self.agents)
         kr = (iter_num, cc)
         self.statistic.append(kr)
         if self.dump_often:
-            f = open("../../results_of_simulation/" + str(iter_num) + ".pout", "wb")
+            f = open("results_of_simulation/" + str(iter_num) + ".pout", "wb")
             cPickle.dump(kr, f, PICKLE_PROTOCOL)
             f.close()
             if self.colour_order:
@@ -75,6 +74,12 @@ class Simulation(object):
 
     def set_networks(self, networks):
         self.graphs = networks
+
+    def set_environments(self, environments):
+        self.environments = environments
+
+    def set_colour_order(self, colour_order):
+        self.colour_order = colour_order
 
     def get_agents(self):
         return self.agents
@@ -96,6 +101,7 @@ class Simulation(object):
     def _change_environment(self):
         for env in self.environments:
             if env["start"] is self.iteration_counter:
+                logging.debug("Changed environment - iteration: " + str(self.iteration_counter))
                 self.interaction.change_environment(env["environment"])
 
     def _choose_agents(self):

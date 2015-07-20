@@ -86,7 +86,6 @@ class AverageFitnessMeasure(FitnessMeasure):
         self.wsum = 0.
 
     def add_payoff(self, payoff, weight=1.):
-        logging.debug("Payoff added.")
         self.sum += float(weight) * payoff
         self.wsum += weight
 
@@ -95,7 +94,6 @@ class AverageFitnessMeasure(FitnessMeasure):
         self.add_payoff(payoff, -weight)
 
     def get_fitness(self):
-        logging.debug("Fitness measure: sum=" + str(self.sum) + " w_sum=" + str(self.wsum))
         if self.wsum == 0.:
             return 0.
         return self.sum / self.wsum

@@ -1,5 +1,4 @@
 import random
-import logging
 
 from cog_simulations.cog_abm.core.interaction import Interaction
 from discrimination_game import DiscriminationGame
@@ -34,7 +33,6 @@ class GuessingGame(Interaction):
 
     @staticmethod
     def save_result(agent, result):
-        logging.debug("Save GG results.")
         agent.add_payoff("GG", int(result))
 
     def guess_game(self, speaker, hearer):
@@ -56,8 +54,6 @@ class GuessingGame(Interaction):
         and s_category (the speaker's category to which topic belongs)
         """
         success, s_category = self.disc_game.play_save(speaker, context, topic)
-
-        logging.debug("Start guessing game.")
 
         # If the speaker did not discriminate the topic from the rest of the context himself:
         if not success:

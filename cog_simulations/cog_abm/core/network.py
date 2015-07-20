@@ -118,10 +118,6 @@ class Network(object):
         """
         agent_id = agent.get_id()
 
-        logging.debug("Add agent")
-        logging.debug("Nodes available: " + str(self.nodes))
-        logging.debug("Agent id: " + str(agent_id))
-
         self.nodes[agent_id].add_agent(agent)
 
         self.agents[agent] = agent_id

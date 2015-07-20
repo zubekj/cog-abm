@@ -134,7 +134,7 @@ def main():
     # Set up basic configuration, out to std err with a reasonable default format.
     logging.basicConfig(level=log_level)
 
-    f = open("../../results_of_simulation/" + opts.file)
+    f = open(opts.file)
     res, params = cPickle.load(f)
     f.close()
 
