@@ -1,5 +1,4 @@
 import sys
-import json
 import logging
 import cPickle
 from time import localtime, strftime
@@ -75,58 +74,23 @@ if __name__ == "__main__":
         logging.basicConfig(level=log_level)
 
     # Check whether start new simulation or continue old.
-
-    # Loading parameters from given or default simulation file.
-    path_to_simulations = "../../results_of_simulation/simulations/"
-    open_simulation = args.load_simulation
-    if open_simulation is not None:
-        f = open(path_to_simulations + open_simulation, 'r')
-        (loaded_simulation, params) = cPickle.load(f)
-        f.close()
-
-        path_to_networks = "../../examples/simulations/"
-        f = open(path_to_networks + args.networks, 'r')
-        networks_source = json.load(f)
-
-        logging.debug(loaded_simulation.get_agents())
-        logging.debug(len(loaded_simulation.get_agents()))
-
-        networks_source["num_agents"] = len(loaded_simulation.get_agents())
-        f.close()
-        networks = {}
-        Parser.load_networks(Parser(), networks, networks_source)
-
-        params["num_iter"] += networks_source["num_iter"]
-        old_iteration = loaded_simulation.get_iteration_counter()
-        networks = networks["networks"]
-        for network in networks:
-            logging.debug(network)
-            network["start"] += old_iteration - 1
-            params["networks"].append(network)
-
-
-        logging.debug('Networks: ' + str(networks))
-
-        logging.debug(networks)
-        iteration_number = networks_source["num_iter"]
-        dump_freq = params["dump_freq"]
-        # Main part - continuing steels experiment.
-        results, simulation = steels_experiment_continuation(loaded_simulation, networks, iteration_number, dump_freq)
-    else:
-        source_file = args.simulation_file
-        params = Parser().parse_simulation(source_file)
+    new_simulation = args.simulation_file
+    if new_simulation is not None:
+        params = Parser().parse_simulation(new_simulation)
         # Main part - running steels experiment.
         results, simulation = steels_experiment(**params)
+    else:
+        simulation, old_params, new_params = Parser.parse_simulation_continuation(args.load_simulation, args.networks)
+        results, simulation, params = steels_experiment_continuation(simulation, old_params, new_params)
 
-    # Saving results of simulation.
+    # Saving results of simulation - always.
     path_to_results = "../../results_of_simulation/"
-    results_name = path_to_results + args.results_file
-    f = open(results_name, "w")
-    cPickle.dump((results, params), f)
-    f.close()
+    with open(path_to_results + args.results_file, "w") as f:
+        cPickle.dump((results, params), f)
 
+    # Saving whole simulation - only when specified.
     save_simulation = args.save_simulation
     if save_simulation is not None:
-        f = open(path_to_simulations + save_simulation, 'w')
-        cPickle.dump((simulation, params), f)
-        f.close()
+        path_to_simulations = "../../results_of_simulation/simulations/"
+        with open(path_to_simulations + save_simulation, 'w') as f:
+            cPickle.dump((simulation, params), f)

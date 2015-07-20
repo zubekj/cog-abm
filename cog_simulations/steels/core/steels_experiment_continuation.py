@@ -1,15 +1,15 @@
-import logging
+def steels_experiment_continuation(simulation, old_params, new_params):
 
+    # Changing parameters to suit whole new simulation.
+    old_params["num_iter"] += new_params["num_iter"]
 
-def steels_experiment_continuation(simulation, networks, iteration_number, dump_freq):
+    old_iteration = simulation.get_iteration_counter()
+    for network in new_params["networks"]:
+        network["start"] += old_iteration - 1
+        old_params["networks"].append(network)
 
-    agents = simulation.get_agents()
-    for agent in agents:
-        logging.debug(agent)
-        for network in networks:
-            network["graph"].add_agent(agent)
+    simulation.set_networks(old_params["networks"])
 
-    simulation.set_networks(networks)
-    results = simulation.continue_(iteration_number, dump_freq)
+    results = simulation.continue_(new_params["new_iter"], old_params["dump_freq"])
 
-    return results, simulation
+    return results, simulation, old_params

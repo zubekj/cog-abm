@@ -21,7 +21,7 @@ def steels_experiment(num_iter=1000, dump_freq=50, alpha=0.1, beta=1, sigma=10, 
     """
 
     has_gg = has_guessing_game(interactions)
-    agents = load_and_bind_agents(agents, networks, has_gg)
+    agents = load_agents(agents, has_gg)
     interactions = load_interactions(interactions)
     colour_order, environments = load_environment(environments)
 
@@ -52,7 +52,7 @@ def has_guessing_game(interactions):
     return has_gg
 
 
-def load_and_bind_agents(agents, networks, guessing_game):
+def load_agents(agents, guessing_game):
     from cog_simulations.cog_abm.core.agent import Agent
     from cog_simulations.steels.core.steels_agent_state_with_lexicon import SteelsAgentStateWithLexicon
     from cog_simulations.cog_abm.agent.sensor import SimpleSensor
@@ -72,11 +72,6 @@ def load_and_bind_agents(agents, networks, guessing_game):
             metric = metrics.get_cs_fitness()
             true_agent.set_fitness_measure("GG", metric)
         true_agents.append(true_agent)
-
-        # Bind agents to networks.
-        for wrapped_network in networks:
-            network = wrapped_network["graph"]
-            network.add_agent(true_agent)
 
     return true_agents
 

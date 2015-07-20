@@ -2,7 +2,7 @@
 Module provides parser for json documents.
 """
 import json
-from pygraph.readwrite import markup
+import cPickle
 from cog_simulations.cog_abm.core.network import Network
 from cog_simulations.cog_abm.generators.graph_generator import graph_generator
 
@@ -45,6 +45,28 @@ class Parser(object):
         self.load_to_dictionary(dictionary, "interactions", source)
 
         return dictionary
+
+    def parse_simulation_continuation(self, old_simulation, networks):
+
+        path_to_simulations = "../../results_of_simulation/simulations/"
+        with open(path_to_simulations + old_simulation, 'r') as f:
+            (old_simulation, parameters) = cPickle.load(f)
+
+        path_to_networks = "../../examples/simulations/"
+        with open(path_to_networks + networks, 'r') as f:
+            networks_source = json.load(f)
+
+        path_to_parameters = "../../examples/simulations/"
+        with open(path_to_parameters + networks, 'r') as f:
+            parameters_source = json.load(f)
+
+        dictionary = {}
+
+        self.load_parameters(dictionary, parameters_source)
+        networks_source["num_agents"] = parameters["num_agents"]
+        self.load_networks(dictionary, networks_source)
+
+        return old_simulation, parameters, dictionary
 
     def load_parameters(self, dictionary, source):
         """ Load general simulation parameters given in source. """
