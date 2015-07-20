@@ -3,6 +3,7 @@ This module implements measurements used in evaluating the outcome of the
 experiment.
 """
 import math
+import logging
 
 from itertools import combinations, imap
 
@@ -30,6 +31,7 @@ def ds(agents, it):
 
 
 def cs_a(agent):
+    logging.debug(agent.get_fitness("GG"))
     return agent.get_fitness("GG")
 
 
