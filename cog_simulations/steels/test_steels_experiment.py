@@ -5,7 +5,7 @@ import numpy as np
 
 from cog_simulations.steels.core.steels_experiment import (ReactiveUnit,
     AdaptiveNetwork, SteelsClassifier)
-from cog_abm.ML.core import Sample
+from cog_simulations.cog_abm.ML.core import Sample
 
 S = Sample
 

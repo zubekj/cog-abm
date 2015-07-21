@@ -15,8 +15,9 @@ log.level = logging.INFO
 
 # Steels experiment main part
 def steels_experiment(num_iter=1000, dump_freq=50, alpha=0.1, beta=1, sigma=10, agents=None,
-                      environments=None,  networks=None, interactions=None, num_agents=None):
-    # Don't remove num_agents
+                      environments=None,  networks=None, interactions=None, dump_often=None,
+                      num_agents=None):
+    # Don't remove num_agents it is required in experiment continuation,
     """
     An experiment in which topology, type and learning can change after some number of iterations.
     """
@@ -34,7 +35,7 @@ def steels_experiment(num_iter=1000, dump_freq=50, alpha=0.1, beta=1, sigma=10, 
              str({'num agents': len(agents)}))
 
     s = Simulation(graphs=networks, interactions=interactions, agents=agents,
-                   environments=environments, colour_order=colour_order)
+                   environments=environments, colour_order=colour_order, dump_often=dump_often)
     res = s.run(num_iter, dump_freq)
 
     return res, s

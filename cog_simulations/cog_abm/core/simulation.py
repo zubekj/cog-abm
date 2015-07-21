@@ -20,7 +20,7 @@ class Simulation(object):
     """
 
     def __init__(self, graphs=None, interactions=None, environments=None, agents=None, pb=False,
-                 colour_order=None):
+                 colour_order=None, dump_often=None):
         """
         @type graphs: List of Maps
         @param graphs: List of Maps with two keys:
@@ -54,7 +54,7 @@ class Simulation(object):
         self.interactions = interactions
         self.agents = tuple(agents)
         self.statistic = []
-        self.dump_often = True
+        self.dump_often = dump_often
         self.pb = pb
         self.colour_order = colour_order
 
@@ -63,7 +63,7 @@ class Simulation(object):
         kr = (iter_num, cc)
         self.statistic.append(kr)
         if self.dump_often:
-            f = open("results_of_simulation/" + str(iter_num) + ".pout", "wb")
+            f = open(self.dump_often + str(iter_num) + ".pout", "wb")
             cPickle.dump(kr, f, PICKLE_PROTOCOL)
             f.close()
             if self.colour_order:
@@ -101,7 +101,6 @@ class Simulation(object):
     def _change_environment(self):
         for env in self.environments:
             if env["start"] is self.iteration_counter:
-                logging.debug("Changed environment - iteration: " + str(self.iteration_counter))
                 self.interaction.change_environment(env["environment"])
 
     def _choose_agents(self):

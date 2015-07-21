@@ -3,9 +3,14 @@ This module implements measurements used in evaluating the outcome of the
 experiment.
 """
 import math
-import logging
+import numpy
 
 from itertools import combinations, imap
+
+import sys
+sys.path.append("../../")
+sys.path.append("../")
+sys.path.append(".")
 
 from cog_simulations.cog_abm.extras.fitness import get_buffered_average
 
@@ -20,6 +25,92 @@ def get_cs_fitness():
     return get_buffered_average(WINDOW_SIZE)
 
 
+def discrimination_success_of_agent(agent):
+    return agent.get_fitness("DG")
+
+
+def discrimination_success_of_population(agents, iteration):
+    if iteration == 0:
+        return 0
+    return numpy.mean([discrimination_success_of_agent(agent) for agent in agents])
+
+
+def communication_success_of_agent(agent):
+    return agent.get_fitness("GG")
+
+
+def communication_success_of_population(agents, iteration):
+    if iteration == 0:
+        return 0
+    return numpy.mean([communication_success_of_agent(agent) for agent in agents])
+
+
+# Calculate total variance of categories for the list of agents. This measure is sensitive to the number of categories.
+def category_variance(agents, iteration):
+    if iteration == 0:
+        return 0
+    # Taking category variance for every pair without repetition.
+    total_variance = numpy.sum([category_variance_between_agents(pair) for pair in combinations(agents, 2)])
+    n = len(agents)
+    return (2 * total_variance) / (n * (n - 1))
+
+
+# Calculate total variance of categories for the pair of agents.
+def category_variance_between_agents(pair):
+    agent1, agent2 = pair
+    cat1 = agent1.state.classifier.categories
+    cat2 = agent2.state.classifier.categories
+
+    # For every category in cat1 and cat2 (dictionaries of categories)
+    # we are taking a distance to closest category from other set.
+    variance = numpy.sum([min([category_distance(cat1[c1], cat2[c2]) for c2 in cat2]) for c1 in cat1]) \
+        + numpy.sum([min([category_distance(cat1[c1], cat2[c2]) for c1 in cat1]) for c2 in cat2])
+
+    return variance / (len(cat1) * len(cat2))
+
+
+# Calculate distance between two adaptive networks (categories).
+def category_distance(c1, c2):
+    reactive_units1 = c1.units
+    reactive_units2 = c2.units
+
+    # For every central value in reactive_units1 and reactive_units2 (list of values)
+    # we are taking a distance to closest value from other set.
+
+    distance = numpy.sum([min([value_distance(v1, v2) for v2 in reactive_units2]) for v1 in reactive_units1]) \
+        + numpy.sum([min([value_distance(v1, v2) for v1 in reactive_units1]) for v2 in reactive_units2])
+
+    return distance / (len(reactive_units1) * len(reactive_units2))
+
+
+# Calculate distance between two reactive units (values).
+def value_distance(r1, r2):
+    (value1, weight1) = r1
+    (value2, weight2) = r2
+
+    return (weight1 * weight2) * value1.central_value.distance(value2.central_value)
+
+
+def count_category(agents, parameters):
+
+    stimuli = None
+
+    for environment in parameters['environments']:
+        if environment['name'] == 'global':
+            from core.steels_experiment import load_environment
+            _, env = load_environment([environment])
+            stimuli = env[0]['environment'].stimuli
+
+    def number_of_categories(agent):
+        agents_set = {}
+        for s in stimuli:
+            agents_set[agent.sense_and_classify(s)] = 1
+        return len(agents_set)
+
+    return [number_of_categories(agent) for agent in agents]
+
+
+
 def ds_a(agent):
     return agent.get_fitness("DG")
 
@@ -31,7 +122,6 @@ def ds(agents, it):
 
 
 def cs_a(agent):
-    logging.debug(agent.get_fitness("GG"))
     return agent.get_fitness("GG")
 
 
@@ -142,9 +232,7 @@ def basic_dist(set1, set2):
 
 if __name__ == '__main__':
     # To test some new distances - should use weights!
-    import sys
-    sys.path.append("../")
-    from reactive_unit import ReactiveUnit
+    from core.reactive_unit import ReactiveUnit
     rus = [(ReactiveUnit([x, x, x]), 1./(x+1)) for x in xrange(3)]
     rus2 = [(ReactiveUnit([x+1, x+1, x+1]), 1./(x+1)) for x in xrange(3)]
     print rus

@@ -15,7 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-'''GrapeFruit - Color manipulation in Python'''
+'''''
+GrapeFruit - Color manipulation in Python
+'''''
 
 # $Id: grapefruit.py 30 2008-06-01 20:44:26Z xbasty $
 __author__ = 'Xavier Basty <xbasty@gmail.com>'

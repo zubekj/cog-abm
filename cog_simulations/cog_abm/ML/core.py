@@ -125,7 +125,7 @@ class NominalAttribute(Attribute):
 class Sample(object):
 
     def __init__(self, values, meta=None, cls=None, cls_meta=None,
-                        dist_fun=None, last_is_class=False, cls_idx=None):
+                 dist_fun=None, last_is_class=False, cls_idx=None):
         self.values = values[:]
         self.meta = meta or [NumericAttribute() for _ in values]
 
@@ -140,8 +140,7 @@ class Sample(object):
             self.cls = cls
             self.cls_meta = cls_meta
 
-        self.dist_fun = dist_fun or \
-                get_default_dist_fun(self.meta)
+        self.dist_fun = dist_fun or get_default_dist_fun(self.meta)
 
     def get_cls(self):
         if self.cls_meta is None or self.cls is None:
