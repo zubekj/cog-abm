@@ -95,7 +95,6 @@ if __name__ == "__main__":
 
     # Saving results of simulation - always.
     with open(args.results_file, "w") as f:
-        print(params["environments"])
         cPickle.dump((results, params), f)
 
     # Saving whole simulation - only when specified.
