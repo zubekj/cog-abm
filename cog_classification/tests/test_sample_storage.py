@@ -10,20 +10,49 @@ class SimpleSample:
         def __init__(self, number):
             self.number = number
 
-        def distance(self, number):
-            return abs(self.number - number.get_attributes()[0])
+        def distance(self, simple_sample):
+            return abs(self.number - simple_sample.get_attributes()[0])
 
         def get_attributes(self):
             return [self.number]
 
+        def equals(self, simple_sample):
+            return self.get_attributes() == simple_sample.get_attributes()
+
 
 class TestSampleStorage:
+    """
+    Functions tested in TestSampleStorage:
+    - add_sample
+    - create_new_class
+    - decrease_weights_in_class
+    - export
+    - increase_weights_in_class
+    - remove_class
+    - remove_sample_from_class
+    - remove_weak_samples_from_class
+
+    Functions not tested:
+    - decrease_weights
+    - empty
+    - remove_weak_samples
+    - get_class_number
+    - get_class_samples
+    - get_class_samples_size
+    - get_classes
+    - get_classes_number
+    - get_true_class
+    - set_weight
+    """
 
     def __init__(self):
         self.test_storage = SampleStorage()
 
     def assert_size(self, number):
         assert_equals(self.test_storage.get_classes_number(), number)
+
+    def assert_samples_size(self, number, target_class):
+        assert_equals(self.test_storage.get_class_samples_size(target_class), number)
 
     def setup(self):
         self.test_storage = SampleStorage()
@@ -39,38 +68,81 @@ class TestSampleStorage:
         # Adding new element to non existing class.
         self.test_storage.add_sample(SimpleSample(1), 1, 1)
         self.assert_size(1)
+        self.assert_samples_size(1, 1)
 
         # Adding old element to existing class.
         self.test_storage.add_sample(SimpleSample(1), 1, 1)
         self.assert_size(1)
+        self.assert_samples_size(1, 1)
 
         # Adding new element to existing class.
         self.test_storage.add_sample(SimpleSample(2), 1, 1)
         self.assert_size(1)
+        self.assert_samples_size(2, 1)
 
         # Adding new element to non existing class.
         self.test_storage.add_sample(SimpleSample(3), 1, 2)
         self.assert_size(2)
+        self.assert_samples_size(2, 1)
+        self.assert_samples_size(1, 2)
 
         # Adding new element to existing class.
         self.test_storage.add_sample(SimpleSample(3), 1, 1)
         self.assert_size(2)
+        self.assert_samples_size(3, 1)
+        self.assert_samples_size(1, 2)
 
         # Adding new element to non existing class.
         self.test_storage.add_sample(SimpleSample(4), 1, 3)
         self.assert_size(3)
+        self.assert_samples_size(3, 1)
+        self.assert_samples_size(1, 2)
+        self.assert_samples_size(1, 3)
 
         # Adding old element to existing class (different true classes).
         self.test_storage.add_sample(SimpleSample(4), 2, 3)
         self.assert_size(4)
+        self.assert_samples_size(3, 1)
+        self.assert_samples_size(1, 2)
+        self.assert_samples_size(1, 3)
 
         # Adding new element to existing class (different true classes).
         self.test_storage.add_sample(SimpleSample(5), 2, 1)
         self.assert_size(5)
+        self.assert_samples_size(3, 1)
+        self.assert_samples_size(1, 2)
+        self.assert_samples_size(1, 3)
 
         # Adding new element without class.
         self.test_storage.add_sample(SimpleSample(5), 2)
         self.assert_size(6)
+        self.assert_samples_size(3, 1)
+        self.assert_samples_size(1, 2)
+        self.assert_samples_size(1, 3)
+
+    def test_create_new_class_no_conflicts_with_analogous_class_names(self):
+        self.test_storage.add_sample(SimpleSample(1), 1, "Class number: 0")
+        self.test_storage.add_sample(SimpleSample(1), 1, "Class number: 1")
+        self.test_storage.add_sample(SimpleSample(1), 1, "Class number: 2")
+        self.test_storage.add_sample(SimpleSample(1), 1, "Class number: 4")
+
+        self.assert_size(4)
+        self.test_storage.add_sample(SimpleSample(1), 1)
+        self.assert_size(5)
+        self.test_storage.add_sample(SimpleSample(1), 1)
+        self.assert_size(6)
+
+        classes = self.test_storage.get_classes()
+
+        for name in ["Class number: 3", "Class number: 5"]:
+            find_class = False
+
+            for c in classes:
+                if name == c:
+                    find_class = True
+                    break
+
+            assert find_class
 
     def test_decrease_weights_in_class_lowers_values(self):
         self.test_storage.add_sample(SimpleSample(1), 1, 1, 1)
@@ -183,22 +255,48 @@ class TestSampleStorage:
 
     @raises(KeyError)
     def test_remove_sample_from_class_empty_storage_fails(self):
-        self.test_storage.remove_sample_from_class(1, 1)
+        self.test_storage.remove_sample_from_class(SimpleSample(1), 1)
 
     @raises(KeyError)
     def test_remove_sample_from_class_storage_without_sample_fails(self):
-        self.test_storage.add_sample(2, 1, 1)
-        self.test_storage.remove_sample_from_class(3, 1)
+        self.test_storage.add_sample(SimpleSample(2), 1, 1)
+        self.test_storage.remove_sample_from_class(SimpleSample(3), 1)
 
     @raises(KeyError)
     def test_remove_sample_from_class_other_class_fails(self):
-        self.test_storage.add_sample(1, 1, 1)
-        self.test_storage.remove_sample_from_class(1, 2)
+        self.test_storage.add_sample(SimpleSample(1), 1, 1)
+        self.test_storage.remove_sample_from_class(SimpleSample(1), 2)
 
     def test_remove_sample_from_class_last_sample_removes_class(self):
-        self.test_storage.add_sample(1, 1, 1)
+        self.test_storage.add_sample(SimpleSample(1), 1, 1)
         self.assert_size(1)
         assert_equals(1, self.test_storage.get_class_samples_size(1))
 
-        self.test_storage.remove_sample_from_class(1, 1)
+        self.test_storage.remove_sample_from_class(SimpleSample(1), 1)
         self.assert_size(0)
+
+    @raises(KeyError)
+    def test_remove_weak_samples_from_class_no_class(self):
+        self.test_storage.remove_weak_samples_from_class(1)
+
+    def test_remove_weak_samples_from_class_removes_class(self):
+        self.test_storage.add_sample(SimpleSample(1), 1, 1, 0)
+        self.test_storage.add_sample(SimpleSample(2), 1, 1, 0)
+        self.test_storage.add_sample(SimpleSample(3), 1, 1, 0)
+
+        self.assert_size(1)
+        self.test_storage.remove_weak_samples_from_class(1)
+        self.assert_size(0)
+
+    def test_remove_weak_samples_from_class_doesnt_affect_other_classes(self):
+        self.test_storage.add_sample(SimpleSample(1), 1, 1, 0)
+        self.test_storage.add_sample(SimpleSample(2), 1, 1, 0)
+        self.test_storage.add_sample(SimpleSample(3), 1, 1, 0)
+
+        self.test_storage.add_sample(SimpleSample(1), 1, 2, 0)
+        self.test_storage.add_sample(SimpleSample(2), 1, 3, 0)
+        self.test_storage.add_sample(SimpleSample(3), 1, 4, 0)
+
+        self.assert_size(4)
+        self.test_storage.remove_weak_samples_from_class(1)
+        self.assert_size(3)
