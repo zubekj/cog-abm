@@ -10,6 +10,7 @@ class SimpleSample:
         def __init__(self, number):
             self.number = number
 
+        @staticmethod
         def distance(self, simple_sample):
             return abs(self.number - simple_sample.get_attributes()[0])
 
@@ -36,6 +37,7 @@ class TestSampleStorage:
     - decrease_weights
     - empty
     - remove_weak_samples
+    - sample_in_class
     - get_class_number
     - get_class_samples
     - get_class_samples_size
@@ -205,7 +207,7 @@ class TestSampleStorage:
         for _, weight in self.test_storage.get_class_samples(1):
             assert_equals(weight, 0)
 
-        self.test_storage.increase_weights_in_class(SimpleSample(1), 1)
+        self.test_storage.increase_weights_in_class(SimpleSample(1), 1, SimpleSample.distance)
 
         for _, weight in self.test_storage.get_class_samples(1):
             assert weight > 0
@@ -217,7 +219,7 @@ class TestSampleStorage:
         for _, weight in self.test_storage.get_class_samples(1):
             assert_equals(weight, 1)
 
-        self.test_storage.increase_weights_in_class(SimpleSample(1), 1)
+        self.test_storage.increase_weights_in_class(SimpleSample(1), 1, SimpleSample.distance)
 
         for _, weight in self.test_storage.get_class_samples(1):
             assert_equals(weight, 1)

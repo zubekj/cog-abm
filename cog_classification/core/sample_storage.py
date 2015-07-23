@@ -66,8 +66,7 @@ class SampleStorage:
         Sample weight should be larger than or equal 0.
 
         If sample would be add to class, which true class is different then for sample, there is generated new class.
-        If sample would be add to class, that already contains this sample, then weights in this class are increased
-        with sample as centre.
+        If sample would be add to class, that already contains this sample, then method do nothing.
 
         Sample can be added to multiple classes.
         """
@@ -80,18 +79,8 @@ class SampleStorage:
 
         if target_class in self.classes:
             if true_class == self.classes[target_class]["true_class"]:
-                sample_in_class = False
 
-                for s in self.classes[target_class]["samples"]:
-                    # We are compare true values of sample and s not references so we cannot use in.
-                    if sample.equals(s):
-                        sample_in_class = True
-                        break
-
-                if sample_in_class:
-                    # If sample has already existed in target class, then we strengthen this class with sample.
-                    self.increase_weights_in_class(sample, target_class)
-                else:
+                if not self.sample_in_class(sample, target_class):
                     # Adding new sample to class
                     self.set_weight(sample, target_class, sample_weight)
             else:
@@ -180,16 +169,18 @@ class SampleStorage:
 
         return data, decisions
 
-    def increase_weights_in_class(self, sample, target_class):
+    def increase_weights_in_class(self, sample, target_class, distance):
         """
         Increase the weights of samples in target class
         according to their distance to sample modified by sigma and beta.
+
+        Distance is calculated by given distance function.
 
         Weights will never rise above max weight.
         """
 
         for class_sample, old_weight in self.get_class_samples(target_class):
-            weight_change = self.beta * 0.1 ** (self.sigma * sample.distance(class_sample))
+            weight_change = self.beta * 0.1 ** (self.sigma * distance(class_sample, sample))
             new_weight = min(old_weight + weight_change, self.max_weight)
             self.set_weight(class_sample, target_class, new_weight)
 
@@ -216,6 +207,7 @@ class SampleStorage:
             self.classes[target_class]["samples"].pop(sample)
         except KeyError:
             for s in self.classes[target_class]["samples"]:
+                # We don't use sample in class method, because it didn't returns reference to analogous sample.
                 if sample.equals(s):
                     sample = s
                     break
@@ -250,6 +242,18 @@ class SampleStorage:
         else:
             for sample in to_remove:
                 self.remove_sample_from_class(sample, target_class)
+
+    def sample_in_class(self, sample, target_class):
+        """ Checking if given sample is in target class. """
+        sample_in_class = False
+
+        for s in self.classes[target_class]["samples"]:
+                    # We are compare true values of sample and s not references so we cannot use in.
+                    if sample.equals(s):
+                        sample_in_class = True
+                        break
+
+        return sample_in_class
 
     def get_class_number(self, target_class):
 
