@@ -67,8 +67,8 @@ class SampleStorage:
         assert new_weight >= 0
         assert new_weight <= max_weight
 
-        # Distance is used only in increase weight
-        self.distance = distance
+        # Distance is used only in increase weights.
+        self.distance = distance or self.standard_distance
 
         self.classes = {}
         self.true_classes = {}
@@ -76,6 +76,7 @@ class SampleStorage:
     def add_sample(self, sample, environment, target_class=None, sample_weight=None):
         """
         Adds the sample to given target class or created new class if no target class is given.
+        Sample is represented by index in environment from which it orginate.
         Sample has sample weight if given or default new weight of sample storage.
         Sample weight should be larger than or equal 0.
 
@@ -98,7 +99,7 @@ class SampleStorage:
                 # No difference between true classes of sample and target_class.
                 if not self.sample_in_class(sample, environment, target_class):
                     # Adding new sample to class
-                    self.set_weight(sample, environment, target_class, sample_weight)
+                    self.set_weight(environment, target_class, sample_weight, sample=sample)
             else:
                 # There is difference in true classes of sample and given target class.
                 # So we are adding sample to empty class (it forces creation of new class for sample).
@@ -107,7 +108,7 @@ class SampleStorage:
             # No target class in sample storage.
             # So we create new class for sample (and new name if target_class is None).
             target_class = self.create_new_class(target_class, environment, true_class)
-            self.set_weight(sample, environment, target_class, sample_weight)
+            self.set_weight(environment, target_class, sample_weight, sample=sample)
 
     def create_new_class(self, target_class, environment, true_class):
         """
@@ -116,7 +117,7 @@ class SampleStorage:
         If target class is given then we assert that this class is not in classes.
         This method add this new created class to sample storage classes.
 
-        Create new class returns correct name of target class.
+        Create new class returns correct name of created class.
         """
 
         if target_class is None:
@@ -136,7 +137,7 @@ class SampleStorage:
                 self.class_name += 1
 
             target_class = name
-            # We didn't increase self.class_name because after finding unique name
+            # After while loop we didn't increase self.class_name because after finding unique name
             # we increased this value on the end of while loop.
 
         self.classes[target_class] = {}
@@ -155,6 +156,7 @@ class SampleStorage:
         """
 
         the_class = self.classes[target_class]
+
         for environment in the_class:
             _, weights = the_class[environment]
             for i in range(len(weights)):
@@ -172,6 +174,10 @@ class SampleStorage:
             self.decrease_weights_in_class(target_class)
 
     def empty(self):
+        """
+        Tests if sample storage is empty.
+        In sample storage there isn't class without samples.
+        """
         return len(self.classes) == 0
 
     def export(self):
@@ -208,10 +214,13 @@ class SampleStorage:
         sample = environment.get_sample(sample)
         for environment_local in the_class:
             indexes, weights = the_class[environment_local]
-            for i, (index, weight) in enumerate(izip(indexes, weights)):
-                class_sample = environment_local.get_sample(index)
+            for i in range(len(indexes)):
+                class_sample = environment_local.get_sample(indexes[i])
                 weight_change = self.beta * 0.1 ** (self.sigma * self.distance(class_sample, sample))
-                weights[i] = min(weight + weight_change, self.max_weight)
+                new_weight = min(weights[i] + weight_change, self.max_weight)
+                # We don't change value directly because it will be easier to change only set weight if some
+                # changes will be necessary.
+                self.set_weight(environment, target_class, new_weight, index=i)
 
     def remove_class(self, target_class):
         """ Removes class and all its samples from sample storage. """
@@ -225,19 +234,28 @@ class SampleStorage:
 
             self.classes.pop(target_class)
 
-    def remove_sample_from_class(self, sample, environment, target_class):
+    def remove_sample_from_class(self, environment, target_class, sample=None, index=None):
         """
-        Removes sample from target class.
+        Removes sample or item from index from target class.
+
+        One of the sample or index should be specified.
 
         If it was last sample then removes target class, too.
         """
 
         the_class = self.classes[target_class]
+
         indexes, weights = the_class[environment]
-        for i, (index, weight) in enumerate(izip(indexes, weights)):
-            if index == sample:
-                indexes.pop(i)
-                weights.pop(i)
+
+        if index is None:
+            # We must find index of sample:
+            for i in range(len(indexes)):
+                if indexes[i] == sample:
+                    index = i
+                    break
+
+        indexes.pop(index)
+        weights.pop(index)
 
         if self.get_class_samples_size(target_class) == 0:
             self.remove_class(target_class)
@@ -267,11 +285,8 @@ class SampleStorage:
 
             to_remove = sorted(to_remove, reverse=True)
             for i in to_remove:
-                indexes.pop(i)
-                weights.pop(i)
-
-        if self.get_class_samples_size(target_class) == 0:
-            self.remove_class(target_class)
+                # Remove sample from class ensures removing classes without samples.
+                self.remove_sample_from_class(environment, target_class, index=i)
 
     def sample_in_class(self, sample, environment, target_class):
         """ Checking if given sample is in target class. """
@@ -318,7 +333,7 @@ class SampleStorage:
         """ Returns labels of all classes of sample storage. """
         return self.classes.keys()
 
-    def get_classes_number(self):
+    def get_classes_size(self):
         """ Returns number of all classes of sample storage. """
         return len(self.classes)
 
@@ -330,25 +345,32 @@ class SampleStorage:
         """ Sets function to compute distance between two samples. """
         self.distance = distance
 
-    def set_weight(self, sample, environment, target_class, new_weight):
-        """ Sets weight of given sample in given target class to new weight. """
+    def set_weight(self, environment, target_class, new_weight, sample=None, index=None):
+        """
+        Sets weight of given sample or item from index in given target class to new weight.
+        One of the sample or index should be specified.
+        """
         assert new_weight >= 0
         assert new_weight <= self.max_weight
 
         the_class = self.classes[target_class]
-
         if environment not in the_class:
-            the_class[environment] = {"indexes": [], "weights": []}
+                the_class[environment] = ([], [])
 
         indexes, weights = the_class[environment]
 
-        found = False
-        for i, (index, weight) in enumerate(izip(indexes, weights)):
-            if index == sample:
-                weights[i] = new_weight
-                found = True
-                break
+        if index is not None:
+            # We know which weight change.
+            weights[index] = new_weight
+        else:
+            # We must find index of sample.
+            found = False
+            for i, (index, weight) in enumerate(izip(indexes, weights)):
+                if index == sample:
+                    weights[i] = new_weight
+                    found = True
+                    break
 
-        if not found:
-            indexes.append(sample)
-            weights.append(new_weight)
+            if not found:
+                indexes.append(sample)
+                weights.append(new_weight)

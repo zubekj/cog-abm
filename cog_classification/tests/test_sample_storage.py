@@ -38,16 +38,16 @@ class TestSampleStorage:
     - remove_weak_samples_from_class
 
     Functions not tested:
+    - __init__
     - decrease_weights
     - empty
     - remove_weak_samples
     - sample_in_class
     - standard_distance
-    - get_class_number
     - get_class_samples
     - get_class_samples_size
     - get_classes
-    - get_classes_number
+    - get_classes_size
     - get_true_class
     - set_distance
     - set_weight
@@ -58,7 +58,7 @@ class TestSampleStorage:
         self.env = None
 
     def assert_size(self, number):
-        assert_equals(self.storage.get_classes_number(), number)
+        assert_equals(self.storage.get_classes_size(), number)
 
     def assert_samples_size(self, number, target_class):
         assert_equals(self.storage.get_class_samples_size(target_class), number)
@@ -66,6 +66,11 @@ class TestSampleStorage:
     @staticmethod
     def make_numpy_array(s_list):
         return np.array(s_list)
+
+    def add(self, sample, environment=None, target_class=None, sample_weight=None):
+        environment = environment or self.env
+
+        self.storage.add_sample(sample, environment, target_class, sample_weight)
 
     def setup(self):
         self.storage = SampleStorage()
@@ -75,57 +80,72 @@ class TestSampleStorage:
         self.assert_size(0)
 
         # Adding new element to non existing class.
-        self.storage.add_sample(1, self.env, 1)
+        self.add(1, target_class=1)
         self.assert_size(1)
         self.assert_samples_size(1, 1)
 
         # Adding old element to existing class.
-        self.storage.add_sample(1, self.env, 1)
+        self.add(1, target_class=1)
         self.assert_size(1)
         self.assert_samples_size(1, 1)
 
         # Adding new element to existing class.
-        self.storage.add_sample(11, self.env, 1)
+        self.add(11, target_class=1)
         self.assert_size(1)
         self.assert_samples_size(2, 1)
 
         # Adding new element to non existing class.
-        self.storage.add_sample(31, self.env, 2)
+        self.add(31, target_class=2)
         self.assert_size(2)
         self.assert_samples_size(2, 1)
         self.assert_samples_size(1, 2)
 
         # Adding new element to existing class.
-        self.storage.add_sample(31, self.env, 1)
+        self.add(31, target_class=1)
         self.assert_size(2)
         self.assert_samples_size(3, 1)
         self.assert_samples_size(1, 2)
 
         # Adding new element to non existing class.
-        self.storage.add_sample(41, self.env, 3)
+        self.add(41, target_class=3)
         self.assert_size(3)
         self.assert_samples_size(3, 1)
         self.assert_samples_size(1, 2)
         self.assert_samples_size(1, 3)
 
         # Adding new element to existing class (different true classes).
-        self.storage.add_sample(42, self.env, 3)
+        self.add(42, target_class=3)
         self.assert_size(4)
         self.assert_samples_size(3, 1)
         self.assert_samples_size(1, 2)
         self.assert_samples_size(1, 3)
 
         # Adding new element to existing class (different true classes).
-        self.storage.add_sample(52, self.env, 1)
+        self.add(52, target_class=1)
         self.assert_size(5)
         self.assert_samples_size(3, 1)
         self.assert_samples_size(1, 2)
         self.assert_samples_size(1, 3)
 
         # Adding new element without class.
-        self.storage.add_sample(52, self.env)
+        self.add(52)
         self.assert_size(6)
         self.assert_samples_size(3, 1)
+        self.assert_samples_size(1, 2)
+        self.assert_samples_size(1, 3)
+
+        env = DummyEnvironment()
+        # Adding element with the same index but with different environment.
+        self.add(1, env, 1)
+        self.assert_size(6)
+        self.assert_samples_size(4, 1)
+        self.assert_samples_size(1, 2)
+        self.assert_samples_size(1, 3)
+
+        # Adding new element with different environment and true class.
+        self.add(42, env, 3)
+        self.assert_size(7)
+        self.assert_samples_size(4, 1)
         self.assert_samples_size(1, 2)
         self.assert_samples_size(1, 3)
 
@@ -252,7 +272,7 @@ class TestSampleStorage:
     def test_remove_class_from_full_to_empty(self):
         self.test_add_sample_classes_number()
         classes = self.storage.get_classes()
-        classes_number = self.storage.get_classes_number()
+        classes_number = self.storage.get_classes_size()
 
         for removed_class in classes:
             self.assert_size(classes_number)
@@ -275,21 +295,22 @@ class TestSampleStorage:
     def test_remove_sample_from_class_empty_storage_fails(self):
         self.storage.remove_sample_from_class(1, self.env, self.env)
 
+    @raises(TypeError)
     def test_remove_sample_from_class_storage_without_sample(self):
         self.storage.add_sample(1, self.env, 1)
-        self.storage.remove_sample_from_class(11, self.env, 1)
+        self.storage.remove_sample_from_class(self.env, 1, sample=11)
 
     @raises(KeyError)
     def test_remove_sample_from_class_other_class_fails(self):
         self.storage.add_sample(1, self.env, 1)
-        self.storage.remove_sample_from_class(1, self.env, 2)
+        self.storage.remove_sample_from_class(self.env, 2, sample=1)
 
     def test_remove_sample_from_class_last_sample_removes_class(self):
         self.storage.add_sample(1, self.env, 1)
         self.assert_size(1)
         assert_equals(1, self.storage.get_class_samples_size(1))
 
-        self.storage.remove_sample_from_class(1, self.env, 1)
+        self.storage.remove_sample_from_class(self.env, 1, sample=1)
         self.assert_size(0)
 
     @raises(KeyError)
