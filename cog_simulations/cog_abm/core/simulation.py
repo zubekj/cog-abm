@@ -55,7 +55,7 @@ class Simulation(object):
         self.agents = tuple(agents)
         self.statistic = []
         self.dump_often = dump_often
-        self.pb = pb
+        self.pb = True
         self.colour_order = colour_order
 
     def dump_results(self, iter_num):
@@ -86,7 +86,7 @@ class Simulation(object):
 
     def _change_graph(self):
         for graph in self.graphs:
-            if graph["start"] is self.iteration_counter:
+            if graph["start"] == self.iteration_counter:
                 self.graph = graph["graph"]
                 for agent in self.agents:
                     self.graph.add_agent(agent)
@@ -94,13 +94,13 @@ class Simulation(object):
 
     def _change_interaction(self):
         for interaction in self.interactions:
-            if interaction["start"] is self.iteration_counter:
+            if interaction["start"] == self.iteration_counter:
                 self.interaction = interaction["interaction"]
                 break
 
     def _change_environment(self):
         for env in self.environments:
-            if env["start"] is self.iteration_counter:
+            if env["start"] == self.iteration_counter:
                 self.interaction.change_environment(env["environment"])
 
     def _choose_agents(self):
@@ -120,6 +120,8 @@ class Simulation(object):
             self._change_interaction()
             self._change_environment()
             agents = self._choose_agents()
+            if abs(agents[0].get_id() - agents[1].get_id()) > 1:
+                logging.debug(self.iteration_counter)
             self._start_interaction(agents)
             self.iteration_counter += 1
 

@@ -15,6 +15,8 @@ class Lexicon:
         self.min_strength = min_strength
         self.max_strength = max_strength
 
+        random.seed()
+
     def add_new_category(self, category, word=None, weight=None):
         weight = weight or self.initial_strength
 

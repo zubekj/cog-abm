@@ -1,5 +1,4 @@
 import random
-
 from cog_simulations.cog_abm.core.interaction import Interaction
 from discrimination_game import DiscriminationGame
 
