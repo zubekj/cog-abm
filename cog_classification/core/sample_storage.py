@@ -194,13 +194,14 @@ class SampleStorage:
             true_samples = []
             for environment in the_class:
                 indexes, _ = the_class[environment]
-                true_samples.append(environment.get_samples(indexes))
-            new_data = np.concatenate(tuple(true_samples))
+                for index in indexes:
+                    true_samples.append(environment.get_sample(index))
 
-            data.append(new_data)
-            decisions += [target_class] * len(new_data)
+            for single_data in true_samples:
+                data.append(single_data)
+            decisions += [target_class] * len(true_samples)
 
-        return np.concatenate(tuple(data)), np.array(decisions)
+        return np.array(data), np.array(decisions)
 
     def increase_weights_in_class(self, sample, environment, target_class):
         """
