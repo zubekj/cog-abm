@@ -13,7 +13,7 @@ class DummyEnvironment:
         pass
 
     @staticmethod
-    def get_true_class(i):
+    def get_class(i):
         return i % 10
 
     @staticmethod
@@ -151,10 +151,10 @@ class TestSampleStorage:
         assert_equals(self.storage.empty(), False)
 
     def test_create_new_class_no_conflicts_with_analogous_class_names(self):
-        self.storage.add_sample(1, self.env, "Class number: 0")
-        self.storage.add_sample(1, self.env, "Class number: 1")
-        self.storage.add_sample(1, self.env, "Class number: 2")
-        self.storage.add_sample(1, self.env, "Class number: 4")
+        self.storage.add_sample(1, self.env, "Category number: 0")
+        self.storage.add_sample(1, self.env, "Category number: 1")
+        self.storage.add_sample(1, self.env, "Category number: 2")
+        self.storage.add_sample(1, self.env, "Category number: 4")
 
         self.assert_size(4)
         self.storage.add_sample(1, self.env)
@@ -164,7 +164,7 @@ class TestSampleStorage:
 
         classes = self.storage.get_categories()
 
-        for name in ["Class number: 3", "Class number: 5"]:
+        for name in ["Category number: 3", "Category number: 5"]:
             find_class = False
 
             for c in classes:
@@ -299,14 +299,14 @@ class TestSampleStorage:
     @raises(KeyError)
     def test_remove_sample_from_class_other_class_fails(self):
         self.storage.add_sample(1, self.env, 1)
-        self.storage.remove_sample_from_category(self.env, 2, sample=1)
+        self.storage.remove_sample_from_category(self.env, 2, sample_index=1)
 
     def test_remove_sample_from_class_last_sample_removes_class(self):
         self.storage.add_sample(1, self.env, 1)
         self.assert_size(1)
         assert_equals(1, self.storage.get_category_samples_size(1))
 
-        self.storage.remove_sample_from_category(self.env, 1, sample=1)
+        self.storage.remove_sample_from_category(self.env, 1, sample_index=1)
         self.assert_size(0)
 
     @raises(KeyError)
