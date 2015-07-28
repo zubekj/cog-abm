@@ -13,7 +13,7 @@ class Agent(object):
     """
     Class representing agent in the system.
 
-    Agent remember old samples from environment and can classify new ones. It can call category.
+    Agent remember old samples from environment and can classify new ones. It can name categories.
 
     Agent has some mechanisms that will help it forget the samples if needed.
 
@@ -54,11 +54,11 @@ class Agent(object):
         cls.AID_lock.release()
         return aid
 
-    def add_sample(self, sample, environment, category=None):
+    def add_sample(self, sample_index, environment, category=None):
         """
-        Adds sample form environment to storage.
+        Adds sample_index form environment to storage.
         """
-        self.sample_storage.add_sample(sample, environment, category)
+        self.sample_storage.add_sample(sample_index, environment, category)
 
     def bad_word_for_category(self, word, category):
         """
@@ -77,6 +77,7 @@ class Agent(object):
             return self.sample_storage.get_categories()[0]
         else:
             try:
+                # Classifier predicts categories for array of samples and returns array of predicted categories.
                 return self.classifier.predict([sample])[0]
             except NotFittedError:
                 return None
@@ -88,11 +89,11 @@ class Agent(object):
         self.sample_storage.decrease_weights()
         self.sample_storage.remove_weak_samples()
 
-    def good_category_for_topic(self, category, topic, environment):
+    def good_category_for_sample(self, category, sample_index, environment):
         """
-        Strengthen memory of sample storage samples in category that are similar to topic form environment.
+        Strengthen memory of sample storage samples in category that are similar to sample form environment.
         """
-        self.sample_storage.increase_weights_in_category(topic, environment, category)
+        self.sample_storage.increase_weights_in_category(sample_index, environment, category)
 
     def good_word_for_category(self, word, category):
         """

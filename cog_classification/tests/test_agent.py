@@ -45,11 +45,11 @@ class TestAgent:
             x = random.choice(range(10))
             c = self.agent.classify(np.array([x]))
             if [x % 10] == c:
-                self.agent.good_category_for_topic(c[0], x, self.environment)
+                self.agent.good_category_for_sample(c[0], x, self.environment)
                 value = 1
             else:
                 if self.agent.get_fitness_measure("DF") > 0.95:
-                    self.agent.good_category_for_topic(c[0], x, self.environment)
+                    self.agent.good_category_for_sample(c[0], x, self.environment)
                     value = 0
                 else:
                     self.agent.add_sample(x, self.environment)
