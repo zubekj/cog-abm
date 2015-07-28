@@ -16,6 +16,15 @@ class Environment:
         self.samples = samples
         self.classes = classes
 
+    def get_all(self):
+        return self.samples, self.classes
+
+    def get_all_classes(self):
+        return self.classes
+
+    def get_all_samples(self):
+        return self.samples
+
     def get_random_sample(self):
         """
         Returns random sample.
@@ -40,7 +49,7 @@ class Environment:
         """
         return np.array([self.samples[index] for index in indexes])
 
-    def get_true_class(self, index):
+    def get_class(self, index):
         """
         Returns class of sample with given index.
         """
