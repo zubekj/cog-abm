@@ -1,8 +1,7 @@
 from cog_classification.core.environment import Environment
 
-from nose.tools import assert_equals
-
 from sklearn import datasets
+
 
 class TestEnvironment:
     """
@@ -66,7 +65,7 @@ class TestEnvironment:
             index = self.get_index()
             assert (irises.data[index] == self.get_sample(index)).all()
 
-    def test_get_samples_full_returned_array_identical_with_orginal(self):
-        orginal = self.env.get_all_samples()
-        copy = self.env.get_samples(range(len(orginal)))
-        assert (orginal == copy).all()
+    def test_get_samples_full_returned_array_identical_with_original(self):
+        original = self.env.get_all_samples()
+        copy = self.env.get_samples(range(len(original)))
+        assert (original == copy).all()
