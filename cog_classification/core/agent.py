@@ -87,7 +87,10 @@ class Agent(object):
         Weakens agent's memory of all known samples and removes categories that become scarcely known.
         """
         self.sample_storage.decrease_weights()
-        self.sample_storage.remove_weak_samples()
+        removed_categories = self.sample_storage.remove_weak_samples()
+
+        for category in removed_categories:
+            self.lexicon.remove_category(category)
 
     def good_category_for_sample(self, category, sample_index, environment):
         """

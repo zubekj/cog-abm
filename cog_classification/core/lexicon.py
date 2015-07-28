@@ -93,6 +93,24 @@ class Lexicon:
 
         return best_category
 
+    def remove_category(self, category):
+        """
+        Removes given category.
+
+        If it was the last category for word it removes this word, too.
+        """
+        words_to_remove = []
+
+        for word in self.categories[category]:
+            self.dictionary[word].pop(category)
+            if len(self.dictionary[word]) == 0:
+                words_to_remove.append(word)
+
+        self.categories.pop(category)
+
+        for word in words_to_remove:
+            self.dictionary.pop(word)
+
     def strengthen_association(self, word, category):
         """
         Strengthen association between word and category.
