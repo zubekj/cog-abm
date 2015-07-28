@@ -8,20 +8,20 @@ class SampleStorage:
     Sample storage provides a way to represent samples known by agent and gives you a easy way to export this samples
     to format designed for machine learning algorithms.
 
-    Every sample is associated with true class of sample, environment of origin,
-    class of sample storage (one sample can be associated with more than one class),
-    weight of association to this class, which can affect removing of sample if weight is lower than fixed
+    Every sample is associated with class of sample, environment of origin,
+    category of sample storage (one sample can be associated with more than one category),
+    weight of association to this category, which can affect removing of sample if weight is lower than fixed
     forgetting threshold.
 
-    Each sample is represented as index in environment of origin at which is stored. It is result of concern about
-    performance and memory usage.
+    Each sample is represented as sample index in environment of origin at which is stored.
+    It is result of concern about performance and memory usage.
 
-    Each sample of the same class from sample storage has the same true class. Every try to add sample with different
-    true class will result in creating new class add adding this sample to it.
+    Each sample of the same category in sample storage has the same class. Every try to add sample with different
+    class will result in creating new category and adding this sample to it.
 
-    Weights can be increased and decreased but it will not remove samples from class directly. Even if weight of
-    sample will drop to 0 (minimum weight), sample will be still part of class. To remove sample with weights lower
-    than forgetting threshold methods remove weak samples and remove weak samples from class should be used.
+    Weights can be increased and decreased but it will not remove samples from category directly. Even if weight of
+    sample will drop to 0 (minimum weight), sample will be still part of category. To remove sample with weights lower
+    than forgetting threshold methods remove weak samples and remove weak samples from category should be used.
 
     Sample storage is implementation of the class described in Konrad Kurdej's master's thesis:
     "Modelowanie procesow poznawczych: konsensusowa metoda klasyfikacji z komunikacja miedzy agentami".
@@ -44,7 +44,7 @@ class SampleStorage:
         distance - default function which can compute distance between two samples.
         """
 
-        self.class_name = 0
+        self.category_name = 0
 
         self.alpha = alpha
         assert alpha >= 0
@@ -70,20 +70,20 @@ class SampleStorage:
         # Distance is used only in increase weights.
         self.distance = distance or self.standard_distance
 
+        self.categories = {}
         self.classes = {}
-        self.true_classes = {}
 
-    def add_sample(self, sample, environment, target_class=None, sample_weight=None):
+    def add_sample(self, sample_index, environment, category=None, sample_weight=None):
         """
-        Adds the sample to given target class or created new class if no target class is given.
-        Sample is represented by index in environment from which it orginate.
+        Adds the sample to given category or created new category if no category is given.
+        Sample is represented by sample index in environment from which it originate.
         Sample has sample weight if given or default new weight of sample storage.
         Sample weight should be larger than or equal 0.
 
-        If sample would be add to class, which true class is different, then for sample there is generated new class.
-        If sample would be add to class, that already contains this sample, then method do nothing.
+        If sample would be add to category, which class is different, then for sample there is generated new category.
+        If sample would be add to category, that already contains this sample, then method do nothing.
 
-        Sample can be added to multiple classes.
+        Sample can be added to multiple categories.
         """
 
         if sample_weight is None:
@@ -92,73 +92,73 @@ class SampleStorage:
             assert sample_weight >= 0
             assert sample_weight <= self.max_weight
 
-        true_class = environment.get_true_class(sample)
+        sample_class = environment.get_class(sample_index)
 
-        if target_class in self.classes:
-            if true_class == self.true_classes[target_class]:
-                # No difference between true classes of sample and target_class.
-                if not self.sample_in_class(sample, environment, target_class):
-                    # Adding new sample to class
-                    self.set_weight(environment, target_class, sample_weight, sample=sample)
+        if category in self.categories:
+            if sample_class == self.classes[category]:
+                # No difference between class of sample and class of category.
+                if not self.sample_in_category(sample_index, environment, category):
+                    # Adding new sample to category
+                    self.set_weight(environment, category, sample_weight, sample_index=sample_index)
             else:
-                # There is difference in true classes of sample and given target class.
-                # So we are adding sample to empty class (it forces creation of new class for sample).
-                self.add_sample(sample, environment, sample_weight=sample_weight)
+                # There is difference in class of sample and class of category.
+                # So we are adding sample to empty category (it forces creation of new category for sample).
+                self.add_sample(sample_index, environment, sample_weight=sample_weight)
         else:
-            # No target class in sample storage.
-            # So we create new class for sample (and new name if target_class is None).
-            target_class = self.create_new_class(target_class, environment, true_class)
-            self.set_weight(environment, target_class, sample_weight, sample=sample)
+            # No such category in sample storage.
+            # So we create new category for sample (and new name if category is None).
+            category = self.create_new_category(environment, sample_class, category)
+            self.set_weight(environment, category, sample_weight, sample_index=sample_index)
 
-    def create_new_class(self, target_class, environment, true_class):
+    def create_new_category(self, environment, sample_class, category=None):
         """
-        Creation of new sample storage class.
+        Creation of new sample storage category.
 
-        If target class is given then we assert that this class is not in classes.
-        This method add this new created class to sample storage classes.
+        If category is given then we assert that this category is not in categories.
+        This method add this new created category to sample storage categories.
 
-        Create new class returns correct name of created class.
+        Create new category returns correct name of created category.
         """
 
-        if target_class is None:
-            # We create new name for target class.
+        if category is None:
+            # We create new name for category.
 
             # First we finds the name that wasn't used.
-            name_in_classes = True
+            name_in_categories = True
             name = None
 
-            while name_in_classes:
-                name_in_classes = False
-                name = "Class number: " + str(self.class_name)
-                for class_name in self.classes:
-                    if class_name == name:
-                        name_in_classes = True
+            while name_in_categories:
+                name_in_categories = False
+                name = "Category number: " + str(self.category_name)
+                for category_name in self.categories:
+                    if category_name == name:
+                        name_in_categories = True
                         break
-                self.class_name += 1
+                self.category_name += 1
 
-            target_class = name
-            # After while loop we didn't increase self.class_name because after finding unique name
+            category = name
+            # After while loop we didn't increase self.category_name because after finding unique name
             # we increased this value on the end of while loop.
 
-        self.classes[target_class] = {}
-        self.classes[target_class][environment] = ([], [])
-        self.true_classes[target_class] = true_class
+        self.categories[category] = {}
+        self.categories[category][environment] = ([], [])
+        self.classes[category] = sample_class
 
-        return target_class
+        return category
 
-    def decrease_weights_in_class(self, target_class):
+    def decrease_weights_in_category(self, category):
         """
-        Decrease weights of every sample in target class according to alpha value.
+        Decrease weights of every sample in category according to alpha value.
 
         The weights will never drop below 0.
 
         This method didn't remove any sample.
         """
 
-        the_class = self.classes[target_class]
+        the_category = self.categories[category]
 
-        for environment in the_class:
-            _, weights = the_class[environment]
+        for environment in the_category:
+            _, weights = the_category[environment]
             for i in range(len(weights)):
                 weights[i] *= self.alpha
 
@@ -170,132 +170,139 @@ class SampleStorage:
 
         This method didn't remove any sample.
         """
-        for target_class in self.get_classes():
-            self.decrease_weights_in_class(target_class)
+        for category in self.get_categories():
+            self.decrease_weights_in_category(category)
 
     def empty(self):
         """
         Tests if sample storage is empty.
-        In sample storage there isn't class without samples.
+        In sample storage there isn't category without samples.
         """
-        return len(self.classes) == 0
+        return len(self.categories) == 0
 
     def export(self):
         """
-        Returns list of list of all attributes of every sample
-        and second list of class in which sample is in sample storage.
+        Returns numpy array of list of all attributes of every sample
+        and second numpy array of categories in which samples are stored in sample storage.
         """
-        data = []
-        decisions = []
+        samples = []
+        samples_classes = []
 
-        for target_class in self.get_classes():
-            the_class = self.classes[target_class]
+        for category in self.get_categories():
+            the_category = self.categories[category]
 
-            true_samples = []
-            for environment in the_class:
-                indexes, _ = the_class[environment]
-                for index in indexes:
-                    true_samples.append(environment.get_sample(index))
+            single_category_samples = []
+            for environment in the_category:
+                sample_indexes, _ = the_category[environment]
+                for index in sample_indexes:
+                    single_category_samples.append(environment.get_sample(index))
 
-            for single_data in true_samples:
-                data.append(single_data)
-            decisions += [target_class] * len(true_samples)
+            for sample in single_category_samples:
+                samples.append(sample)
+            samples_classes += [category] * len(single_category_samples)
 
-        return np.array(data), np.array(decisions)
+        return np.array(samples), np.array(samples_classes)
 
-    def increase_weights_in_class(self, sample, environment, target_class):
+    def increase_weights_in_category(self, sample_index, environment, category):
         """
-        Increase the weights of samples in target class
-        according to their distance to sample modified by sigma and beta.
+        Increase the weights of samples in category according to their distance to sample modified by sigma and beta.
 
         Weights will never rise above max weight.
         """
 
-        the_class = self.classes[target_class]
-        sample = environment.get_sample(sample)
-        for environment_local in the_class:
-            indexes, weights = the_class[environment_local]
-            for i in range(len(indexes)):
-                class_sample = environment_local.get_sample(indexes[i])
-                weight_change = self.beta * 0.1 ** (self.sigma * self.distance(class_sample, sample))
+        the_category = self.categories[category]
+        sample = environment.get_sample(sample_index)
+
+        for environment_local in the_category:
+
+            sample_indexes, weights = the_category[environment_local]
+
+            for i in range(len(sample_indexes)):
+
+                category_sample = environment_local.get_sample(sample_indexes[i])
+
+                weight_change = self.beta * 0.1 ** (self.sigma * self.distance(category_sample, sample))
                 new_weight = min(weights[i] + weight_change, self.max_weight)
+
                 # We don't change value directly because it will be easier to change only set weight if some
                 # changes will be necessary.
-                self.set_weight(environment, target_class, new_weight, index=i)
+                self.set_weight(environment, category, new_weight, index=i)
 
-    def remove_class(self, target_class):
-        """ Removes class and all its samples from sample storage. """
+    def remove_category(self, category):
+        """ Removes category and all its samples from sample storage. """
         try:
-            self.classes.pop(target_class)
+            self.categories.pop(category)
+            self.classes.pop(category)
         except KeyError:
-            for c in self.classes:
-                if target_class == c:
-                    target_class = c
+            for c in self.categories:
+                if category == c:
+                    category = c
                     break
 
-            self.classes.pop(target_class)
+            self.categories.pop(category)
+            self.classes.pop(category)
 
-    def remove_sample_from_class(self, environment, target_class, sample=None, index=None):
+    def remove_sample_from_category(self, environment, category, sample_index=None, index=None):
         """
-        Removes sample or item from index from target class.
+        Removes sample or item from index from category.
 
         One of the sample or index should be specified.
 
-        If it was last sample then removes target class, too.
+        If it was last sample then removes category, too.
         """
 
-        the_class = self.classes[target_class]
+        the_category = self.categories[category]
 
-        indexes, weights = the_class[environment]
+        sample_indexes, weights = the_category[environment]
 
         if index is None:
             # We must find index of sample:
-            for i in range(len(indexes)):
-                if indexes[i] == sample:
+            for i in range(len(sample_indexes)):
+                if sample_indexes[i] == sample_index:
                     index = i
                     break
 
-        indexes.pop(index)
+        sample_indexes.pop(index)
         weights.pop(index)
 
-        if self.get_class_samples_size(target_class) == 0:
-            self.remove_class(target_class)
+        if self.get_category_samples_size(category) == 0:
+            self.remove_category(category)
 
     def remove_weak_samples(self):
         """
-        Removes samples, which weight is lower than forgetting threshold, in each class.
+        Removes samples, which weight is lower than forgetting threshold, in each category.
         """
-        for target_class in self.get_classes():
-            self.remove_weak_samples_from_class(target_class)
+        for category in self.get_categories():
+            self.remove_weak_samples_from_category(category)
 
-    def remove_weak_samples_from_class(self, target_class):
+    def remove_weak_samples_from_category(self, category):
         """
         Removes all samples which weight is lower than forgetting threshold.
 
-        If all samples are removed from class, the class is removed too.
+        If all samples are removed from category, the category is removed too.
         """
 
-        the_class = self.classes[target_class]
-        for environment in the_class:
+        the_category = self.categories[category]
+        for environment in the_category:
 
             to_remove = []
-            indexes, weights = the_class[environment]
-            for i, (index, weight) in enumerate(izip(indexes, weights)):
+            sample_indexes, weights = the_category[environment]
+            for i, (_, weight) in enumerate(izip(sample_indexes, weights)):
                 if weight < self.forgetting_threshold:
                     to_remove.append(i)
 
             to_remove = sorted(to_remove, reverse=True)
             for i in to_remove:
-                # Remove sample from class ensures removing classes without samples.
-                self.remove_sample_from_class(environment, target_class, index=i)
+                # Remove sample from category ensures removing categories without samples.
+                self.remove_sample_from_category(environment, category, index=i)
 
-    def sample_in_class(self, sample, environment, target_class):
-        """ Checking if given sample is in target class. """
-        if environment not in self.classes[target_class]:
+    def sample_in_category(self, sample_index, environment, category):
+        """ Checking if given sample index is in category. """
+        if environment not in self.categories[category]:
             return False
         else:
-            indexes, _ = self.classes[target_class][environment]
-            return sample in indexes
+            sample_indexes, _ = self.categories[category][environment]
+            return sample_index in sample_indexes
 
     @staticmethod
     def standard_distance(sample1, sample2):
@@ -307,71 +314,71 @@ class SampleStorage:
 
         return distance
 
-    def get_class_samples(self, target_class):
-        """ Returns list of tuple (sample, environment, weight) for target class. """
+    def get_category_samples(self, category):
+        """ Returns list of tuple (sample_index, environment, weight) for category. """
         samples = []
         
-        the_class = self.classes[target_class]
-        for environment in the_class:
-            indexes, weights = the_class[environment]
-            for index, weight in izip(indexes, weights):
-                samples.append((index, environment, weight))
+        the_category = self.categories[category]
+        for environment in the_category:
+            sample_indexes, weights = the_category[environment]
+            for sample_index, weight in izip(sample_indexes, weights):
+                samples.append((sample_index, environment, weight))
 
         return samples
 
-    def get_class_samples_size(self, target_class):
-        """ Returns number of samples in given target class. """
+    def get_category_samples_size(self, category):
+        """ Returns number of samples in given category. """
         size = 0
 
-        the_class = self.classes[target_class]
-        for environment in the_class:
-            indexes, _ = the_class[environment]
-            size += len(indexes)
+        the_category = self.categories[category]
+        for environment in the_category:
+            sample_indexes, _ = the_category[environment]
+            size += len(sample_indexes)
 
         return size
 
-    def get_classes(self):
-        """ Returns labels of all classes of sample storage. """
-        return self.classes.keys()
+    def get_categories(self):
+        """ Returns labels of all categories of sample storage. """
+        return self.categories.keys()
 
-    def get_classes_size(self):
-        """ Returns number of all classes of sample storage. """
-        return len(self.classes)
+    def get_categories_size(self):
+        """ Returns number of all categories of sample storage. """
+        return len(self.categories)
 
-    def get_true_class(self, target_class):
-        """ Returns true class of given target class. """
-        return self.true_classes[target_class]
+    def get_class(self, category):
+        """ Returns class of given category. """
+        return self.classes[category]
 
     def set_distance(self, distance):
         """ Sets function to compute distance between two samples. """
         self.distance = distance
 
-    def set_weight(self, environment, target_class, new_weight, sample=None, index=None):
+    def set_weight(self, environment, category, new_weight, sample_index=None, index=None):
         """
-        Sets weight of given sample or item from index in given target class to new weight.
+        Sets weight of given sample or item from index in given category to new weight.
         One of the sample or index should be specified.
         """
         assert new_weight >= 0
         assert new_weight <= self.max_weight
 
-        the_class = self.classes[target_class]
-        if environment not in the_class:
-                the_class[environment] = ([], [])
+        the_category = self.categories[category]
+        if environment not in the_category:
+                the_category[environment] = ([], [])
 
-        indexes, weights = the_class[environment]
+        sample_indexes, weights = the_category[environment]
 
         if index is not None:
             # We know which weight change.
             weights[index] = new_weight
         else:
-            # We must find index of sample.
+            # We must find index of sample_index.
             found = False
-            for i, (index, weight) in enumerate(izip(indexes, weights)):
-                if index == sample:
+            for i, (index, weight) in enumerate(izip(sample_indexes, weights)):
+                if index == sample_index:
                     weights[i] = new_weight
                     found = True
                     break
 
             if not found:
-                indexes.append(sample)
+                sample_indexes.append(sample_index)
                 weights.append(new_weight)

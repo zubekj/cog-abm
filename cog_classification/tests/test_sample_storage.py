@@ -25,26 +25,26 @@ class TestSampleStorage:
     """
     Functions tested in TestSampleStorage:
     - add_sample
-    - create_new_class
-    - decrease_weights_in_class
+    - create_new_category
+    - decrease_weights_in_category
     - export
-    - increase_weights_in_class
-    - remove_class
-    - remove_sample_from_class
-    - remove_weak_samples_from_class
+    - increase_weights_in_category
+    - remove_category
+    - remove_sample_from_category
+    - remove_weak_samples_from_category
 
     Functions not tested:
     - __init__
     - decrease_weights
     - empty
     - remove_weak_samples
-    - sample_in_class
+    - sample_in_category
     - standard_distance
-    - get_class_samples
-    - get_class_samples_size
-    - get_classes
-    - get_classes_size
-    - get_true_class
+    - get_category_samples
+    - get_category_samples_size
+    - get_categories
+    - get_categories_size
+    - get_class
     - set_distance
     - set_weight
     """
@@ -54,10 +54,10 @@ class TestSampleStorage:
         self.env = None
 
     def assert_size(self, number):
-        assert_equals(self.storage.get_classes_size(), number)
+        assert_equals(self.storage.get_categories_size(), number)
 
     def assert_samples_size(self, number, target_class):
-        assert_equals(self.storage.get_class_samples_size(target_class), number)
+        assert_equals(self.storage.get_category_samples_size(target_class), number)
 
     @staticmethod
     def make_numpy_array(s_list):
@@ -109,14 +109,14 @@ class TestSampleStorage:
         self.assert_samples_size(1, 2)
         self.assert_samples_size(1, 3)
 
-        # Adding new element to existing class (different true classes).
+        # Adding new element to existing class (different true categories).
         self.add(42, target_class=3)
         self.assert_size(4)
         self.assert_samples_size(3, 1)
         self.assert_samples_size(1, 2)
         self.assert_samples_size(1, 3)
 
-        # Adding new element to existing class (different true classes).
+        # Adding new element to existing class (different true categories).
         self.add(52, target_class=1)
         self.assert_size(5)
         self.assert_samples_size(3, 1)
@@ -162,7 +162,7 @@ class TestSampleStorage:
         self.storage.add_sample(1, self.env)
         self.assert_size(6)
 
-        classes = self.storage.get_classes()
+        classes = self.storage.get_categories()
 
         for name in ["Class number: 3", "Class number: 5"]:
             find_class = False
@@ -178,12 +178,12 @@ class TestSampleStorage:
         self.storage.add_sample(1, self.env, 1, 1)
         self.storage.add_sample(21, self.env, 1, 1)
 
-        for _, _, weight in self.storage.get_class_samples(1):
+        for _, _, weight in self.storage.get_category_samples(1):
             assert_equals(weight, 1)
 
-        self.storage.decrease_weights_in_class(1)
+        self.storage.decrease_weights_in_category(1)
 
-        for _, _, weight in self.storage.get_class_samples(1):
+        for _, _, weight in self.storage.get_category_samples(1):
             assert weight < 1
 
     def test_decrease_weights_in_class_no_under_zero(self):
@@ -191,9 +191,9 @@ class TestSampleStorage:
         self.storage.add_sample(21, self.env, 1, 0.01)
 
         for _ in range(1000):
-            self.storage.decrease_weights_in_class(1)
+            self.storage.decrease_weights_in_category(1)
 
-        for _, _, weight in self.storage.get_class_samples(1):
+        for _, _, weight in self.storage.get_category_samples(1):
             assert weight > 0
 
     def test_export(self):
@@ -236,43 +236,43 @@ class TestSampleStorage:
         self.storage.add_sample(1, self.env, 1, 0)
         self.storage.add_sample(21, self.env, 1, 0)
 
-        for _, _, weight in self.storage.get_class_samples(1):
+        for _, _, weight in self.storage.get_category_samples(1):
             assert_equals(weight, 0)
 
-        self.storage.increase_weights_in_class(1, self.env, 1)
+        self.storage.increase_weights_in_category(1, self.env, 1)
 
-        for _, _, weight in self.storage.get_class_samples(1):
+        for _, _, weight in self.storage.get_category_samples(1):
             assert weight > 0
 
     def test_increase_weights_in_class_no_over_one(self):
         self.storage.add_sample(1, self.env, 1, 1)
         self.storage.add_sample(21, self.env, 1, 1)
 
-        for _, _, weight in self.storage.get_class_samples(1):
+        for _, _, weight in self.storage.get_category_samples(1):
             assert_equals(weight, 1)
 
-        self.storage.increase_weights_in_class(1, self.env, 1)
+        self.storage.increase_weights_in_category(1, self.env, 1)
 
-        for _, _, weight in self.storage.get_class_samples(1):
+        for _, _, weight in self.storage.get_category_samples(1):
             assert_equals(weight, 1)
 
     @raises(KeyError)
     def test_remove_class_from_empty_storage_fails(self):
-        self.storage.remove_class(1)
+        self.storage.remove_category(1)
 
     @raises(KeyError)
     def test_remove_class_other_class_fails(self):
         self.storage.add_sample(1, self.env, 1, 1)
-        self.storage.remove_class(2)
+        self.storage.remove_category(2)
 
     def test_remove_class_from_full_to_empty(self):
         self.test_add_sample_classes_number()
-        classes = self.storage.get_classes()
-        classes_number = self.storage.get_classes_size()
+        classes = self.storage.get_categories()
+        classes_number = self.storage.get_categories_size()
 
         for removed_class in classes:
             self.assert_size(classes_number)
-            self.storage.remove_class(removed_class)
+            self.storage.remove_category(removed_class)
             classes_number -= 1
 
         self.assert_size(0)
@@ -281,37 +281,37 @@ class TestSampleStorage:
         self.assert_size(0)
         self.storage.add_sample(1, self.env, 1, 1)
         self.assert_size(1)
-        self.storage.remove_class(1)
+        self.storage.remove_category(1)
         self.assert_size(0)
         self.storage.add_sample(1, self.env, 1, 1)
         self.assert_size(1)
-        assert 1 in self.storage.get_classes()
+        assert 1 in self.storage.get_categories()
 
     @raises(KeyError)
     def test_remove_sample_from_class_empty_storage_fails(self):
-        self.storage.remove_sample_from_class(1, self.env, self.env)
+        self.storage.remove_sample_from_category(1, self.env, self.env)
 
     @raises(TypeError)
     def test_remove_sample_from_class_storage_without_sample(self):
         self.storage.add_sample(1, self.env, 1)
-        self.storage.remove_sample_from_class(self.env, 1, sample=11)
+        self.storage.remove_sample_from_category(self.env, 1, sample=11)
 
     @raises(KeyError)
     def test_remove_sample_from_class_other_class_fails(self):
         self.storage.add_sample(1, self.env, 1)
-        self.storage.remove_sample_from_class(self.env, 2, sample=1)
+        self.storage.remove_sample_from_category(self.env, 2, sample=1)
 
     def test_remove_sample_from_class_last_sample_removes_class(self):
         self.storage.add_sample(1, self.env, 1)
         self.assert_size(1)
-        assert_equals(1, self.storage.get_class_samples_size(1))
+        assert_equals(1, self.storage.get_category_samples_size(1))
 
-        self.storage.remove_sample_from_class(self.env, 1, sample=1)
+        self.storage.remove_sample_from_category(self.env, 1, sample=1)
         self.assert_size(0)
 
     @raises(KeyError)
     def test_remove_weak_samples_from_class_no_class(self):
-        self.storage.remove_weak_samples_from_class(1)
+        self.storage.remove_weak_samples_from_category(1)
 
     def test_remove_weak_samples_from_class_removes_class(self):
         self.storage.add_sample(1, self.env, 1, 0)
@@ -319,7 +319,7 @@ class TestSampleStorage:
         self.storage.add_sample(21, self.env, 1, 0)
 
         self.assert_size(1)
-        self.storage.remove_weak_samples_from_class(1)
+        self.storage.remove_weak_samples_from_category(1)
         self.assert_size(0)
 
     def test_remove_weak_samples_from_class_doesnt_affect_other_classes(self):
@@ -332,5 +332,5 @@ class TestSampleStorage:
         self.storage.add_sample(34, self.env, 4, 0)
 
         self.assert_size(4)
-        self.storage.remove_weak_samples_from_class(1)
+        self.storage.remove_weak_samples_from_category(1)
         self.assert_size(3)

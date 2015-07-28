@@ -16,7 +16,7 @@ class Lexicon:
         Parameters explanation:
         dictionary - dictionary which represents association between words and categories.
         Keys are words and values are dictionaries {category: weight}.
-        classes - dictionary which represents association between categories and words.
+        categories - dictionary which represents association between categories and words.
         Keys are words and values are lists of words.
         increase_strength - how much increase association strength when strengthen
         lateral_inhibition - how much decrease association strength

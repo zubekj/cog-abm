@@ -31,7 +31,7 @@ class Agent(object):
         classifier - machine learning algorithm
             which implements functions fit and predict as defined in sklearn library.
         sample_storage - storage all samples used to teach classifier
-        lexicon - storage associations between sample storage classes and words.
+        lexicon - storage associations between sample storage categories and words.
         """
         self.id = aid or Agent.get_next_id()
         self.classifier = classifier or svm.SVC()
@@ -73,8 +73,8 @@ class Agent(object):
         If agent known only one class, it return the class.
         If agent hasn't taught any classification yet, it  return None.
         """
-        if self.sample_storage.get_classes_size() == 1:
-            return self.sample_storage.get_classes()[0]
+        if self.sample_storage.get_categories_size() == 1:
+            return self.sample_storage.get_categories()[0]
         else:
             try:
                 return self.classifier.predict([sample])[0]
@@ -83,7 +83,7 @@ class Agent(object):
 
     def forget(self):
         """
-        Weakens agent's memory of all known samples and removes classes that become scarcely known.
+        Weakens agent's memory of all known samples and removes categories that become scarcely known.
         """
         self.sample_storage.decrease_weights()
         self.sample_storage.remove_weak_samples()
@@ -92,7 +92,7 @@ class Agent(object):
         """
         Strengthen memory of sample storage samples in category that are similar to topic form environment.
         """
-        self.sample_storage.increase_weights_in_class(topic, environment, category)
+        self.sample_storage.increase_weights_in_category(topic, environment, category)
 
     def good_word_for_category(self, word, category):
         """
@@ -105,7 +105,7 @@ class Agent(object):
         Teaches classifier using samples and class from sample storage.
         """
         data, decisions = self.sample_storage.export()
-        if len(decisions) > 0 and self.sample_storage.get_classes_size() > 1:
+        if len(decisions) > 0 and self.sample_storage.get_categories_size() > 1:
             self.classifier.fit(data, decisions)
 
     def update_fitness(self, name, information):
