@@ -20,10 +20,6 @@ class DummyEnvironment:
     def get_sample(i):
         return np.array([i])
 
-    @staticmethod
-    def get_samples(indexes):
-        return np.array(indexes)
-
 
 class TestSampleStorage:
     """

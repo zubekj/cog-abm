@@ -72,9 +72,14 @@ class Lexicon:
     def strengthen_association(self, word, category):
         self.dictionary[word][category] += self.increase_strength
 
-    def weaken_other_associations(self, word, category):
+    def weaken_other_associations_for_words(self, word, category):
         for other_word in self.classes(category):
             if not other_word == word:
+                self.dictionary[word][category] -= self.lateral_inhibition
+
+    def weaken_other_associations_for_categories(self, word, category):
+        for other_category in self.dictionary[word]:
+            if not other_category == category:
                 self.dictionary[word][category] -= self.lateral_inhibition
 
     def weaken_association(self, word, category):

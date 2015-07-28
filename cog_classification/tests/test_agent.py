@@ -17,11 +17,10 @@ class TestAgent:
 
     def add_topic_to_class(self, category, topic, environment=None):
         environment = environment or self.environment
-        self.agent.add_topic_to_class(category, topic, environment)
+        self.agent.add_sample(topic, environment, category)
 
     def setup(self):
         self.agent = Agent()
-        # sample_storage=SampleStorage()
         self.environment = DummyEnvironment()
 
     def test_add_topic_to_class(self):
@@ -53,7 +52,7 @@ class TestAgent:
                     self.agent.good_category_for_topic(c[0], x, self.environment)
                     value = 0
                 else:
-                    self.agent.add_topic_to_new_class(x, self.environment)
+                    self.agent.add_sample(x, self.environment)
                     value = 0
 
             self.agent.update_fitness("DF", value)

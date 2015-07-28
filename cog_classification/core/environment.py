@@ -11,7 +11,7 @@ class Environment:
         random.seed()
 
     def get_random_sample(self):
-
+        return random.choice(self.data)
 
     def get_sample(self, index):
         return np.array(self.data[index])
