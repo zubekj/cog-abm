@@ -10,8 +10,8 @@ class Lexicon:
     Association is described by weight.
     """
 
-    def __init__(self, dictionary=None, classes=None, increase_strength=0.1, lateral_inhibition=0.1,
-                 decrease_strength=0.1, initial_strength=0.5, min_strength=0, max_strength=1):
+    def __init__(self, dictionary=None, categories=None, increase_strength=0.1, lateral_inhibition=0.1,
+                 decrease_strength=0.1, initial_strength=0.5, min_strength=0, max_strength=1, word_range=100000):
         """
         Parameters explanation:
         dictionary - dictionary which represents association between words and categories.
@@ -27,9 +27,10 @@ class Lexicon:
         initial_strength - default strength in new association
         min_strength - minimal strength of association
         max_strength - maximal strength of association
+        word_range - the pool of words (expressed as numbers) from which new words will be taken
         """
         self.dictionary = dictionary or {}
-        self.classes = classes or {}
+        self.categories = categories or {}
 
         self.increase_strength = increase_strength
         self.lateral_inhibition = lateral_inhibition
@@ -37,6 +38,8 @@ class Lexicon:
         self.initial_strength = initial_strength
         self.min_strength = min_strength
         self.max_strength = max_strength
+
+        self.word_range = word_range
 
     def add_new_category(self, category, word=None, weight=None):
         """
@@ -48,15 +51,15 @@ class Lexicon:
         weight = weight or self.initial_strength
 
         if word is None:
-            new_word = random.randrange(10000)
+            new_word = random.randrange(self.word_range)
             while new_word in self.dictionary:
-                new_word = random.randrange(10000)
+                new_word = random.randrange(self.word_range)
             word = new_word
 
         if word not in self.dictionary:
             self.dictionary[word] = {category: weight}
 
-        self.classes[category] = [word]
+        self.categories[category] = [word]
 
         return word
 
@@ -67,7 +70,7 @@ class Lexicon:
         best_word = None
         best_weight = -float('inf')
 
-        for word in self.classes[category]:
+        for word in self.categories[category]:
             element_weight = self.dictionary[word][category]
             if element_weight > best_weight:
                 best_word = word
@@ -100,7 +103,7 @@ class Lexicon:
         """
         Weaken association between words other than specified and category.
         """
-        for other_word in self.classes(category):
+        for other_word in self.categories(category):
             if not other_word == word:
                 self.dictionary[word][category] -= self.lateral_inhibition
 
