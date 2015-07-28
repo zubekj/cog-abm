@@ -248,7 +248,7 @@ class SampleStorage:
 
         One of the sample or index should be specified.
 
-        If it was last sample then removes category, too.
+        If it was last sample then removes category and returns it's name, otherwise returns None.
         """
 
         the_category = self.categories[category]
@@ -267,13 +267,16 @@ class SampleStorage:
 
         if self.get_category_samples_size(category) == 0:
             self.remove_category(category)
+            return category
 
     def remove_weak_samples(self):
         """
         Removes samples, which weight is lower than forgetting threshold, in each category.
+
+        Return list of all removed categories.
         """
-        for category in self.get_categories():
-            self.remove_weak_samples_from_category(category)
+        removed_categories = [self.remove_weak_samples_from_category(category) for category in self.get_categories()]
+        return [category for category in removed_categories if category is not None]
 
     def remove_weak_samples_from_category(self, category):
         """
