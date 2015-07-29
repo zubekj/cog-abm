@@ -68,7 +68,7 @@ class SampleStorage:
         assert new_weight <= max_weight
 
         # Distance is used only in increase weights.
-        self.distance = distance or self.standard_distance
+        self.distance = distance
 
         self.categories = {}
         self.classes = {}
@@ -146,6 +146,17 @@ class SampleStorage:
 
         return category
 
+    def decrease_weights(self):
+        """
+        Decrease weights of every sample according to alpha value.
+
+        The weights will never drop below 0.
+
+        This method didn't remove any sample.
+        """
+        for category in self.get_categories():
+            self.decrease_weights_in_category(category)
+
     def decrease_weights_in_category(self, category):
         """
         Decrease weights of every sample in category according to alpha value.
@@ -161,17 +172,6 @@ class SampleStorage:
             _, weights = the_category[environment]
             for i in range(len(weights)):
                 weights[i] *= self.alpha
-
-    def decrease_weights(self):
-        """
-        Decrease weights of every sample according to alpha value.
-
-        The weights will never drop below 0.
-
-        This method didn't remove any sample.
-        """
-        for category in self.get_categories():
-            self.decrease_weights_in_category(category)
 
     def empty(self):
         """
@@ -221,7 +221,12 @@ class SampleStorage:
 
                 category_sample = environment_local.get_sample(sample_indexes[i])
 
-                weight_change = self.beta * 0.1 ** (self.sigma * self.distance(category_sample, sample))
+                if self.distance is None:
+                    distance = environment.distance(category_sample, sample)
+                else:
+                    distance = self.distance(category_sample, sample)
+
+                weight_change = self.beta * 0.1 ** (self.sigma * distance)
                 new_weight = min(weights[i] + weight_change, self.max_weight)
 
                 # We don't change value directly because it will be easier to change only set weight if some
@@ -245,6 +250,9 @@ class SampleStorage:
     def remove_sample_from_category(self, environment, category, sample_index=None, index=None):
         """
         Removes sample or item from index from category.
+
+        Sample index - index of sample in environment.
+        Index - index of sample index in category environment.
 
         One of the sample or index should be specified.
 
@@ -306,16 +314,6 @@ class SampleStorage:
         else:
             sample_indexes, _ = self.categories[category][environment]
             return sample_index in sample_indexes
-
-    @staticmethod
-    def standard_distance(sample1, sample2):
-        """ Calculates standard distance between two samples of numerical values. """
-
-        distance = 0
-        for v1, v2 in izip(sample1, sample2):
-            distance += abs(v1 - v2)
-
-        return distance
 
     def get_category_samples(self, category):
         """ Returns list of tuple (sample_index, environment, weight) for category. """

@@ -13,10 +13,12 @@ class TestEnvironment:
 
     Functions not tested:
     - __init__
+    - standard_distance
     - get_all
     - get_all_classes
     - get_all_samples
     - get_class
+    - set_distance
     """
 
     def __init__(self):

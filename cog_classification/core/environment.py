@@ -1,5 +1,7 @@
-import random
+from itertools import izip
+
 import numpy as np
+import random
 
 
 class Environment:
@@ -7,14 +9,30 @@ class Environment:
     Stores samples and their classes.
     """
 
-    def __init__(self, samples, classes):
+    def __init__(self, samples, classes, distance=None):
         """
         Parameters explanation:
         samples - list of samples
         classes - list of samples' classes
+        distance - distance function between two samples
         """
         self.samples = samples
         self.classes = classes
+
+        if distance is None:
+            distance = self.standard_distance
+
+        self.distance = distance
+
+    @staticmethod
+    def standard_distance(sample1, sample2):
+        """ Calculates standard distance between two samples of numerical values. """
+
+        distance = 0
+        for v1, v2 in izip(sample1, sample2):
+            distance += abs(v1 - v2)
+
+        return distance
 
     def get_all(self):
         return self.samples, self.classes
@@ -54,3 +72,9 @@ class Environment:
         Returns class of sample with given index.
         """
         return np.array(self.classes[index])
+
+    def set_distance(self, distance):
+        """"
+        Change environment distance function.
+        """
+        self.distance = distance
