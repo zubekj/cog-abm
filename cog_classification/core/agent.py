@@ -118,17 +118,23 @@ class Agent(object):
         """
         self.fitness[name].update(information)
 
+    def the_best_category_for_word(self, word, category):
+        """
+        Weakens associations between other categories and word.
+        """
+        self.lexicon.weaken_other_associations_for_categories(word, category)
+
     def the_best_word_for_category(self, word, category):
         """
         Weakens associations between other words and category.
         """
         self.lexicon.weaken_other_associations_for_words(word, category)
 
-    def the_best_category_for_word(self, word, category):
+    def get_category_class(self, category):
+        """"
+        Returns class of given category.
         """
-        Weakens associations between other categories and word.
-        """
-        self.lexicon.weaken_other_associations_for_categories(word, category)
+        return self.sample_storage.get_class(category)
 
     def get_id(self):
         """

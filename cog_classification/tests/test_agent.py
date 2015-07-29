@@ -1,62 +1,9 @@
 from nose.tools import assert_equals
-import random
 
 from cog_classification.core.agent import Agent
+from cog_classification.core.environment import Environment
 
-from test_sample_storage import DummyEnvironment
-
-import numpy as np
-
-
-class TestAgent:
-
-    def __init__(self):
-        self.agent = None
-        self.environment = None
-        pass
-
-    def add_topic_to_class(self, category, topic, environment=None):
-        environment = environment or self.environment
-        self.agent.add_sample(topic, environment, category)
-
-    def setup(self):
-        self.agent = Agent()
-        self.environment = DummyEnvironment()
-
-    def test_add_topic_to_class(self):
-        self.add_topic_to_class(1, 1)
-
-    def test_set_fitness(self):
-        self.agent.set_fitness("DF", DummyFitness())
-        assert_equals(self.agent.get_fitness_measure("DF"), 0)
-
-    def test_learning_cycle(self):
-        self.add_topic_to_class(1, 1)
-        self.add_topic_to_class(2, 2)
-        self.agent.learn()
-        assert_equals(self.agent.classify(np.array([1])), [1])
-        assert_equals(self.agent.classify(np.array([2])), [2])
-
-    def test_single_classification_game_iterations(self):
-        random.seed()
-        self.agent.set_fitness("DF", DummyFitness())
-        for _ in range(100):
-            self.agent.learn()
-            x = random.choice(range(10))
-            c = self.agent.classify(np.array([x]))
-            if [x % 10] == c:
-                self.agent.good_category_for_sample(c[0], x, self.environment)
-                value = 1
-            else:
-                if self.agent.get_fitness_measure("DF") > 0.95:
-                    self.agent.good_category_for_sample(c[0], x, self.environment)
-                    value = 0
-                else:
-                    self.agent.add_sample(x, self.environment)
-                    value = 0
-
-            self.agent.update_fitness("DF", value)
-            self.agent.forget()
+from sklearn import datasets
 
 
 class DummyFitness:
@@ -69,8 +16,103 @@ class DummyFitness:
         if self.all == 0:
             return 0
         else:
-            return self.success / self.all
+            return float(self.success) / self.all
 
     def update(self, value):
         self.all += 1
         self.success += value
+
+
+class TestAgent:
+    """
+    Functions tested in TestAgent:
+    - classify
+
+    Functions not tested:
+    - __init__
+    - add_sample
+    - bad_word_for_category
+    - forget
+    - good_category_for_sample
+    - good_word_for_category
+    - learn
+    - update_fitness
+    - the_best_category_for_word
+    - the_best_word_for_category
+    - get_category_class
+    - get_id
+    - get_fitness_measure
+    - get_words
+    - set_fitness
+    """
+
+    def __init__(self):
+        self.agent = None
+
+        irises = datasets.load_iris()
+        self.environment = Environment(irises.data, irises.target)
+
+    def add(self, sample_index, category=None, environment=None):
+        environment = environment or self.environment
+        self.agent.add_sample(sample_index, environment, category)
+
+    def classify(self, sample=None):
+        if sample is None:
+            sample = self.environment.get_random_sample()
+        return self.agent.classify(sample)
+
+    def setup(self):
+        self.agent = Agent()
+
+    def test_classify(self):
+        sample_index = self.environment.get_random_sample_index()
+        sample = self.environment.get_sample(sample_index)
+
+        # Classify with no samples returns None
+        assert_equals(self.classify(sample), None)
+
+        # Classify with one sample returns this sample category
+        self.add(1, 2)
+        assert_equals(self.classify(sample), 2)
+
+        # Classify before fitting (learning) returns None
+        self.add(51, 1)
+        assert_equals(self.classify(sample), None)
+
+        # Classify after fitting (learning) doesn't return None
+        self.agent.learn()
+        assert self.classify(sample) is not None
+
+    def test_learning_cycle(self):
+        self.add(1, 1)
+        self.add(51, 2)
+        self.add(101, 3)
+        self.agent.learn()
+        for _ in range(10):
+            assert self.classify() is not None
+
+    def test_single_classification_game_iterations(self):
+        agent = self.agent
+        env = self.environment
+
+        agent.set_fitness("DF", DummyFitness())
+        for _ in range(100):
+            agent.learn()
+            sample_index = env.get_random_sample_index()
+            sample = env.get_sample(sample_index)
+            category = agent.classify(sample)
+            if category is None:
+                self.add(sample_index)
+                value = 0
+            elif env.get_class(sample_index) == agent.get_category_class(category):
+                agent.good_category_for_sample(category, sample_index, env)
+                value = 1
+            elif agent.get_fitness_measure("DF") > 0.95:
+                agent.good_category_for_sample(category, sample_index, env)
+                value = 0
+            else:
+                self.add(sample_index)
+                value = 0
+
+            self.agent.update_fitness("DF", value)
+            self.agent.forget()
