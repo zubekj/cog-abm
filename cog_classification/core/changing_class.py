@@ -4,9 +4,10 @@ class ChangingClass:
     def __init__(self, behaviors, changes):
         """
         Args:
-            behaviors (dictionary): dictionary with name of behavior as a key and behavior as a value.
-            changes (dictionary): dictionary with time of change (number) as a key and name of behavior on which the
-                current behavior will be changed when name of this change will be given in change.
+            behaviors ({name_of_behavior: behavior}).
+            changes ({time: name_of_behavior}): dictionary with time of change (number) as a key
+                and name of behavior on which the current behavior will be changed
+                when name of this change will be given in change.
         """
         self.behaviors = behaviors
         self.changes = changes

@@ -5,8 +5,8 @@ class Simulation:
         """
         Args:
             agents (Network): source of agents.
-            interactions (Interaction): source of interactions for agents.
-            environment (Environment): source of samples for interactions.
+            interactions (ChangingClass): source of interactions for agents.
+            environment (ChangingClass): source of samples for interactions.
             result (Result): object that will accumulate statistics of simulation.
             end_condition (Condition): object that determines end of simulation.
         """
@@ -35,7 +35,10 @@ class Simulation:
             self.agents.change(self.iteration)
             self.environment.change(self.iteration)
 
-            self.interactions.interact(self.agents, self.environment)
+            interaction = self.interactions.get_current_behavior()
+            environment = self.environment.get_current_behavior()
+
+            interaction.interact(self.agents, environment)
 
             self.result.save(**self.__dict__)
 
