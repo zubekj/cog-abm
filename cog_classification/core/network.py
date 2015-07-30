@@ -1,5 +1,6 @@
 import random
 
+
 class Network:
 
     def __init__(self, agents, topologies, changes):
@@ -46,6 +47,3 @@ class Network:
             return None
         else:
             return random.choice(candidates)
-
-
-

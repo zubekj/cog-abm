@@ -83,10 +83,7 @@ class Lexicon:
             weight = max(self.min_strength, weight)
 
             if word is None:
-                new_word = random.randrange(self.word_range)
-                while new_word in self.dictionary:
-                    new_word = random.randrange(self.word_range)
-                word = new_word
+                word = self.generate_word()
 
             if word not in self.dictionary:
                 self.dictionary[word] = {category: weight}
@@ -125,13 +122,20 @@ class Lexicon:
         best_category = None
         best_weight = -float('inf')
 
-        for category in self.dictionary[word]:
-            element_weight = self.dictionary[word][category]
-            if element_weight > best_weight:
-                best_category = category
-                best_weight = element_weight
+        if word in self.dictionary:
+            for category in self.dictionary[word]:
+                element_weight = self.dictionary[word][category]
+                if element_weight > best_weight:
+                    best_category = category
+                    best_weight = element_weight
 
         return best_category
+
+    def generate_word(self):
+        new_word = random.randrange(self.word_range)
+        while new_word in self.dictionary:
+            new_word = random.randrange(self.word_range)
+        return new_word
 
     def remove_category(self, category):
         """
@@ -188,11 +192,14 @@ class Lexicon:
         best_word = None
         best_weight = -float('inf')
 
-        for word in self.categories[category]:
-            element_weight = self.dictionary[word][category]
-            if element_weight > best_weight:
-                best_word = word
-                best_weight = element_weight
+        if category in self.categories:
+            for word in self.categories[category]:
+                element_weight = self.dictionary[word][category]
+                if element_weight > best_weight:
+                    best_word = word
+                    best_weight = element_weight
+        else:
+            best_word = self.add_new_category(category)
 
         return best_word
 

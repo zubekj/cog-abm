@@ -6,13 +6,12 @@ class DiscriminationGame:
     "Coordinating perceptually grounded categories through language: A case study for colour".
     """
 
-    def __init__(self, samples_number=4, good_agent_measure=0.95, number_of_agents=1):
+    def __init__(self, samples_number=4, good_agent_measure=0.95):
         """
         Parameters explanation:
         samples number - the number of samples shown to agent in one interaction including topic.
             Value from 2 to infinity.
         good_agent_measure - the threshold which affects generation of new categories. Value from 0 to 1.
-        number of agents - the number of agents which play in discrimination game in one interaction.
         """
         assert samples_number > 1
         self.samples_number = samples_number
@@ -21,18 +20,14 @@ class DiscriminationGame:
         assert good_agent_measure <= 1
         self.good_agent_measure = good_agent_measure
 
-        assert number_of_agents > 0
-        self.number_of_agents = number_of_agents
-
     def interact(self, agents, environment):
         """
         One turn of interaction in discrimination game.
         """
-        for _ in range(self.number_of_agents):
-            agent = agents.get_agent()
-            result, topic_index, topic_category = self.play(agent, environment)
-            self.learning_after_game(agent, topic_index, environment, topic_category, result)
-            agent.update_fitness("DG", result)
+        agent = agents.get_agent()
+        result, topic_index, topic_category = self.play(agent, environment)
+        self.learning_after_game(agent, topic_index, environment, topic_category, result)
+        agent.update_fitness("DG", result)
 
     def learning_after_game(self, agent, topic_index, environment, topic_category, result):
         """

@@ -66,6 +66,9 @@ class Agent(object):
         """
         self.lexicon.weaken_association(word, category)
 
+    def category_for_word(self, word):
+        return self.lexicon.category_for_word(word)
+
     def classify(self, sample):
         """
         Classify given specific sample.
@@ -129,6 +132,9 @@ class Agent(object):
         Weakens associations between other words and category.
         """
         self.lexicon.weaken_other_associations_for_words(word, category)
+
+    def word_for_category(self, category):
+        return self.lexicon.word_for_category(category)
 
     def get_category_class(self, category):
         """"
