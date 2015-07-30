@@ -24,7 +24,7 @@ class Simulation:
         Starts simulation.
 
         Returns:
-            (Result) result of simulation
+            (Result) result of simulation.
         """
         self.result.save(**self.__dict__)
 
@@ -45,18 +45,16 @@ class Simulation:
         """
         Starts completed simulation from termination point with additional parameters.
 
-        Saved results are results of whole simulation - form start of original simulation.
-
         Args:
             like in __init__.
 
         Returns:
-            (Result) result of simulation
+            (Result) result of whole simulation - form start of original simulation.
         """
-        self.agents.update(agents)
-        self.interactions.update(interactions)
-        self.environment.update(environment)
-        self.result.update(result)
-        self.end_condition.update(end_condition)
+        self.agents.update(agents, self.iteration)
+        self.interactions.update(interactions, self.iteration)
+        self.environment.update(environment, self.iteration)
+        self.result.update(result, self.iteration)
+        self.end_condition.update(end_condition, self.iteration)
 
         return self.run()
