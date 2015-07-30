@@ -5,8 +5,8 @@ from multiprocessing import Lock
 from sklearn import svm
 from sklearn.utils.validation import NotFittedError
 
-from sample_storage import SampleStorage
-from lexicon import Lexicon
+from cog_classification.data_storage.sample_storage import SampleStorage
+from cog_classification.data_storage.lexicon import Lexicon
 
 
 class Agent(object):

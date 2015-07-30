@@ -44,7 +44,7 @@ class Simulation:
 
         return self.result
 
-    def continue_simulation(self, agents=None, interactions=None, environment=None, result=None, end_condition=None):
+    def continue_simulation(self, agents=None, interactions=None, environment=None, end_condition=None):
         """
         Starts completed simulation from termination point with additional parameters.
 
@@ -57,7 +57,6 @@ class Simulation:
         self.agents.update(agents, self.iteration)
         self.interactions.update(interactions, self.iteration)
         self.environment.update(environment, self.iteration)
-        self.result.update(result, self.iteration)
         self.end_condition.update(end_condition, self.iteration)
 
         return self.run()

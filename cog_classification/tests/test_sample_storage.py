@@ -1,11 +1,10 @@
-from nose.tools import assert_equals, raises
-
-from cog_classification.core.sample_storage import SampleStorage
-from cog_classification.core.environment import Environment
-
 from itertools import izip_longest
 
+from nose.tools import assert_equals, raises
 from sklearn import datasets
+
+from cog_classification.data_storage.sample_storage import SampleStorage
+from cog_classification.core.environment import Environment
 
 
 class TestSampleStorage:

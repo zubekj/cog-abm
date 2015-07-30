@@ -1,6 +1,6 @@
 import random
 
-from cog_classification.core.changing_class import ChangingClass
+from cog_classification.data_storage.changing_class import ChangingClass
 
 
 class Network(ChangingClass):
@@ -12,7 +12,7 @@ class Network(ChangingClass):
             agents ({agent_name: agent}).
             topologies ({agent_name: [neighbour_name, ...]}):
         """
-        super(Network, self).__init__(topologies, changes)
+        ChangingClass.__init__(self, topologies, changes)
         self.agents = agents
 
     def get_agent(self):

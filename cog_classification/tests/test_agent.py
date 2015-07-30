@@ -1,9 +1,8 @@
 from nose.tools import assert_equals
-
-from cog_classification.core.agent import Agent
-from cog_classification.core.environment import Environment
-
 from sklearn import datasets
+
+from cog_classification.steels_classifier.agent import Agent
+from cog_classification.core.environment import Environment
 
 
 class DummyFitness:

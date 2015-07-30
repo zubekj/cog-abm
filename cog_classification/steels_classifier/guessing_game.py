@@ -1,4 +1,4 @@
-from cog_classification.core.discrimination_game import DiscriminationGame
+from cog_classification.steels_classifier.discrimination_game import DiscriminationGame
 
 class GuessingGame:
 
