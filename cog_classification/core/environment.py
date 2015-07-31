@@ -11,10 +11,10 @@ class Environment:
 
     def __init__(self, samples, classes, distance=None):
         """
-        Parameters explanation:
-        samples - list of samples
-        classes - list of samples' classes
-        distance - distance function between two samples
+        Args:
+            samples (list): list of samples.
+            classes (list): list of samples' classes.
+            distance (function): distance function between two samples.
         """
         self.samples = samples
         self.classes = classes
@@ -35,6 +35,10 @@ class Environment:
         return distance
 
     def get_all(self):
+        """
+        Returns:
+            ((list, list)) list of samples and list of classes.
+        """
         return self.samples, self.classes
 
     def get_all_classes(self):
@@ -44,15 +48,9 @@ class Environment:
         return self.samples
 
     def get_random_sample(self):
-        """
-        Returns random sample.
-        """
         return random.choice(self.samples)
 
     def get_random_sample_index(self):
-        """
-        Returns index of random sample.
-        """
         return random.randrange(len(self.samples))
 
     def get_sample(self, index):

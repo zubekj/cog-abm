@@ -48,9 +48,9 @@ class DiscriminationGame:
         """
         The core implementation of single game.
 
-        Agent gets sets of samples in which one is chosen as topic.
+        SteelsAgent gets sets of samples in which one is chosen as topic.
 
-        Agent task is to classify this topic as different from other samples.
+        SteelsAgent task is to classify this topic as different from other samples.
         """
         topic_index = environment.get_random_sample_index()
         topic_class = environment.get_class(topic_index)

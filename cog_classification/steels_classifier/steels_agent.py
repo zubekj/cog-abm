@@ -1,28 +1,23 @@
 """ Module implementing agent in the system. """
 
-from multiprocessing import Lock
-
 from sklearn import svm
 from sklearn.utils.validation import NotFittedError
 
+from cog_classification.core.agent import Agent
 from cog_classification.data_storage.sample_storage import SampleStorage
 from cog_classification.data_storage.lexicon import Lexicon
 
 
-class Agent(object):
+class SteelsAgent(Agent):
     """
     Class representing agent in the system.
 
-    Agent remember old samples from environment and can classify new ones. It can name categories.
+    SteelsAgent remember old samples from environment and can classify new ones. It can name categories.
 
-    Agent has some mechanisms that will help it forget the samples if needed.
+    SteelsAgent has some mechanisms that will help it forget the samples if needed.
 
     There is an option of monitoring agent fitness.
     """
-
-    # AID is set that it will match networks nodes.
-    AID = 0
-    AID_lock = Lock()
 
     def __init__(self, aid=None, classifier=None, sample_storage=None, lexicon=None):
         """
@@ -33,26 +28,10 @@ class Agent(object):
         sample_storage - storage all samples used to teach classifier
         lexicon - storage associations between sample storage categories and words.
         """
-        self.id = aid or Agent.get_next_id()
+        Agent.__init__(self, aid)
         self.classifier = classifier or svm.SVC()
         self.sample_storage = sample_storage or SampleStorage()
         self.lexicon = lexicon or Lexicon
-
-        # fitness is dictionary of agent's fitness measures
-        self.fitness = {}
-
-    @classmethod
-    def get_next_id(cls):
-        """
-        Generates new unique id for agent.
-
-        It asserts that user doesn't specify id value for any agent.
-        """
-        cls.AID_lock.acquire()
-        aid = cls.AID
-        cls.AID += 1
-        cls.AID_lock.release()
-        return aid
 
     def add_sample(self, sample_index, environment, category=None):
         """
@@ -115,12 +94,6 @@ class Agent(object):
         if len(decisions) > 0 and self.sample_storage.get_categories_size() > 1:
             self.classifier.fit(data, decisions)
 
-    def update_fitness(self, name, information):
-        """
-        Gives information to fitness measure with a specific name.
-        """
-        self.fitness[name].update(information)
-
     def the_best_category_for_word(self, word, category):
         """
         Weakens associations between other categories and word.
@@ -148,20 +121,8 @@ class Agent(object):
         """
         return self.id
 
-    def get_fitness_measure(self, name):
-        """
-        Returns value of fitness measure with a specific name.
-        """
-        return self.fitness[name].get_measure()
-
     def get_words(self):
         """
         Returns all words known by agents.
         """
         return self.lexicon.get_words()
-
-    def set_fitness(self, name, fitness_measure):
-        """
-        Adds given fitness measure with a specific name.
-        """
-        self.fitness[name] = fitness_measure

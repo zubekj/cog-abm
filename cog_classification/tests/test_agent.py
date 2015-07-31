@@ -1,7 +1,7 @@
 from nose.tools import assert_equals
 from sklearn import datasets
 
-from cog_classification.steels_classifier.agent import Agent
+from cog_classification.steels_classifier.steels_agent import SteelsAgent
 from cog_classification.core.environment import Environment
 
 
@@ -61,7 +61,7 @@ class TestAgent:
         return self.agent.classify(sample)
 
     def setup(self):
-        self.agent = Agent()
+        self.agent = SteelsAgent()
 
     def test_classify(self):
         sample_index = self.environment.get_random_sample_index()

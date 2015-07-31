@@ -2,7 +2,7 @@ import random
 
 from sklearn import datasets
 
-from cog_classification.steels_classifier.agent import Agent
+from cog_classification.steels_classifier.steels_agent import SteelsAgent
 from cog_classification.steels_classifier.discrimination_game import DiscriminationGame
 from cog_classification.core.environment import Environment
 from cog_classification.tests.test_agent import DummyFitness
@@ -39,7 +39,7 @@ class TestDiscriminationGame:
     def setup(self):
         agents = []
         for _ in range(10):
-            agent = Agent()
+            agent = SteelsAgent()
             agent.set_fitness("DG", DummyFitness())
             agents.append(agent)
         self.agents = DummyNetwork(agents)

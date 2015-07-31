@@ -5,7 +5,6 @@ class Result:
 
     def __init__(self):
         self.results = {}
-        pass
 
     def save(self, agents, interactions, environment, result, end_condition, iteration):
         pass
@@ -29,7 +28,7 @@ class StandardResult(Result):
             results = {"iteration": iteration}
 
             for agent in agents.get_all_agents():
-                for fitness_name in agent.get_fitnesses():
+                for fitness_name in agent.get_fitness_measures():
 
                     fitness_measure = agent.get_fitness_measure(fitness_name)
 

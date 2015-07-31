@@ -28,7 +28,8 @@ class Simulation:
         """
         self.result.save(**self.__dict__)
 
-        while not self.end_condition.end(self.iteration):
+        # Main loop of simulation.
+        while not self.end_condition.end(**self.__dict__):
             self.iteration += 1
 
             self.interactions.change(self.iteration)

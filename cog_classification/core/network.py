@@ -10,7 +10,8 @@ class Network(ChangingClass):
         """
         Args:
             agents ({agent_name: agent}).
-            topologies ({agent_name: [neighbour_name, ...]}):
+            topologies ({topology_name: {agent_name: [neighbour_name, ...]}}).
+            changes ({change_time: topology_name})
         """
         ChangingClass.__init__(self, topologies, changes)
         self.agents = agents
@@ -39,7 +40,7 @@ class Network(ChangingClass):
         candidates = []
 
         # Choosing firs agent.
-        agent_name = random.choice(self.agents)
+        agent_name = random.choice(self.agents.keys())
         agents.append(self.agents[agent_name])
         agents_names.append(agent_name)
 
@@ -52,7 +53,7 @@ class Network(ChangingClass):
                 return []
             else:
                 new_agent = random.choice(candidates)
-                candidates.pop(new_agent)
+                candidates = [agent for agent in candidates if not agent == new_agent]
 
                 agent_name = new_agent
                 agents.append(self.agents[agent_name])
