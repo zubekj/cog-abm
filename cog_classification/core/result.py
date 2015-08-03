@@ -9,6 +9,8 @@ class Result:
     def save(self, agents, interactions, environment, result, end_condition, iteration):
         pass
 
+    def get_results(self):
+        return self.results
 
 class StandardResult(Result):
     """
@@ -38,6 +40,3 @@ class StandardResult(Result):
                         results[fitness_name] = [fitness_measure]
 
             self.results[iteration / self.gap] = results
-
-    def get_results(self):
-        return self.results

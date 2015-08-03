@@ -1,7 +1,7 @@
 from nose.tools import assert_equals
 from sklearn import datasets
 
-from cog_classification.steels_classifier.steels_agent import SteelsAgent
+from cog_classification.steels_universal.steels_agent import SteelsAgent
 from cog_classification.core.environment import Environment
 
 
@@ -30,14 +30,14 @@ class TestAgent:
     Functions not tested:
     - __init__
     - add_sample
-    - bad_word_for_category
+    - weaken_association_word_category
     - forget
-    - good_category_for_sample
-    - good_word_for_category
+    - strengthen_memory_sample_category
+    - strengthen_association_word_category
     - learn
     - update_fitness
-    - the_best_category_for_word
-    - the_best_word_for_category
+    - weaken_association_word_other_categories
+    - weaken_association_other_word_categories
     - get_category_class
     - get_id
     - get_fitness_measure
@@ -104,10 +104,10 @@ class TestAgent:
                 self.add(sample_index)
                 value = 0
             elif env.get_class(sample_index) == agent.get_category_class(category):
-                agent.good_category_for_sample(category, sample_index, env)
+                agent.strengthen_memory_sample_category(category, sample_index, env)
                 value = 1
             elif agent.get_fitness_measure("DF") > 0.95:
-                agent.good_category_for_sample(category, sample_index, env)
+                agent.strengthen_memory_sample_category(category, sample_index, env)
                 value = 0
             else:
                 self.add(sample_index)

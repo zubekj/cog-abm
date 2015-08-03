@@ -2,8 +2,8 @@ import random
 
 from sklearn import datasets
 
-from cog_classification.steels_classifier.steels_agent import SteelsAgent
-from cog_classification.steels_classifier.discrimination_game import DiscriminationGame
+from cog_classification.steels_universal.steels_agent import SteelsAgent
+from cog_classification.steels_universal.discrimination_game import DiscriminationGame
 from cog_classification.core.environment import Environment
 from cog_classification.tests.test_agent import DummyFitness
 

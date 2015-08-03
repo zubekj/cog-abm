@@ -47,11 +47,17 @@ class Environment:
     def get_all_samples(self):
         return self.samples
 
-    def get_random_sample(self):
-        return random.choice(self.samples)
+    def get_class(self, index):
+        """
+        Returns class of sample with given index.
+        """
+        return np.array(self.classes[index])
 
-    def get_random_sample_index(self):
-        return random.randrange(len(self.samples))
+    def get_random_sample(self):
+        index = random.randrange(len(self.samples))
+        sample = self.get_sample(index)
+        sample_class = self.get_class(index)
+        return index, sample, sample_class
 
     def get_sample(self, index):
         """
@@ -64,12 +70,6 @@ class Environment:
         Returns list of samples with given indexes.
         """
         return np.array([self.samples[index] for index in indexes])
-
-    def get_class(self, index):
-        """
-        Returns class of sample with given index.
-        """
-        return np.array(self.classes[index])
 
     def set_distance(self, distance):
         """"

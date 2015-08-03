@@ -57,8 +57,6 @@ class TestSimulation:
 
         simulation_result = self.simulation.run()
 
-        print(max(simulation_result.get_results()))
-
 
 class InfectInteraction:
 

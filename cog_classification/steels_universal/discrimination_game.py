@@ -25,7 +25,7 @@ class DiscriminationGame:
         One turn of interaction in discrimination game.
         """
         agent = agents.get_agent()
-        result, topic_index, topic_category = self.play(agent, environment)
+        result, topic_index, topic_category, _ = self.play(agent, environment)
         self.learning_after_game(agent, topic_index, environment, topic_category, result)
         agent.update_fitness("DG", result)
 
@@ -36,7 +36,7 @@ class DiscriminationGame:
         """
 
         if result:
-            agent.good_category_for_sample(topic_category, topic_index, environment)
+            agent.strengthen_memory_sample_category(topic_category, topic_index, environment)
         elif agent.get_fitness_measure("DG") >= self.good_agent_measure:
             agent.add_sample(topic_index, environment, topic_category)
         else:
@@ -57,6 +57,10 @@ class DiscriminationGame:
         other_samples = [self.sample_from_other_class(topic_class, environment) for _ in range(self.samples_number - 1)]
 
         topic = environment.get_sample(topic_index)
+        return self.play_with_given_samples(agent, topic, topic_index, other_samples)
+
+    @staticmethod
+    def play_with_given_samples(agent, topic, other_samples):
         topic_category = agent.classify(topic)
         other_categories = [agent.classify(sample) for sample in other_samples]
 
@@ -65,7 +69,7 @@ class DiscriminationGame:
         else:
             result = topic_category in other_categories
 
-        return result, topic_index, topic_category
+        return result, topic_category
 
     @staticmethod
     def sample_from_other_class(sample_class, environment):
@@ -73,6 +77,6 @@ class DiscriminationGame:
         Finds in environment sample that has different class than sample class.
         """
         while True:
-            sample_index = environment.get_random_sample_index()
-            if not environment.get_class(sample_index) == sample_class:
-                return environment.get_sample(sample_index)
+            index, sample, taken_class = environment.get_random_sample()
+            if not taken_class == sample_class:
+                return sample

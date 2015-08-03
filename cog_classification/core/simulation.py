@@ -53,7 +53,7 @@ class Simulation:
             like in __init__.
 
         Returns:
-            (Result) result of whole simulation - form start of original simulation.
+            (Result) result of whole simulation - form start of original simulation to the end of extended simulation.
         """
         self.agents.update(agents, self.iteration)
         self.interactions.update(interactions, self.iteration)

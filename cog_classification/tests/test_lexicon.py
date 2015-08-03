@@ -9,13 +9,13 @@ class TestLexicon:
     - __init__
     - add_new_category
     - add_word_to_category
-    - category_for_word
+    - find_category_for_word
     - remove_category
     - strengthen_association
     - weaken_association
     - weaken_other_associations_for_categories
     - weaken_other_associations_for_words
-    - word_for_category
+    - find_word_for_category
 
     Functions not tested:
     - get_words
@@ -40,10 +40,10 @@ class TestLexicon:
         self.word_for_category(category, word)
 
     def category_for_word(self, category, word):
-        assert_equals(self.lexicon.category_for_word(word), category)
+        assert_equals(self.lexicon.find_category_for_word(word), category)
 
     def word_for_category(self, category, word):
-        assert_equals(self.lexicon.word_for_category(category), word)
+        assert_equals(self.lexicon.find_word_for_category(category), word)
 
     def words_size(self, size):
         assert_equals(self.lexicon.get_words_size(), size)
