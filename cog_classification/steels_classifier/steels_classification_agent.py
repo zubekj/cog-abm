@@ -22,7 +22,7 @@ class SteelsClassificationAgent(SteelsAgent):
         """
         return self.sample_storage.add_sample(sample_index, environment, category)
 
-    def choose_the_best_sample_for_category(self, category, samples):
+    def the_best_sample_for_category(self, category, samples):
 
         the_best_sample = samples[0]
         the_best_probability = -float('inf')

@@ -99,7 +99,8 @@ class Lexicon:
         Add new word to category.
 
         If weight isn't specified lexicon uses initial strength.
-        If category doesn't exist, lexicon raises KeyError.
+        If category doesn't exist, lexicon adds new category.
+        If category is None, lexicon raises ValueError.
         If word already in category, nothing happens.
         """
         if category in self.categories:

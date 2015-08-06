@@ -80,10 +80,9 @@ class SampleStorage:
         Sample has sample weight if given or default new weight of sample storage.
         Sample weight should be larger than or equal 0.
 
+        If sample has been already added to other category then method do nothing.
         If sample would be add to category, which class is different, then for sample there is generated new category.
         If sample would be add to category, that already contains this sample, then method do nothing.
-
-        Sample can be added to multiple categories.
         """
 
         if sample_weight is None:
@@ -93,6 +92,14 @@ class SampleStorage:
             assert sample_weight <= self.max_weight
 
         sample_class = environment.get_class(sample_index)
+
+        for checked_category in self.categories:
+            if self.sample_in_category(sample_index, environment, checked_category):
+                """
+                We are sure that if sample is in storage in checked category
+                then it won't be add to other category by replacing category by checked category.
+                """
+                category = checked_category
 
         if category in self.categories:
             if sample_class == self.classes[category]:
@@ -104,7 +111,7 @@ class SampleStorage:
                 # There is difference in class of sample and class of category.
                 # So we are adding sample to empty category (it forces creation of new category for sample).
                 return self.add_sample(sample_index, environment, sample_weight=sample_weight)
-        elif category is None:
+        else:
             # No such category in sample storage.
             # So we create new category for sample (and new name if category is None).
             category = self.create_new_category(environment, sample_class, category)
@@ -274,6 +281,12 @@ class SampleStorage:
         sample_indexes.pop(index)
         weights.pop(index)
 
+        if self.get_category_samples_size(category) == 0:
+            self.remove_category(category)
+            return category
+        else:
+            return None
+
     def remove_weak_samples(self):
         """
         Removes samples, which weight is lower than forgetting threshold, in each category.
@@ -288,9 +301,11 @@ class SampleStorage:
         Removes all samples which weight is lower than forgetting threshold.
 
         If all samples are removed from category, the category is removed too.
+        In this case category name is returned otherwise None.
         """
 
         the_category = self.categories[category]
+        removed_category = None
         for environment in the_category:
 
             to_remove = []
@@ -301,11 +316,9 @@ class SampleStorage:
 
             to_remove = sorted(to_remove, reverse=True)
             for i in to_remove:
-                self.remove_sample_from_category(environment, category, index=i)
+                removed_category = self.remove_sample_from_category(environment, category, index=i)
 
-        if self.get_category_samples_size(category) == 0:
-            self.remove_category(category)
-            return category
+        return removed_category
 
     def sample_in_category(self, sample_index, environment, category):
         """ Checking if given sample index is in category. """

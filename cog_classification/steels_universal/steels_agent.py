@@ -28,9 +28,7 @@ class SteelsAgent(Agent):
         self.lexicon = lexicon or Lexicon()
 
     def add_word_to_category(self, word, category):
-        self.get_categories_size()
         return self.lexicon.add_word_to_category(word, category)
-        self.get_categories_size()
 
     def weaken_association_word_category(self, word, category):
         """

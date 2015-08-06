@@ -78,37 +78,37 @@ class TestSampleStorage:
         self.assert_samples_size(2, 1)
         self.assert_samples_size(1, 2)
 
-        # Adding new element to existing class.
+        # Adding existing element to existing class.
         self.add(31, category=1)
         self.assert_size(2)
-        self.assert_samples_size(3, 1)
+        self.assert_samples_size(2, 1)
         self.assert_samples_size(1, 2)
 
         # Adding new element to non existing class.
         self.add(41, category=3)
         self.assert_size(3)
-        self.assert_samples_size(3, 1)
+        self.assert_samples_size(2, 1)
         self.assert_samples_size(1, 2)
         self.assert_samples_size(1, 3)
 
         # Adding new element to existing class (different true categories).
         self.add(52, category=3)
         self.assert_size(4)
-        self.assert_samples_size(3, 1)
+        self.assert_samples_size(2, 1)
         self.assert_samples_size(1, 2)
         self.assert_samples_size(1, 3)
 
         # Adding new element to existing class (different true categories).
         self.add(53, category=1)
         self.assert_size(5)
-        self.assert_samples_size(3, 1)
+        self.assert_samples_size(2, 1)
         self.assert_samples_size(1, 2)
         self.assert_samples_size(1, 3)
 
         # Adding new element without class.
         self.add(54)
         self.assert_size(6)
-        self.assert_samples_size(3, 1)
+        self.assert_samples_size(2, 1)
         self.assert_samples_size(1, 2)
         self.assert_samples_size(1, 3)
 
@@ -117,14 +117,14 @@ class TestSampleStorage:
         # Adding element with the same index but with different environment.
         self.add(1, env, 1)
         self.assert_size(6)
-        self.assert_samples_size(4, 1)
+        self.assert_samples_size(3, 1)
         self.assert_samples_size(1, 2)
         self.assert_samples_size(1, 3)
 
         # Adding new element with different environment and true class.
         self.add(63, env, 3)
         self.assert_size(7)
-        self.assert_samples_size(4, 1)
+        self.assert_samples_size(3, 1)
         self.assert_samples_size(1, 2)
         self.assert_samples_size(1, 3)
 
@@ -135,14 +135,14 @@ class TestSampleStorage:
 
     def test_create_new_category_no_conflicts_with_analogous_category_names(self):
         self.add(1, category="Category number: 0")
-        self.add(1, category="Category number: 1")
-        self.add(1, category="Category number: 2")
-        self.add(1, category="Category number: 4")
+        self.add(2, category="Category number: 1")
+        self.add(3, category="Category number: 2")
+        self.add(4, category="Category number: 4")
 
         self.assert_size(4)
-        self.add(1)
+        self.add(5)
         self.assert_size(5)
-        self.add(1)
+        self.add(6)
         self.assert_size(6)
 
         categories = self.storage.get_categories()

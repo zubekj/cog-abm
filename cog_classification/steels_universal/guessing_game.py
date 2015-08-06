@@ -38,7 +38,7 @@ class GuessingGame:
                 all_samples = other_samples + [topic]
                 random.shuffle(all_samples)
 
-                guessed_topic = hearer.choose_the_best_sample_for_category(hearer_category, all_samples)
+                guessed_topic = hearer.the_best_sample_for_category(hearer_category, all_samples)
 
                 # If hearer correctly assumed that topic belongs to guesses category the most.
                 if all(topic == guessed_topic):
@@ -78,10 +78,17 @@ class GuessingGame:
             speaker.update_fitness("DG", True)
             hearer.update_fitness("GG", True)
 
+            speaker.forget()
+            hearer.forget()
+
         elif result == "Speaker failed discrimination.":
             self.game.learning_after_game(speaker, topic_index, environment, speaker_category, False)
 
+            speaker.update_fitness("GG", False)
             speaker.update_fitness("DG", False)
+            hearer.update_fitness("GG", False)
+
+            speaker.forget()
 
         elif result == "Hearer didn't know word.":
             result, hearer_category = self.game.play_with_given_samples(hearer, environment.get_sample(topic_index),
@@ -100,6 +107,9 @@ class GuessingGame:
             speaker.update_fitness("DG", True)
             hearer.update_fitness("GG", False)
 
+            speaker.forget()
+            hearer.forget()
+
         elif result == "Not matching samples.":
 
             speaker.weaken_association_word_category(word, speaker_category)
@@ -110,8 +120,8 @@ class GuessingGame:
             speaker.update_fitness("GG", False)
             speaker.update_fitness("DG", True)
             hearer.update_fitness("GG", False)
+
+            speaker.forget()
+            hearer.forget()
         else:
             raise ValueError
-
-        speaker.forget()
-        hearer.forget()

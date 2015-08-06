@@ -30,7 +30,7 @@ class TestLexicon:
         return self.lexicon.add_new_category(category, word, weight)
 
     def add_word(self, category, word, weight=None):
-        self.lexicon.add_word_to_category(category, word, weight)
+        self.lexicon.add_word_to_category(word, category, weight)
 
     def categories_size(self, size):
         assert_equals(self.lexicon.get_categories_size(), size)
@@ -110,9 +110,9 @@ class TestLexicon:
         self.add_word(1, 3, 0.3)
         self.category_and_word(1, 3)
 
-    @raises(KeyError)
-    def test_add_word_to_category_no_category_error(self):
-        self.lexicon.add_word_to_category(1, 1)
+    @raises(ValueError)
+    def test_add_word_to_category_none_category_error(self):
+        self.lexicon.add_word_to_category(1, None)
 
     def test_remove_category_adding_and_removing_to_empty(self):
         self.test_word_for_category_adding_new_words_and_categories()
