@@ -119,6 +119,16 @@ def count_category(agents, parameters):
     return [number_of_categories(agent) for agent in agents]
 
 
+def count_words(agents):
+
+    words = []
+
+    for agent in agents:
+        for word in agent.state.lexicon.known_words():
+            words.append(word)
+
+    return len(words)
+
 
 def ds_a(agent):
     return agent.get_fitness("DG")

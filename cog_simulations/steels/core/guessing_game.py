@@ -75,7 +75,7 @@ class GuessingGame(Interaction):
         # word = word that speaker uses to call the s_category category.
         word = speaker.state.word_for(s_category)
         # If there is no word that speaker has for this category:
-        if word is None:
+        if word is None and self.learning_mode:
             # A random word is chosen for this category and added:
             word = speaker.state.lexicon.add_element(s_category)
 
@@ -145,7 +145,7 @@ class GuessingGame(Interaction):
             """
 
             # If agents can learn:
-            if not self.learning_mode:
+            if self.learning_mode:
                 speaker.state.lexicon.decrease(s_category, word)
                 # ^^ as in 4.2 1.(b)
                 hearer.state.lexicon.decrease(h_word_category, word)

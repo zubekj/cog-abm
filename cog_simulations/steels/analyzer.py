@@ -66,7 +66,8 @@ if __name__ == "__main__":
     with open(arguments.results) as f:
         results, parameters = cPickle.load(f)
 
-    functions_dictionary = {"cc": lambda agents, iteration: count_category(agents, parameters),
+    functions_dictionary = {"cw": lambda agents, iteration: [count_words(agents)],
+                            "cc": lambda agents, iteration: count_category(agents, parameters),
                             "CS": lambda agents, iteration: [communication_success_of_population(agents, iteration)],
                             "CSA": lambda agents, iteration: map(communication_success_of_agent, agents),
                             "cv": lambda agents, iteration: [category_variance(agents, iteration)],
