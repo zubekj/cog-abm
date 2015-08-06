@@ -35,11 +35,13 @@ class GuessingGame:
             # If hearer finds such category.
             if hearer_category is not None:
 
-                guessed_topic = hearer.choose_the_best_sample_for_category(hearer_category,
-                                                                           random.shuffle(other_samples + [topic]))
+                all_samples = other_samples + [topic]
+                random.shuffle(all_samples)
+
+                guessed_topic = hearer.choose_the_best_sample_for_category(hearer_category, all_samples)
 
                 # If hearer correctly assumed that topic belongs to guesses category the most.
-                if topic == guessed_topic:
+                if all(topic == guessed_topic):
                     result = "Success"
 
                 # If hearer didn't assume that topic belongs to guesses category the most.
@@ -86,10 +88,13 @@ class GuessingGame:
                                                                         other_samples)
 
             if not result:
-                    self.game.learning_after_game(hearer, topic_index, environment, hearer_category, result)
+                    hearer_category = self.game.learning_after_game(hearer, topic_index, environment,
+                                                                    hearer_category, result)
 
+            if hearer_category is None:
+                raise ValueError
             # Associating the category for topic with word.
-            hearer.strengthen_association_word_category(word, hearer_category)
+            hearer.add_word_to_category(word, hearer_category)
 
             speaker.update_fitness("GG", False)
             speaker.update_fitness("DG", True)
@@ -107,3 +112,6 @@ class GuessingGame:
             hearer.update_fitness("GG", False)
         else:
             raise ValueError
+
+        speaker.forget()
+        hearer.forget()

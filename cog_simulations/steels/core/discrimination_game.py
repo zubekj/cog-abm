@@ -4,10 +4,11 @@ from cog_simulations.cog_abm.core.interaction import Interaction
 
 class DiscriminationGame(Interaction):
 
-    def __init__(self, context_len=4, inc_category_threshold=0.95, environment=None):
+    def __init__(self, context_len=4, inc_category_threshold=0.95, environment=None, game_name=None):
         self.context_len = context_len
         self.inc_category_threshold = inc_category_threshold
         self.environment = environment
+        self.game_name = game_name or "DG"
 
     def change_environment(self, environment):
         self.environment = environment
@@ -19,9 +20,8 @@ class DiscriminationGame(Interaction):
     def set_inc_category_threshold(self, new_inc_category_threshold):
         self.inc_category_threshold = new_inc_category_threshold
 
-    @staticmethod
-    def save_result(agent, result):
-        agent.add_payoff("DG", int(result))
+    def save_result(self, agent, result):
+        agent.add_payoff(self.game_name, int(result))
 
     @staticmethod
     def disc_game(agent, context, topic):
@@ -83,8 +83,8 @@ class DiscriminationGame(Interaction):
     def interact(self, agent1, agent2):
         context, topic = self.get_setup()
         return (
-            ("DG", self.interact_one_agent(agent1, context, topic)),
-            ("DG", self.interact_one_agent(agent2, context, topic))
+            (self.game_name, self.interact_one_agent(agent1, context, topic)),
+            (self.game_name, self.interact_one_agent(agent2, context, topic))
         )
 
     def __repr__(self):

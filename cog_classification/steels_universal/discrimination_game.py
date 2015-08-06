@@ -27,6 +27,7 @@ class DiscriminationGame:
         agent = agents.get_agent()
         result, topic_index, topic_category, _ = self.play(agent, environment)
         self.learning_after_game(agent, topic_index, environment, topic_category, result)
+        agent.forget()
         agent.update_fitness("DG", result)
 
     def learning_after_game(self, agent, topic_index, environment, topic_category, result):
@@ -38,11 +39,9 @@ class DiscriminationGame:
         if result:
             agent.strengthen_memory_sample_category(topic_category, topic_index, environment)
         elif agent.get_fitness_measure("DG") >= self.good_agent_measure:
-            agent.add_sample(topic_index, environment, topic_category)
+            return agent.add_sample(topic_index, environment, topic_category)
         else:
-            agent.add_sample(topic_index, environment)
-
-        agent.forget()
+            return agent.add_sample(topic_index, environment)
 
     def play(self, agent, environment):
         """

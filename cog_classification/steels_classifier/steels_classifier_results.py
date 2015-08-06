@@ -14,7 +14,7 @@ class SteelsClassifierResults(Result):
         classes_voting = {}
 
         for agent in self.results['agents']:
-            class_vote = agent.predict(sample)
+            class_vote = int(agent.get_category_class(agent.classify(sample)))
             if class_vote in classes_voting:
                 classes_voting[class_vote] += 1
             else:
@@ -29,3 +29,8 @@ class SteelsClassifierResults(Result):
                 best_class = class_vote
 
         return best_class
+
+    def test_agents(self):
+        for agent in self.results['agents']:
+            print("Words: %s" % len(agent.get_words()))
+            print("Categories: %s" % agent.get_categories_size())

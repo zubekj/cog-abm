@@ -48,6 +48,7 @@ class Simulation(object):
         """
         self.iteration_counter = 1
         self.environments = environments
+        self.environment = None
         self.graph = None
         self.graphs = graphs
         self.interaction = None
@@ -96,11 +97,13 @@ class Simulation(object):
         for interaction in self.interactions:
             if interaction["start"] == self.iteration_counter:
                 self.interaction = interaction["interaction"]
+                self.interaction.change_environment(self.environment)
                 break
 
     def _change_environment(self):
         for env in self.environments:
             if env["start"] == self.iteration_counter:
+                self.environment = env["environment"]
                 self.interaction.change_environment(env["environment"])
 
     def _choose_agents(self):
@@ -120,8 +123,6 @@ class Simulation(object):
             self._change_interaction()
             self._change_environment()
             agents = self._choose_agents()
-            if abs(agents[0].get_id() - agents[1].get_id()) > 1:
-                logging.debug(self.iteration_counter)
             self._start_interaction(agents)
             self.iteration_counter += 1
 

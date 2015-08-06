@@ -103,12 +103,14 @@ class SampleStorage:
             else:
                 # There is difference in class of sample and class of category.
                 # So we are adding sample to empty category (it forces creation of new category for sample).
-                self.add_sample(sample_index, environment, sample_weight=sample_weight)
-        else:
+                return self.add_sample(sample_index, environment, sample_weight=sample_weight)
+        elif category is None:
             # No such category in sample storage.
             # So we create new category for sample (and new name if category is None).
             category = self.create_new_category(environment, sample_class, category)
             self.set_weight(environment, category, sample_weight, sample_index=sample_index)
+
+        return category
 
     def create_new_category(self, environment, sample_class, category=None):
         """
@@ -209,7 +211,6 @@ class SampleStorage:
 
         Weights will never rise above max weight.
         """
-
         the_category = self.categories[category]
         sample = environment.get_sample(sample_index)
 
@@ -273,10 +274,6 @@ class SampleStorage:
         sample_indexes.pop(index)
         weights.pop(index)
 
-        if self.get_category_samples_size(category) == 0:
-            self.remove_category(category)
-            return category
-
     def remove_weak_samples(self):
         """
         Removes samples, which weight is lower than forgetting threshold, in each category.
@@ -304,8 +301,11 @@ class SampleStorage:
 
             to_remove = sorted(to_remove, reverse=True)
             for i in to_remove:
-                # Remove sample from category ensures removing categories without samples.
                 self.remove_sample_from_category(environment, category, index=i)
+
+        if self.get_category_samples_size(category) == 0:
+            self.remove_category(category)
+            return category
 
     def sample_in_category(self, sample_index, environment, category):
         """ Checking if given sample index is in category. """

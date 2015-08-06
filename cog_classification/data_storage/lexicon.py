@@ -94,28 +94,33 @@ class Lexicon:
 
             return word
 
-    def add_word_to_category(self, category, word, weight=None):
+    def add_word_to_category(self, word, category, weight=None):
         """
-        Add new word to existing category.
+        Add new word to category.
 
         If weight isn't specified lexicon uses initial strength.
         If category doesn't exist, lexicon raises KeyError.
         If word already in category, nothing happens.
         """
-        if word not in self.categories[category]:
-            if weight is None:
-                weight = self.initial_strength
-            weight = min(self.max_strength, weight)
-            weight = max(self.min_strength, weight)
+        if category in self.categories:
+            if word not in self.categories[category]:
+                if weight is None:
+                    weight = self.initial_strength
+                weight = min(self.max_strength, weight)
+                weight = max(self.min_strength, weight)
 
-            self.categories[category].append(word)
+                self.categories[category].append(word)
 
-            if word in self.dictionary:
-                self.dictionary[word][category] = weight
-            else:
-                self.dictionary[word] = {category: weight}
+                if word in self.dictionary:
+                    self.dictionary[word][category] = weight
+                else:
+                    self.dictionary[word] = {category: weight}
+        elif category is not None:
+            self.add_new_category(category, word)
+        else:
+            raise ValueError
 
-    def category_for_word(self, word):
+    def find_category_for_word(self, word):
         """
         Finds category with the strongest association with word.
         """
@@ -143,24 +148,28 @@ class Lexicon:
 
         If it was the last category for word it removes this word, too.
         """
-        words_to_remove = []
+        if category in self.categories:
+            words_to_remove = []
 
-        for word in self.categories[category]:
-            self.dictionary[word].pop(category)
-            if len(self.dictionary[word]) == 0:
-                words_to_remove.append(word)
+            for word in self.categories[category]:
+                self.dictionary[word].pop(category)
+                if len(self.dictionary[word]) == 0:
+                    words_to_remove.append(word)
 
-        self.categories.pop(category)
+            self.categories.pop(category)
 
-        for word in words_to_remove:
-            self.dictionary.pop(word)
+            for word in words_to_remove:
+                self.dictionary.pop(word)
 
     def strengthen_association(self, word, category):
         """
         Strengthen association between word and category.
         """
-        new_strength = min(self.max_strength, self.dictionary[word][category] + self.increase_strength)
-        self.dictionary[word][category] = new_strength
+        if category in self.dictionary[word]:
+            new_strength = min(self.max_strength, self.dictionary[word][category] + self.increase_strength)
+            self.dictionary[word][category] = new_strength
+        else:
+            self.add_word_to_category(category, word)
 
     def weaken_association(self, word, category):
         """
@@ -185,7 +194,7 @@ class Lexicon:
                 new_strength = max(self.min_strength, self.dictionary[word][category] - self.lateral_inhibition)
                 self.dictionary[other_word][category] = new_strength
 
-    def word_for_category(self, category):
+    def find_word_for_category(self, category):
         """
         Finds word with the strongest association with category.
         """
@@ -202,6 +211,9 @@ class Lexicon:
             best_word = self.add_new_category(category)
 
         return best_word
+
+    def get_categories(self):
+        return self.categories.keys()
 
     def get_categories_size(self):
         """

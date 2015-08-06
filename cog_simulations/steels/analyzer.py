@@ -30,7 +30,7 @@ def add_arguments(parser_p):
     parser_p.add_argument('-l', '--log_file', dest='log_file', action='store',
                           help='Name of file in which will be stored log information.')
 
-    parser_p.add_argument('statistics', action="store", nargs='*', choices=["cc", "CS", "CSA", "cv", "DS", "DSA", "it"])
+    parser_p.add_argument('statistics', action="store", nargs='*')
 
 
 def set_logging_options():
@@ -47,6 +47,12 @@ def set_logging_options():
         logging.basicConfig(filename=arguments.log_file, level=log_level)
     else:
         logging.basicConfig(level=log_level)
+
+def default(statistic_name):
+    if statistic_name[-1] == 'A':
+        return lambda agents, iteration: [success_of_agent(agent, statistic_name[:-1]) for agent in agents]
+    else:
+        return lambda agents, iteration: [success_of_population(agents, iteration, statistic_name)]
 
 if __name__ == "__main__":
 
@@ -68,7 +74,7 @@ if __name__ == "__main__":
                             "DSA": lambda agents, iteration: map(discrimination_success_of_agent, agents),
                             "it": lambda agents, iteration: [iteration]}
 
-    functions = [functions_dictionary.get(statistic) for statistic in arguments.statistics]
+    functions = [functions_dictionary.get(statistic, default(statistic)) for statistic in arguments.statistics]
 
     pb = get_progressbar()
     statistic_values = [[x for f in functions for x in f(agents_set, it)] for it, agents_set in pb(results)]

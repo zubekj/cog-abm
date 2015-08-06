@@ -27,6 +27,11 @@ class SteelsAgent(Agent):
         Agent.__init__(self, aid)
         self.lexicon = lexicon or Lexicon()
 
+    def add_word_to_category(self, word, category):
+        self.get_categories_size()
+        return self.lexicon.add_word_to_category(word, category)
+        self.get_categories_size()
+
     def weaken_association_word_category(self, word, category):
         """
         Weakens association between word and category in lexicon.
@@ -34,16 +39,13 @@ class SteelsAgent(Agent):
         self.lexicon.weaken_association(word, category)
 
     def find_category_for_word(self, word):
-        return self.lexicon.category_for_word(word)
+        return self.lexicon.find_category_for_word(word)
 
     def strengthen_association_word_category(self, word, category):
         """
         Strengthen association between word and category.
         """
-        if word in self.lexicon.get_words():
-            self.lexicon.strengthen_association(word, category)
-        else:
-            self.lexicon.add_word_to_category(word, category)
+        self.lexicon.strengthen_association(word, category)
 
     def weaken_association_word_other_categories(self, word, category):
         """
@@ -58,7 +60,7 @@ class SteelsAgent(Agent):
         self.lexicon.weaken_other_associations_for_words(word, category)
 
     def find_word_for_category(self, category):
-        return self.lexicon.word_for_category(category)
+        return self.lexicon.find_word_for_category(category)
 
     def get_words(self):
         """

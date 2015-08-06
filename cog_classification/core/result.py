@@ -17,7 +17,7 @@ class StandardResult(Result):
     Class that saves all agents statistics every given time.
     """
 
-    def __init__(self, gap):
+    def __init__(self, gap=50):
         Result.__init__(self)
         self.gap = gap
 

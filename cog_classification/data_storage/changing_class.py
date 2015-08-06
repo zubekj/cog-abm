@@ -1,7 +1,7 @@
 class ChangingClass:
     """ This class implements behavior changing in time. """
 
-    def __init__(self, behaviors, changes):
+    def __init__(self, behaviors, changes=None):
         """
         Args:
             behaviors ({name_of_behavior: behavior}).
@@ -10,6 +10,8 @@ class ChangingClass:
                 when name of this change will be given in change.
         """
         self.behaviors = behaviors
+        if changes is None:
+            changes = {1: behaviors.keys()[0]}
         self.changes = changes
 
         self.current_behavior = None

@@ -6,13 +6,15 @@ from cog_classification.data_storage.changing_class import ChangingClass
 class Network(ChangingClass):
     """ This class implements set of agents with changing topology. """
 
-    def __init__(self, agents, topologies, changes):
+    def __init__(self, agents, topologies, changes=None):
         """
         Args:
             agents ({agent_name: agent}).
             topologies ({topology_name: {agent_name: [neighbour_name, ...]}}).
             changes ({change_time: topology_name})
         """
+        if changes is None:
+            changes = {1: topologies.keys()[0]}
         ChangingClass.__init__(self, topologies, changes)
         self.agents = agents
 

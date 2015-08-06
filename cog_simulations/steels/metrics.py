@@ -45,6 +45,15 @@ def communication_success_of_population(agents, iteration):
     return numpy.mean([communication_success_of_agent(agent) for agent in agents])
 
 
+def success_of_agent(agent, fitness):
+    return agent.get_fitness(fitness)
+
+
+def success_of_population(agents, iteration, fitness):
+    if iteration == 0:
+        return 0
+    return numpy.mean([success_of_agent(agent, fitness) for agent in agents])
+
 # Calculate total variance of categories for the list of agents. This measure is sensitive to the number of categories.
 def category_variance(agents, iteration):
     if iteration == 0:

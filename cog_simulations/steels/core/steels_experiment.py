@@ -22,8 +22,8 @@ def steels_experiment(num_iter=1000, dump_freq=50, alpha=0.1, beta=1, sigma=10, 
     An experiment in which topology, type and learning can change after some number of iterations.
     """
 
-    has_gg = has_guessing_game(interactions)
-    agents = load_agents(agents, has_gg)
+    games_labels = load_games_labels(interactions)
+    agents = load_agents(agents, games_labels)
     interactions = load_interactions(interactions)
     colour_order, environments = load_environment(environments)
 
@@ -41,17 +41,23 @@ def steels_experiment(num_iter=1000, dump_freq=50, alpha=0.1, beta=1, sigma=10, 
     return res, s
 
 
-def has_guessing_game(interactions):
-    has_gg = False
-    for i in interactions:
-        if i["type"] == "GuessingGame":
-            has_gg = True
-            break
+def load_games_labels(interactions):
+    labels = ["DG"]
 
-    return has_gg
+    for interaction in interactions:
+        if "game_name" in interaction:
+            labels.append(interaction["game_name"])
+            if interaction["type"] == "GuessingGame":
+                labels.append("DG_%s" % interaction["game_name"])
+        else:
+            if interaction["type"] == "GuessingGame":
+                labels.append("GG")
+
+    return list(set(labels))
 
 
-def load_agents(agents, guessing_game):
+
+def load_agents(agents, games_labels):
     from cog_simulations.cog_abm.core.agent import Agent
     from cog_simulations.steels.core.steels_agent_state_with_lexicon import SteelsAgentStateWithLexicon
     from cog_simulations.cog_abm.agent.sensor import SimpleSensor
@@ -66,9 +72,9 @@ def load_agents(agents, guessing_game):
         state = SteelsAgentStateWithLexicon(classifier(*classifier_arg))
         true_agent = Agent(state=state, sensor=SimpleSensor())
         true_agent.set_fitness_measure("DG", metrics.get_ds_fitness())
-        if guessing_game:
+        for label in games_labels:
             metric = metrics.get_cs_fitness()
-            true_agent.set_fitness_measure("GG", metric)
+            true_agent.set_fitness_measure(label, metric)
         true_agents.append(true_agent)
 
     return true_agents
@@ -81,15 +87,18 @@ def load_interactions(interactions):
     interaction_list = []
 
     for interaction in interactions:
+        game_name = None
+        if "game_name" in interaction:
+            game_name = interaction["game_name"]
+
         context_size = interaction["context_size"]
         learning = interaction["learning"]
         start = interaction["start"]
         inc_category_threshold = interaction["inc_category_threshold"]
-        dg = DiscriminationGame(context_size, float(inc_category_threshold))
         if interaction["type"] == "GuessingGame":
-            inter = GuessingGame(dg, learning_mode=learning)
+            inter = GuessingGame(learning_mode=learning, game_name=game_name)
         else:
-            inter = dg
+            inter = DiscriminationGame(context_size, float(inc_category_threshold), game_name=game_name)
         interaction_list.append({"start": start, "interaction": inter})
 
     return interaction_list

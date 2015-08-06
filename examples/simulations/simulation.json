@@ -10,6 +10,7 @@
       {
         "id" : 1,
         "type" : "GuessingGame",
+        "game_name" : "New_name",
         "start" : 1,
         "context_size" : 4,
         "learning" : true,

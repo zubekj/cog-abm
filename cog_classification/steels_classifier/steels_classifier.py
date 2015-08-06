@@ -7,7 +7,7 @@ from cog_classification.core.simulation import Simulation
 from cog_classification.core.condition import IterationCondition
 from steels_classifier_results import SteelsClassifierResults
 from cog_classification.steels_universal.guessing_game import GuessingGame
-from cog_classification.steels_universal.steels_agent import SteelsAgent
+from steels_classification_agent import SteelsClassificationAgent
 from cog_classification.tools.topology_generator import generate_topology
 from cog_classification.data_storage.changing_class import ChangingClass
 
@@ -26,7 +26,7 @@ class SteelsClassifier:
         self.simulation = None
         self.result = None
         self.condition = IterationCondition(1000)
-        self.interactions = ChangingClass({'i': GuessingGame()}, {1: 'i'})
+        self.interactions = ChangingClass({'i': GuessingGame()})
 
     def fit(self, x, y):
         """
@@ -43,12 +43,11 @@ class SteelsClassifier:
 
         if self.classifiers is None:
             for _ in range(10):
-                agent = SteelsAgent()
-
+                agent = SteelsClassificationAgent()
                 agents[agent.get_id()] = agent
         else:
             for classifier in self.classifiers:
-                agent = SteelsAgent(classifier=classifier)
+                agent = SteelsClassificationAgent(classifier=classifier)
                 agents[agent.get_id()] = agent
 
         for agent in agents.values():

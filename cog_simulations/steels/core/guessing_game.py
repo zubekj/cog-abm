@@ -9,15 +9,25 @@ class GuessingGame(Interaction):
     of Tony Belpaeme and Joris Bleys.
     """
 
-    def __init__(self, disc_game=None, context_size=None, learning_mode=True, environment=None):
+    def __init__(self, disc_game=None, context_size=None, learning_mode=True, environment=None, game_name=None,
+                 inc_category_threshold=0.95):
+
         if disc_game is None:
-            disc_game = DiscriminationGame(environment=environment)
+
+            disc_game_name = None
+            if game_name:
+                disc_game_name = "DG_%s" % game_name
+
+            disc_game = DiscriminationGame(environment=environment, inc_category_threshold=inc_category_threshold,
+                                           game_name=disc_game_name)
             if context_size is not None:
                 disc_game.context_len = context_size
 
         self.disc_game = disc_game
         self.learning_mode = learning_mode
         self.environment = environment
+
+        self.game_name = game_name or 'GG'
 
     def change_environment(self, environment):
         self.environment = environment
@@ -30,9 +40,8 @@ class GuessingGame(Interaction):
     def set_inc_category_threshold(self, new_inc_category_threshold):
         self.disc_game.set_inc_category_threshold(new_inc_category_threshold)
 
-    @staticmethod
-    def save_result(agent, result):
-        agent.add_payoff("GG", int(result))
+    def save_result(self, agent, result):
+        agent.add_payoff(self.game_name, int(result))
 
     def guess_game(self, speaker, hearer):
         """
@@ -159,7 +168,7 @@ class GuessingGame(Interaction):
         r = self.guess_game(speaker, hearer)
         self.save_result(speaker, r)
         self.save_result(hearer, r)
-        return ("GG", r), ("GG", r)
+        return (self.game_name, r), (self.game_name, r)
 
     def __repr__(self):
         return "GuessingGame: %s" % self.disc_game
