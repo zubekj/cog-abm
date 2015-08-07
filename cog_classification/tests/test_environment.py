@@ -26,10 +26,12 @@ class TestEnvironment:
         self.env = Environment(irises.data, irises.target)
 
     def get_random(self):
-        return self.env.get_random_sample()
+        _, sample, _ = self.env.get_random_sample()
+        return sample
 
     def get_index(self):
-        return self.env.get_random_sample_index()
+        index, _, _ = self.env.get_random_sample()
+        return index
 
     def get_sample(self, index):
         return self.env.get_sample(index)

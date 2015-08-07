@@ -17,13 +17,13 @@ class TestSampleStorage:
     - increase_weights_in_category
     - remove_category
     - remove_sample_from_category
-    - remove_weak_samples_from_category
+    - remove_samples_with_low_weights_from_category
 
     Functions not tested:
     - __init__
     - decrease_weights
     - empty
-    - remove_weak_samples
+    - remove_samples_with_low_weights
     - sample_in_category
     - get_category_samples
     - get_category_samples_size
@@ -300,7 +300,7 @@ class TestSampleStorage:
 
     @raises(KeyError)
     def test_remove_weak_samples_from_category_no_category(self):
-        self.storage.remove_weak_samples_from_category(1)
+        self.storage.remove_samples_with_low_weights_from_category(1)
 
     def test_remove_weak_samples_from_category_removes_category(self):
         self.add(1, self.env, 1, 0)
@@ -308,7 +308,7 @@ class TestSampleStorage:
         self.add(21, self.env, 1, 0)
 
         self.assert_size(1)
-        self.storage.remove_weak_samples_from_category(1)
+        self.storage.remove_samples_with_low_weights_from_category(1)
         self.assert_size(0)
 
     def test_remove_weak_samples_from_category_doesnt_affect_other_categories(self):
@@ -321,5 +321,5 @@ class TestSampleStorage:
         self.add(34, self.env, 4, 0)
 
         self.assert_size(4)
-        self.storage.remove_weak_samples_from_category(1)
+        self.storage.remove_samples_with_low_weights_from_category(1)
         self.assert_size(3)

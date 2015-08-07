@@ -59,7 +59,7 @@ class SteelsClassificationAgent(SteelsAgent):
         """
         self.get_categories_size()
         self.sample_storage.decrease_weights()
-        removed_categories = self.sample_storage.remove_weak_samples()
+        removed_categories = self.sample_storage.remove_samples_with_low_weights()
         for category in removed_categories:
             self.lexicon.remove_category(category)
         self.get_categories_size()

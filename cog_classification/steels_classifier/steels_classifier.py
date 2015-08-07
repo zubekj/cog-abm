@@ -9,7 +9,7 @@ from steels_classifier_results import SteelsClassifierResults
 from cog_classification.steels_universal.guessing_game import GuessingGame
 from steels_classification_agent import SteelsClassificationAgent
 from cog_classification.tools.topology_generator import generate_topology
-from cog_classification.data_storage.changing_class import ChangingClass
+from cog_classification.core.behavior_switcher import BehaviorSwitcher
 
 
 class SteelsClassifier:
@@ -26,7 +26,7 @@ class SteelsClassifier:
         self.simulation = None
         self.result = None
         self.condition = IterationCondition(1000)
-        self.interactions = ChangingClass({'i': GuessingGame()})
+        self.interactions = BehaviorSwitcher({'i': GuessingGame()})
 
     def fit(self, x, y):
         """
@@ -56,7 +56,7 @@ class SteelsClassifier:
 
         network = Network(agents, {'a': generate_topology("clique", agents_names=agents.keys())}, {1: 'a'})
 
-        self.simulation = Simulation(network, self.interactions, ChangingClass({'e': environment}, {1: 'e'}),
+        self.simulation = Simulation(network, self.interactions, BehaviorSwitcher({'e': environment}, {1: 'e'}),
                                      SteelsClassifierResults(), self.condition)
 
         self.result = self.simulation.run()

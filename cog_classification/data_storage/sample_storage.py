@@ -5,6 +5,21 @@ import numpy as np
 
 class SampleStorage:
     """
+    Storage of samples that represents agents knowledge about environment.
+
+    :param float alpha: how fast samples are forgotten. Values from 0 (total sclerosis) to 1 (perfect memory).
+    :param float beta: how much weights of samples will be increased. Values from 0 (no strengthening) to infinity.
+    :param float sigma: affects how factor of similarity affects strengthening of weights. \
+        Value form 0 (similarity doesn't affects strengthening) \
+        to infinity (the less similar samples the weaker strengthen).
+    :param float max_weight: the maximum weight of sample. Value from 0 to infinity.
+    :param float new_weight: the weight of new sample added to sample storage if no other value were given. \
+        Value from 0 to max weight.
+    :param float forgetting_threshold: the samples with lower weight value than forgetting threshold value are removed.\
+        Value from 0 to max weight.
+    :param distance: default function which can compute distance between two samples.
+    :type distance: function(sample, sample)
+
     Sample storage provides a way to represent samples known by agent and gives you a easy way to export this samples
     to format designed for machine learning algorithms.
 
@@ -29,20 +44,6 @@ class SampleStorage:
 
     def __init__(self, alpha=0.99, beta=1, sigma=1, new_weight=1, max_weight=1,
                  forgetting_threshold=0.05, distance=None):
-        """
-        Parameters explanation:
-        alpha - how fast samples are forgotten. Values from 0 (total sclerosis) to 1 (perfect memory).
-        beta - how much weights of samples will be increased. Values from 0 (no strengthening) to infinity.
-        sigma - affects how factor of similarity affects strengthening of weights.
-                Value form 0 (similarity doesn't affects strengthening)
-                      to infinity (the less similar samples the weaker strengthen).
-        max_weight - the maximum weight of sample. Value from 0 to infinity.
-        new_weight - the weight of new sample added to sample storage if no other value were given.
-                     Value from 0 to max weight.
-        forgetting_threshold - the samples with lower weight value than forgetting threshold value are removed.
-                               Value from 0 to max weight.
-        distance - default function which can compute distance between two samples.
-        """
 
         self.category_name = 0
 
@@ -75,14 +76,26 @@ class SampleStorage:
 
     def add_sample(self, sample_index, environment, category=None, sample_weight=None):
         """
-        Adds the sample to given category or created new category if no category is given.
-        Sample is represented by sample index in environment from which it originate.
-        Sample has sample weight if given or default new weight of sample storage.
-        Sample weight should be larger than or equal 0.
+        Adds sample to sample storage.
 
-        If sample has been already added to other category then method do nothing.
-        If sample would be add to category, which class is different, then for sample there is generated new category.
-        If sample would be add to category, that already contains this sample, then method do nothing.
+        :param sample_index: The index of sample in environment.
+        :type sample_index: int or long
+        :param Environment environment: The environment from which sample origins.
+        :param hashable category: The category which sample will be add.
+        :param float sample_weight: The initial weight of sample. (>=0; <=max_weight)
+
+        :raise IndexError: if the sample index doesn't correspond to any sample in the environment.
+        :raise TypeError: if the category isn't hashable.
+        :raise AssertionError: if the sample_weight out of range.
+
+        :return: The name of category which sample was added.
+        :rtype: hashable
+
+        | Adds the sample to given category. If no category is given, adds sample to new created category.
+        | If sample would be add to category, which class is different, then adds sample to new created category.
+        | If sample has been already added to any category, then method do nothing.
+
+        | Sample has sample_weight if given or default new_weight of sample storage.
         """
 
         if sample_weight is None:
@@ -97,7 +110,7 @@ class SampleStorage:
             if self.sample_in_category(sample_index, environment, checked_category):
                 """
                 We are sure that if sample is in storage in checked category
-                then it won't be add to other category by replacing category by checked category.
+                then it won't be add to any other category by replacing category by checked category.
                 """
                 category = checked_category
 
@@ -114,19 +127,23 @@ class SampleStorage:
         else:
             # No such category in sample storage.
             # So we create new category for sample (and new name if category is None).
-            category = self.create_new_category(environment, sample_class, category)
+            category = self.create_new_category(sample_class, category)
+            self.categories[category][environment] = ([], [])
             self.set_weight(environment, category, sample_weight, sample_index=sample_index)
 
         return category
 
-    def create_new_category(self, environment, sample_class, category=None):
+    def create_new_category(self, sample_class, category=None):
         """
-        Creation of new sample storage category.
+        Creates new empty category in sample storage.
 
-        If category is given then we assert that this category is not in categories.
-        This method add this new created category to sample storage categories.
+        :param sample_class: The class of all samples in this category.
+        :param hashable category: The name of category.
 
-        Create new category returns correct name of created category.
+        :raise: **AssertionError** - if category has already been in sample storage categories.
+
+        :return: The name of category.
+        :rtype: hashable
         """
 
         if category is None:
@@ -148,31 +165,36 @@ class SampleStorage:
             category = name
             # After while loop we didn't increase self.category_name because after finding unique name
             # we increased this value on the end of while loop.
+        else:
+            assert category not in self.categories
 
         self.categories[category] = {}
-        self.categories[category][environment] = ([], [])
         self.classes[category] = sample_class
 
         return category
 
     def decrease_weights(self):
         """
-        Decrease weights of every sample according to alpha value.
+        Decrease weights in sample storage.
 
-        The weights will never drop below 0.
-
-        This method didn't remove any sample.
+        | Weights of every sample in category will be decreased according to alpha value.
+        | The weights will never drop below 0.
+        | This method didn't remove any sample.
         """
         for category in self.get_categories():
             self.decrease_weights_in_category(category)
 
     def decrease_weights_in_category(self, category):
         """
-        Decrease weights of every sample in category according to alpha value.
+        Decrease weights in category.
 
-        The weights will never drop below 0.
+        :param hashable category: The category which sample will be add.
 
-        This method didn't remove any sample.
+        :raise: **KeyError** - if category doesn't exist in sample storage.
+
+        | Weights of every sample in category will be decreased according to alpha value.
+        | The weights will never drop below 0.
+        | This method didn't remove any sample.
         """
 
         the_category = self.categories[category]
@@ -180,22 +202,27 @@ class SampleStorage:
         for environment in the_category:
             _, weights = the_category[environment]
             for i in range(len(weights)):
-                weights[i] *= self.alpha
+                weights[i] = max(0, self.alpha * weights[i])
 
     def empty(self):
         """
         Tests if sample storage is empty.
-        In sample storage there isn't category without samples.
         """
+
+        # There isn't sample without category so, if number of categories equals zero then sample storage is empty.
         return len(self.categories) == 0
 
     def export(self):
         """
-        Returns numpy array of list of all attributes of every sample
-        and second numpy array of categories in which samples are stored in sample storage.
+        Returns all sample storage data.
+
+        :returns: * lists of all attributes of every sample *(numpy array)*
+            * list of classes of every sample *(numpy array)*
+
+        List of attributes and class at given index of returned numpy array are parallel.
         """
         samples = []
-        samples_classes = []
+        samples_categories = []
 
         for category in self.get_categories():
             the_category = self.categories[category]
@@ -208,15 +235,24 @@ class SampleStorage:
 
             for sample in single_category_samples:
                 samples.append(sample)
-            samples_classes += [category] * len(single_category_samples)
+            samples_categories += [category] * len(single_category_samples)
 
-        return np.array(samples), np.array(samples_classes)
+        return np.array(samples), np.array(samples_categories)
 
     def increase_weights_in_category(self, sample_index, environment, category):
         """
-        Increase the weights of samples in category according to their distance to sample modified by sigma and beta.
+        Increase the weights of samples in category.
 
-        Weights will never rise above max weight.
+        :param sample_index: The index of sample in environment.
+        :type sample_index: int or long
+        :param Environment environment: The environment from which sample origins.
+        :param hashable category: The category which samples weights will be increased.
+
+        :raise: **KeyError** - if category doesn't exist in sample storage.
+
+        | Weights will be increased according to their distance to sample modified by sigma and beta.
+        | Weights will never rise above max weight.
+        | This method **doesn't** add sample to category.
         """
         the_category = self.categories[category]
         sample = environment.get_sample(sample_index)
@@ -242,7 +278,11 @@ class SampleStorage:
                 self.set_weight(environment, category, new_weight, index=i)
 
     def remove_category(self, category):
-        """ Removes category and all its samples from sample storage. """
+        """
+        Removes category and all its samples from sample storage.
+
+        :param hashable category: The removed category.
+        """
         try:
             self.categories.pop(category)
             self.classes.pop(category)
@@ -257,14 +297,22 @@ class SampleStorage:
 
     def remove_sample_from_category(self, environment, category, sample_index=None, index=None):
         """
-        Removes sample or item from index from category.
+        Removes sample from given category.
 
-        Sample index - index of sample in environment.
-        Index - index of sample index in category environment.
+        :param Environment environment: The environment from which removed sample origins.
+        :param hashable category: The category of removed sample.
+        :param sample_index: The index of sample in environment.
+        :type sample_index: int or long
+        :param index: The index of sample in category environment list.
 
-        One of the sample or index should be specified.
+        :raise TypeError: if both sample_index and index aren't defined.
+        :raise KeyError: if category doesn't exist in sample storage.
 
-        If it was last sample then removes category and returns it's name, otherwise returns None.
+        :returns: The name of removed category or None if category hasn't removed.
+        :rtype: hashable or None
+
+        | **One of the sample or index should be specified.**
+        | If it was the last sample in the category, then category is removed, too.
         """
 
         the_category = self.categories[category]
@@ -287,21 +335,34 @@ class SampleStorage:
         else:
             return None
 
-    def remove_weak_samples(self):
+    def remove_samples_with_low_weights(self):
         """
-        Removes samples, which weight is lower than forgetting threshold, in each category.
+        Removes every sample with low weight.
 
-        Return list of all removed categories.
+        :returns: List of names of all removed category. (Can be empty.)
+        :rtype: hashable or None
+
+        | Removed will be samples with weight lower than forgetting threshold.
+        | It removes classes that lose all samples.
+
         """
-        removed_categories = [self.remove_weak_samples_from_category(category) for category in self.get_categories()]
+        removed_categories = [self.remove_samples_with_low_weights_from_category(category)
+                              for category in self.get_categories()]
         return [category for category in removed_categories if category is not None]
 
-    def remove_weak_samples_from_category(self, category):
+    def remove_samples_with_low_weights_from_category(self, category):
         """
-        Removes all samples which weight is lower than forgetting threshold.
+        Removes every sample in category with low weight.
 
-        If all samples are removed from category, the category is removed too.
-        In this case category name is returned otherwise None.
+        :param hashable category: The category which samples weights will be increased.
+
+        :raise: **KeyError** - if category doesn't exist in sample storage.
+
+        :returns: The name of removed category or None if category hasn't removed.
+        :rtype: hashable or None
+
+        | Removed will be samples with weight lower than forgetting threshold.
+        | It can remove the class if it loses all samples.
         """
 
         the_category = self.categories[category]
@@ -321,7 +382,19 @@ class SampleStorage:
         return removed_category
 
     def sample_in_category(self, sample_index, environment, category):
-        """ Checking if given sample index is in category. """
+        """
+        Checks if given sample_index is in category.
+
+        :param sample_index: The index of sample in environment.
+        :type sample_index: int or long
+        :param Environment environment: The environment from which sample origins.
+        :param hashable category: The category which samples weights will be increased.
+
+        :raise: **KeyError** - if category doesn't exist in sample storage.
+
+        :return: True if sample is in category, otherwise False.
+        :rtype: bool
+        """
         if environment not in self.categories[category]:
             return False
         else:
@@ -329,7 +402,20 @@ class SampleStorage:
             return sample_index in sample_indexes
 
     def get_category_samples(self, category):
-        """ Returns list of tuple (sample_index, environment, weight) for category. """
+        """
+        :param hashable category: The category which samples weights will be increased.
+
+        :raise: **KeyError** - if category doesn't exist in sample storage.
+
+        :return: list of all samples in category.
+        :rtype: list of tuples - (sample_index, environment, weight)
+
+                 - sample_index (int or long) - The index of sample in environment.
+
+                 - environment (Environment) - The environment from which sample origins.
+
+                 - weight (float) - The weight of sample in category.
+        """
         samples = []
         
         the_category = self.categories[category]
@@ -341,7 +427,14 @@ class SampleStorage:
         return samples
 
     def get_category_samples_size(self, category):
-        """ Returns number of samples in given category. """
+        """
+        :param hashable category: The category which samples weights will be increased.
+
+        :raise: **KeyError** - if category doesn't exist in sample storage.
+
+        :return: number of samples in the category.
+        :rtype: long
+        """
         size = 0
 
         the_category = self.categories[category]
@@ -352,25 +445,46 @@ class SampleStorage:
         return size
 
     def get_categories(self):
-        """ Returns labels of all categories of sample storage. """
+        """
+        :return: list of all categories names of sample storage.
+        :rtype: list
+        """
         return self.categories.keys()
 
     def get_categories_size(self):
-        """ Returns number of all categories of sample storage. """
+        """
+        :return: number of categories in the sample storage.
+        :rtype: long
+        """
         return len(self.categories)
 
     def get_class(self, category):
-        """ Returns class of given category. """
-        return self.classes[category]
+        """
+        :param hashable category: The category.
 
-    def set_distance(self, distance):
-        """ Sets function to compute distance between two samples. """
-        self.distance = distance
+        :raise: **KeyError** - if category doesn't exist in sample storage.
+
+        :return: class of given category.
+        """
+        return self.classes[category]
 
     def set_weight(self, environment, category, new_weight, sample_index=None, index=None):
         """
-        Sets weight of given sample or item from index in given category to new weight.
-        One of the sample or index should be specified.
+        Sets weight of sample in category.
+
+        :param Environment environment: The environment from which sample origins.
+        :param hashable category: The category of sample.
+        :param float new_weight: The weight to be set for sample in category. (>=0, <=max_weight)
+        :param sample_index: The index of sample in environment.
+        :type sample_index: int or long
+        :param index: The index of sample in category environment list.
+
+        :raise KeyError: if category doesn't exist in sample storage.
+        :raise AssertionError: if new_weight is out of range.
+        :raise AssertionError: if both sample_index and index aren't defined.
+
+        | **One of the sample or index should be specified.**
+        | If sample isn't in category then it is added to it with weight equals to new_weight.
         """
         assert new_weight >= 0
         assert new_weight <= self.max_weight
@@ -385,6 +499,7 @@ class SampleStorage:
             # We know which weight change.
             weights[index] = new_weight
         else:
+            assert sample_index is not None
             # We must find index of sample_index.
             found = False
             for i, (index, weight) in enumerate(izip(sample_indexes, weights)):

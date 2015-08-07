@@ -1,9 +1,9 @@
 import random
 
-from cog_classification.data_storage.changing_class import ChangingClass
+from cog_classification.core.behavior_switcher import BehaviorSwitcher
 
 
-class Network(ChangingClass):
+class Network(BehaviorSwitcher):
     """ This class implements set of agents with changing topology. """
 
     def __init__(self, agents, topologies, changes=None):
@@ -15,7 +15,7 @@ class Network(ChangingClass):
         """
         if changes is None:
             changes = {1: topologies.keys()[0]}
-        ChangingClass.__init__(self, topologies, changes)
+        BehaviorSwitcher.__init__(self, topologies, changes)
         self.agents = agents
 
     def get_agent(self):

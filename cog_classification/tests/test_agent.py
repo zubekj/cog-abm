@@ -58,13 +58,13 @@ class TestAgent:
     def classify(self, sample=None):
         if sample is None:
             sample = self.environment.get_random_sample()
-        return self.agent.classify(sample)
+        return self.agent.predict(sample)
 
     def setup(self):
         self.agent = SteelsAgent()
 
     def test_classify(self):
-        sample_index = self.environment.get_random_sample_index()
+        sample_index, _, _ = self.environment.get_random_sample()
         sample = self.environment.get_sample(sample_index)
 
         # Classify with no samples returns None
