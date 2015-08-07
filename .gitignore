@@ -3,3 +3,10 @@
 *.bak
 *.swp
 */.coverage
+#SIMULATION RESULTS:
+*.pout
+*result
+*results
+#PROJECT FILES:
+*.project
+*.pydevproject

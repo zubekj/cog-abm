@@ -1,0 +1,7 @@
+#!/bin/bash
+
+rm simulation_results
+rm *.results
+rm *.result
+rm *.pout
+
