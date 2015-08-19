@@ -3,8 +3,10 @@ import sys
 import cPickle
 import logging
 
-sys.path.append('../')
-sys.path.append('../../')
+import os
+
+sys.path.append(os.path.dirname(__file__) + '/../')
+sys.path.append(os.path.dirname(__file__) + '/../../')
 
 from cog_simulations.cog_abm.extras.tools import get_progressbar
 from cog_simulations.steels.metrics import *
