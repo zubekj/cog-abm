@@ -1,30 +1,32 @@
 # -*- coding: utf-8 -*-
+
+#  data=pd.read_csv("data_no_shift_sim/data_max_max_clos_CSA0.txt", delim_whitespace=True, header=None)
+
 import xlwt
 import numpy as np
 import cPickle as pickle
-t=[[]]
+t = [[]]
 for i in xrange(20):
-    f=open("data_no_shift_sim/data_max_max_clos_CSA"+format(i)+".txt")
+    f = open("data_no_shift_sim/data_max_max_clos_CSA"+format(i)+".txt")
     lines = []
     for line in f:
         lines.append(line.split()[1:])
     t.append([[float(x) for x in l] for l in lines ])
 
        
-mean=[]
+mean = []
 for sim in t[1:]:
     mean.append([])
     for iter in sim:
         mean[-1].append(np.mean(iter))
 
 print mean[0]
-m_mean=[]
+m_mean = []
 for i in xrange(len(mean[1])):
-    suma=0
+    suma = 0
     for j in xrange(len(mean)):
-        suma+=mean[j][i]
+        suma += mean[j][i]
     m_mean.append(suma/len(mean))
-print "TERAZ"
 print m_mean
 
 
@@ -37,6 +39,7 @@ for i in xrange(len(m_mean)):
 #    sheet1.write(0,1,"max_max_clos_CSA")
     sheet1.write(i+1,1,m_mean[i])
     sheet1.write(i+1,0,50*i)
+f.close()
 
 #book.save("raport.xls")
 
@@ -47,29 +50,28 @@ for i in xrange(len(m_mean)):
 ################################################################################
 #### MAX VAR CONS
 
-t=[[]]
+t = [[]]
 for i in xrange(20):
-    f=open("data_no_shift_sim/data_max_var_cons_CSA"+format(i)+".txt")
+    f = open("data_no_shift_sim/data_max_var_cons_CSA"+format(i)+".txt")
     lines = []
     for line in f:
         lines.append(line.split()[1:])
     t.append([[float(x) for x in l] for l in lines ])
 
 
-mean=[]
+mean = []
 for sim in t[1:]:
     mean.append([])
     for iter in sim:
         mean[-1].append(np.mean(iter))
 
 print mean[0]
-m_mean=[]
+m_mean = []
 for i in xrange(len(mean[1])):
-    suma=0
+    suma = 0
     for j in xrange(len(mean)):
-        suma+=mean[j][i]
+        suma += mean[j][i]
     m_mean.append(suma/len(mean))
-print "TERAZ"
 print m_mean
 
 
@@ -80,35 +82,34 @@ for i in xrange(len(m_mean)):
 
     sheet1.write(i+1,2,m_mean[i])
 
-
+f.close()
 
 
 ################################################################################
 #### MIN AVG BET
 
-t=[[]]
+t = [[]]
 for i in xrange(20):
-    f=open("data_no_shift_sim/data_min_avg_bet_CSA"+format(i)+".txt")
+    f = open("data_no_shift_sim/data_min_avg_bet_CSA"+format(i)+".txt")
     lines = []
     for line in f:
         lines.append(line.split()[1:])
     t.append([[float(x) for x in l] for l in lines ])
 
 
-mean=[]
+mean = []
 for sim in t[1:]:
     mean.append([])
     for iter in sim:
         mean[-1].append(np.mean(iter))
 
 print mean[0]
-m_mean=[]
+m_mean = []
 for i in xrange(len(mean[1])):
-    suma=0
+    suma = 0
     for j in xrange(len(mean)):
-        suma+=mean[j][i]
+        suma += mean[j][i]
     m_mean.append(suma/len(mean))
-print "TERAZ"
 print m_mean
 
 
@@ -116,34 +117,34 @@ print m_mean
 for i in xrange(len(m_mean)):
     sheet1.write(i+1,3,m_mean[i])
 
+f.close()
 
 
 ################################################################################
 #### MIN AVG CLUST
 
-t=[[]]
+t = [[]]
 for i in xrange(20):
-    f=open("data_no_shift_sim/data_min_avg_clust_CSA"+format(i)+".txt")
+    f = open("data_no_shift_sim/data_min_avg_clust_CSA"+format(i)+".txt")
     lines = []
     for line in f:
         lines.append(line.split()[1:])
     t.append([[float(x) for x in l] for l in lines ])
 
 
-mean=[]
+mean = []
 for sim in t[1:]:
     mean.append([])
     for iter in sim:
         mean[-1].append(np.mean(iter))
 
 print mean[0]
-m_mean=[]
+m_mean = []
 for i in xrange(len(mean[1])):
-    suma=0
+    suma = 0
     for j in xrange(len(mean)):
-        suma+=mean[j][i]
+        suma += mean[j][i]
     m_mean.append(suma/len(mean))
-print "TERAZ"
 print m_mean
 
 
@@ -153,7 +154,7 @@ for i in xrange(len(m_mean)):
 
 book.save("raportCSA.xls")
 
-
+f.close()
 
 #tt=open("data_no_shift_sim/data_max_max_clos_CSA0.txt")
 #line=tt.readline().split()
@@ -162,7 +163,7 @@ book.save("raportCSA.xls")
 #i=0
 #for line in tt:
 #    edge = line.split()
-#    i+=1;
+#    i += 1;
 #    print edge
 #    if i > 3:
 #        break

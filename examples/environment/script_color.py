@@ -1,9 +1,8 @@
-#f=open('1269_munsell_chipscopy.json', 'r')
 def divide(val, list):
-    less=[]
-    more=[]
+    less = []
+    more = []
     for i in list:
-        if i['a']>=val:
+        if i['a'] >= val:
             more.append(i)
         else:
             less.append(i)

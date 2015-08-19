@@ -5,26 +5,15 @@ for i in range(5000):
     # interactions=""
     s = """
         {
-        "id" : 1,
-        "type" : "GuessingGame",
-        "start" : %s,
-        "context_size" : 4,
-        "learning" : true,
-        "inc_category_threshold" : 0.95
+        "type": "Clique", "start": %s
         },
         """ % (2 * i + 1)
     s2 = """
         {
-        "id" : 2,
-        "type" : "GuessingGame",
-        "start" : %s,
-        "game_name" : "CL",
-        "context_size" : 4,
-        "learning" : false,
-        "inc_category_threshold" : 0.95
-                },
+        "type": "Line", "start": %s
+        },
         """ % (2 * i + 2)
     interactions = interactions + s + s2
-f = open('interactions.txt', 'w')
+f = open('simulations.txt', 'w')
 f.write(interactions)
 f
