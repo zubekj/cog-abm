@@ -1,12 +1,17 @@
+# -*- coding: utf-8 -*-
 # /COG_SIM
 
 import os
+import pandas as pd # must be python2
+import numpy as np
+import cPickle as pickle
 
 
 networks = {"max_avg_bet", "max_avg_clust", "max_max_bet", "max_max_clos", "max_var_cons", "min_avg_bet", "min_avg_clust", "min_max_clos"}
 
 
 # simulations
+
 for i in xrange(20):
     
     for network in networks:
@@ -18,6 +23,7 @@ for i in xrange(20):
 
 
 # analyzer
+
 results = {"CSA", "DSA", "CLA", "DG_CLA"}
 for i in xrange(20):
     for result in results:
@@ -29,6 +35,23 @@ for i in xrange(20):
         os.system("python cog_simulations/steels/analyzer.py -r results_of_simulation/shift_sim_results/results_hub_to_clique" + format(i) + " it " + result + " > data_hub_to_clique_" + result + "_" + format(i))
 
 
-
-
 # pandas
+# stat [network][result][iter][DataFrame]
+
+stat = []
+for network in networks:
+    stat.append([])
+    for result in results:
+        stat[-1].append([])
+        for i in xrange(20):
+            stat[-1][-1].append(pd.read_csv("data_" + network + "-" + result + format(i)), delim_whitespace=True, header=None, index_col=0)
+# line, hub, ring
+    stat.append([])
+    stat.append([])
+    stat.append([])
+
+
+
+
+#pd.read_csv('data_ring_DSA9.txt', delim_whitespace=True, header=None, idndex_col=0)
+
