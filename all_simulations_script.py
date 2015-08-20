@@ -29,7 +29,7 @@ for i in xrange(20):
         for network in networks:
             os.system("python cog_simulations/steels/analyzer.py -r results_of_simulation/shift_sim_results/results_" + network + "_to_clique" + format(i) + " it " + result + " > data_" + network + "_to_clique_" + result + "_" + format(i))
         for network2 in networks2:
-            os.system("python cog_simulations/steels/analyzer.py -r results_of_simulation/shift_sim_results/results" + network2 + "_to_clique" + format(i) + " it " + result + " > data_" network2 + "_to_clique_" + result + "_" + format(i))
+            os.system("python cog_simulations/steels/analyzer.py -r results_of_simulation/shift_sim_results/results" + network2 + "_to_clique" + format(i) + " it " + result + " > data_" + network2 + "_to_clique_" + result + "_" + format(i))
 
 # pandas
 # data [network][result][iter][DataFrame]
