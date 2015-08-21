@@ -7,6 +7,8 @@ import os
 
 sys.path.append(os.path.dirname(__file__) + '/../')
 sys.path.append(os.path.dirname(__file__) + '/../../')
+sys.path.append('../')
+sys.path.append('../../')
 
 from cog_simulations.cog_abm.extras.tools import get_progressbar
 from cog_simulations.steels.metrics import *
