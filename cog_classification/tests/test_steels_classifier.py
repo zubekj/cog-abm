@@ -20,7 +20,6 @@ class TestSteelsClassifier:
         for i, sample in enumerate(iris.data):
             success += self.classifier.predict(sample) == iris.target[i]
 
-        self.classifier.result.test_agents()
         print(float(success)/len(iris.data))
 
     def test_classifier_2(self):
@@ -31,5 +30,4 @@ class TestSteelsClassifier:
         for i in range(1, 5):
             success += self.classifier.predict([i]) == i
 
-        self.classifier.result.test_agents()
         print(float(success)/4)
