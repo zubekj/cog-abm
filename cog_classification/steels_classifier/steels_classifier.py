@@ -15,13 +15,12 @@ from cog_classification.core.behavior_switcher import BehaviorSwitcher
 class SteelsClassifier:
     """
     Classifier founded on Steels and Belpaeme multi-agent network and interactions concept.
+
+    :param classifiers: Classifiers that will be used with agents creation.
+    :type classifiers: List of classifiers.
     """
 
     def __init__(self, classifiers=None):
-        """
-        Args:
-            classifiers (list): list of classifiers that will be used with agents creation.
-        """
         self.classifiers = classifiers
         self.simulation = None
         self.result = None
@@ -30,11 +29,10 @@ class SteelsClassifier:
 
     def fit(self, x, y):
         """
-            Fit the steels classifier according to the given training data.
+        Fit the steels classifier according to the given training data.
 
-            Args:
-                x (list): list of samples.
-                y (list): list of samples' classes.
+        :param list x: Samples.
+        :param list y: Samples' classes.
         """
 
         environment = Environment(x, y)
@@ -62,6 +60,14 @@ class SteelsClassifier:
         self.result = self.simulation.run()
 
     def predict(self, sample):
+        """
+        :param sample: The sample which class is predicted.
+
+        :raise: **NotFittedError** - if no data have been fitted yet.
+
+        :return: The predicted class of sample.
+        :rtype: hashable
+        """
         if self.result is not None:
             return self.result.predict(sample)
         else:
