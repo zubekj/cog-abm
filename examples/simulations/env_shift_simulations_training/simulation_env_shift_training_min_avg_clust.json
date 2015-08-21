@@ -5,7 +5,7 @@
     
      
         {
-        "type" : "Source", "source": "examples/networks/graph_min_avg_clust",  "start" : 1
+        "type" : "Source", "source": "examples/networks/graph_min_avg_clust.json",  "start" : 1
         }
                
         
