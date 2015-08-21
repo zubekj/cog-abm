@@ -1,19 +1,21 @@
 class BehaviorSwitcher:
-    """ This class implements behavior changing in time. """
+    """
+    This class implements behavior changing in time.
 
-    def __init__(self, behaviors, changes=None):
-        """
-        Args:
-            behaviors ({name_of_behavior: behavior}).
-            changes ({time: name_of_behavior}): dictionary with time of change (number) as a key
-                and name of behavior on which the current behavior will be changed
-                when name of this change will be given in change.
-        """
-        self.behaviors = behaviors
-        if changes is None:
-            changes = {1: behaviors.keys()[0]}
-        self.changes = changes
+    :param dictionary behaviors: dictionary with time of change (long) as a key and behavior as a value. \
+        Behavior switcher will be using new behavior from it's time of change.
 
+    :raise: **ValueError** - if behaviors is None.
+    """
+
+    def __init__(self, behaviors):
+        if behaviors is not None:
+            if isinstance(behaviors, dict):
+                self.behaviors = behaviors
+            else:
+                self.behaviors = {1: behaviors}
+        else:
+            raise ValueError
         self.current_behavior = None
         # To initialize current behavior change should be used.
 
@@ -21,30 +23,20 @@ class BehaviorSwitcher:
         """
         Changes current behavior on behavior associated with change time.
 
-        If there is no such change, method leaves the old value of current behavior.
+        :param long change_time: The current time that can change behavior.
+
+        If there is no new behavior associated with change time, method leaves the old value of current behavior.
         """
 
-        if change_time in self.changes:
-            self.current_behavior = self.behaviors[self.changes[change_time]]
+        if change_time in self.behaviors:
+            self.current_behavior = self.behaviors[change_time]
 
     def update(self, changing_class, time):
         """
-        Adds behaviors and changes moved by time from changing class to self.
+        Adds behaviors moved by time from changing class to self.
 
-        Args:
-            changing_class (BehaviorSwitcher): instance whose content is added to self.
-            time (number): how much should be changes form changing class moved forward.
+        :param BehaviorSwitcher changing_class: instance whose content is added to self.
+        :param long time: how much should be behaviors form changing class moved forward.
         """
-        self.behaviors.update(changing_class.get_behaviors())
-
-        for change, behavior in changing_class.get_changes().iteritems():
-            self.changes[change + time] = behavior
-
-    def get_behaviors(self):
-        return self.behaviors
-
-    def get_changes(self):
-        return self.behaviors
-
-    def get_current_behavior(self):
-        return self.current_behavior
+        for change, behavior in changing_class.behaviors.iteritems():
+            self.behaviors[change + time] = behavior

@@ -35,8 +35,8 @@ class Simulation:
             self.agents.change(self.iteration)
             self.environment.change(self.iteration)
 
-            interaction = self.interactions.get_current_behavior()
-            environment = self.environment.get_current_behavior()
+            interaction = self.interactions.current_behavior
+            environment = self.environment.current_behavior
 
             interaction.interact(self.agents, environment)
 
