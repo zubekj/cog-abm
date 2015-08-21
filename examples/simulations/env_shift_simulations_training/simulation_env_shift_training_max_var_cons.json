@@ -5,7 +5,7 @@
     
      
         {
-        "type" : "Source", "source": "networks/graph_max_var_cons.json",  "start" : 1
+        "type" : "Source", "source": "../../networks/graph_max_var_cons.json",  "start" : 1
         }
                
         

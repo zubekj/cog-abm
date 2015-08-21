@@ -5,7 +5,7 @@
     
      
         {
-        "type" : "Source", "source": "networks/graph_max_avg_clust.json",  "start" : 1
+        "type" : "Source", "source": "../../networks/graph_max_avg_clust.json",  "start" : 1
         }
                
         

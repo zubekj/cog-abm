@@ -5,7 +5,7 @@
     
      
         {
-        "type" : "Source", "source": "networks/graph_min_max_clos.json",  "start" : 1
+        "type" : "Source", "source": "../../networks/graph_min_max_clos.json",  "start" : 1
         }
                
         

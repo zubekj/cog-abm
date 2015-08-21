@@ -5,7 +5,7 @@
     
      
         {
-        "type" : "Source", "source": "networks/graph_max_max_bet.json",  "start" : 1
+        "type" : "Source", "source": "../../networks/graph_max_max_bet.json",  "start" : 1
         }
                
         
