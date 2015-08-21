@@ -44,11 +44,11 @@ class SteelsClassifier:
         if self.classifiers is None:
             for _ in range(10):
                 agent = SteelsClassificationAgent()
-                agents[agent.get_id()] = agent
+                agents[agent.id] = agent
         else:
             for classifier in self.classifiers:
                 agent = SteelsClassificationAgent(classifier=classifier)
-                agents[agent.get_id()] = agent
+                agents[agent.id] = agent
 
         for agent in agents.values():
             agent.set_fitness("DG", CurrentFitness())
