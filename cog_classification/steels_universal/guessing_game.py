@@ -70,9 +70,9 @@ class GuessingGame:
             hearer.decrease_weights_for_other_words(word, hearer_category)
 
             # Strengthen memory of category.
-            speaker.strengthen_memory_sample_category(speaker_category, topic_index, environment)
+            speaker.increase_weights_sample_category(topic_index, environment, speaker_category)
             # Strengthen memory of category.
-            hearer.strengthen_memory_sample_category(hearer_category, topic_index, environment)
+            hearer.increase_weights_sample_category(topic_index, environment, hearer_category)
 
             speaker.update_fitness("GG", True)
             speaker.update_fitness("DG", True)

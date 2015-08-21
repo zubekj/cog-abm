@@ -32,7 +32,7 @@ class TestAgent:
     - add_sample
     - decrease_weight_word_category
     - forget
-    - strengthen_memory_sample_category
+    - increase_weights_sample_category
     - increase_weight_word_category
     - learn
     - update_fitness
@@ -104,10 +104,10 @@ class TestAgent:
                 self.add(sample_index)
                 value = 0
             elif env.get_class(sample_index) == agent.get_category_class(category):
-                agent.strengthen_memory_sample_category(category, sample_index, env)
+                agent.increase_weights_sample_category(sample_index, env, category)
                 value = 1
             elif agent.get_fitness_measure("DF") > 0.95:
-                agent.strengthen_memory_sample_category(category, sample_index, env)
+                agent.increase_weights_sample_category(sample_index, env, category)
                 value = 0
             else:
                 self.add(sample_index)

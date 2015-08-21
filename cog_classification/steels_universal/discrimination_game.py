@@ -37,7 +37,7 @@ class DiscriminationGame:
         """
 
         if result:
-            agent.strengthen_memory_sample_category(topic_category, topic_index, environment)
+            agent.increase_weights_sample_category(topic_index, environment, topic_category)
         elif agent.get_fitness_measure("DG") >= self.good_agent_measure:
             return agent.add_sample(topic_index, environment, topic_category)
         else:
