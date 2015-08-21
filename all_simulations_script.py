@@ -1,14 +1,9 @@
-def fun(networks):
-
-
 
 # -*- coding: utf-8 -*-
 # /COG_SIM
-
 import os
 import pandas as pd # must be python2
 import numpy as np
-import cPickle as pickle
 
 
 networks = {"max_avg_bet", "max_avg_clust", "max_max_bet", "max_max_clos", "max_var_cons", "min_avg_bet", "min_avg_clust", "min_max_clos"}
@@ -47,22 +42,21 @@ data = pd.DataFrame(index = networks + networks2, columns = columns)
 
 for result in results:
     for network in networks+networks2:
-        data_sim = []
         mean = pd.DataFrame(index=index)
         var = pd.DataFrame(index=index)
         for i in xrange(20):
-            data_sim.append(pd.read_csv("data_" + network + "_" + result + format(i)), delim_whitespace=True, header=None, index_col=0)
-            mean[i] = (data_sim[-1].mean(1))
-            var[i] = (data_sim[-1].var(1))
+            data_sim = pd.DataFrame(pd.read_csv("data_" + network + "_" + result + format(i)), delim_whitespace=True, header=None, index_col=0)
+            mean[i] = (data_sim.mean(1))
+            var[i] = (data_sim.var(1))
         data[result + "_mean"][network] = mean.mean(1)
         data[result + "_var"][network] = var.mean(1)
 
 
-
-
-
 # return stats
 
+f=open("simulations_results.csv", 'w')
+data.to_csv(f)
+f.close()
 
 
 
