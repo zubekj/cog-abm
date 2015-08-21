@@ -30,14 +30,14 @@ class TestAgent:
     Functions not tested:
     - __init__
     - add_sample
-    - weaken_association_word_category
+    - decrease_weight_word_category
     - forget
     - strengthen_memory_sample_category
-    - strengthen_association_word_category
+    - increase_weight_word_category
     - learn
     - update_fitness
-    - weaken_association_word_other_categories
-    - weaken_association_other_word_categories
+    - decrease_weights_for_other_categories
+    - decrease_weights_for_other_words
     - get_category_class
     - get_id
     - get_fitness_measure

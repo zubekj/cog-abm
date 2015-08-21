@@ -1,5 +1,3 @@
-""" Module implementing steels agent used in classification task. """
-
 from sklearn import naive_bayes
 from sklearn.utils.validation import NotFittedError
 
@@ -10,6 +8,16 @@ from itertools import izip
 
 
 class SteelsClassificationAgent(SteelsAgent):
+    """
+    Class implementing steels agent used in classification task.
+
+    :param hashable aid: Agent's id. Unique identifier of agent.
+    :param Lexicon lexicon: Agent's storage of associations between categories and words.
+    :param classifier: The classifier that implements three functions: fit, predict and predict_proba.
+    :param SampleStorage sample_storage: Agent's storage of samples that represents knowledge about environment.
+
+    Steels agent can associate words with categories, remember samples from environment and can classify given sample.
+    """
 
     def __init__(self, aid=None, lexicon=None, classifier=None, sample_storage=None):
         SteelsAgent.__init__(self, aid, lexicon)
@@ -17,13 +25,18 @@ class SteelsClassificationAgent(SteelsAgent):
         self.sample_storage = sample_storage or SampleStorage()
 
     def add_sample(self, sample_index, environment, category=None):
-        """
-        Adds sample_index form environment to storage.
-        """
         return self.sample_storage.add_sample(sample_index, environment, category)
 
     def the_best_sample_for_category(self, category, samples):
+        """
+        Chooses the sample that have the highest probability of belonging to given category.
 
+        :param hashable category: The category for which sample is chosen.
+        :param samples: The list of samples from which the best sample is chosen.
+        :type samples: list of sample
+
+        :raise: **IndexError** - if samples is empty.
+        """
         the_best_sample = samples[0]
         the_best_probability = -float('inf')
 

@@ -239,6 +239,73 @@ class SampleStorage:
 
         return np.array(samples), np.array(samples_categories)
 
+    def get_categories(self):
+        """
+        :return: list of all categories names of sample storage.
+        :rtype: list
+        """
+        return self.categories.keys()
+
+    def get_categories_size(self):
+        """
+        :return: number of categories in the sample storage.
+        :rtype: long
+        """
+        return len(self.categories)
+
+    def get_category_samples(self, category):
+        """
+        :param hashable category: The category which samples weights will be increased.
+
+        :raise: **KeyError** - if category doesn't exist in sample storage.
+
+        :return: list of all samples in category.
+        :rtype: list of tuples - (sample_index, environment, weight)
+
+                 - sample_index (int or long) - The index of sample in environment.
+
+                 - environment (Environment) - The environment from which sample origins.
+
+                 - weight (float) - The weight of sample in category.
+        """
+        samples = []
+
+        the_category = self.categories[category]
+        for environment in the_category:
+            sample_indexes, weights = the_category[environment]
+            for sample_index, weight in izip(sample_indexes, weights):
+                samples.append((sample_index, environment, weight))
+
+        return samples
+
+    def get_category_samples_size(self, category):
+        """
+        :param hashable category: The category which samples weights will be increased.
+
+        :raise: **KeyError** - if category doesn't exist in sample storage.
+
+        :return: number of samples in the category.
+        :rtype: long
+        """
+        size = 0
+
+        the_category = self.categories[category]
+        for environment in the_category:
+            sample_indexes, _ = the_category[environment]
+            size += len(sample_indexes)
+
+        return size
+
+    def get_class(self, category):
+        """
+        :param hashable category: The category.
+
+        :raise: **KeyError** - if category doesn't exist in sample storage.
+
+        :return: class of given category.
+        """
+        return self.classes[category]
+
     def increase_weights_in_category(self, sample_index, environment, category):
         """
         Increase the weights of samples in category.
@@ -400,73 +467,6 @@ class SampleStorage:
         else:
             sample_indexes, _ = self.categories[category][environment]
             return sample_index in sample_indexes
-
-    def get_category_samples(self, category):
-        """
-        :param hashable category: The category which samples weights will be increased.
-
-        :raise: **KeyError** - if category doesn't exist in sample storage.
-
-        :return: list of all samples in category.
-        :rtype: list of tuples - (sample_index, environment, weight)
-
-                 - sample_index (int or long) - The index of sample in environment.
-
-                 - environment (Environment) - The environment from which sample origins.
-
-                 - weight (float) - The weight of sample in category.
-        """
-        samples = []
-        
-        the_category = self.categories[category]
-        for environment in the_category:
-            sample_indexes, weights = the_category[environment]
-            for sample_index, weight in izip(sample_indexes, weights):
-                samples.append((sample_index, environment, weight))
-
-        return samples
-
-    def get_category_samples_size(self, category):
-        """
-        :param hashable category: The category which samples weights will be increased.
-
-        :raise: **KeyError** - if category doesn't exist in sample storage.
-
-        :return: number of samples in the category.
-        :rtype: long
-        """
-        size = 0
-
-        the_category = self.categories[category]
-        for environment in the_category:
-            sample_indexes, _ = the_category[environment]
-            size += len(sample_indexes)
-
-        return size
-
-    def get_categories(self):
-        """
-        :return: list of all categories names of sample storage.
-        :rtype: list
-        """
-        return self.categories.keys()
-
-    def get_categories_size(self):
-        """
-        :return: number of categories in the sample storage.
-        :rtype: long
-        """
-        return len(self.categories)
-
-    def get_class(self, category):
-        """
-        :param hashable category: The category.
-
-        :raise: **KeyError** - if category doesn't exist in sample storage.
-
-        :return: class of given category.
-        """
-        return self.classes[category]
 
     def set_weight(self, environment, category, new_weight, sample_index=None, index=None):
         """

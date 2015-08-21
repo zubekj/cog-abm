@@ -60,14 +60,14 @@ class GuessingGame:
         if result == "Success":
 
             # Strengthen association between word and category.
-            speaker.strengthen_association_word_category(word, speaker_category)
+            speaker.increase_weight_word_category(word, speaker_category)
             # Strengthen association between word and category.
-            hearer.strengthen_association_word_category(word, hearer_category)
+            hearer.increase_weight_word_category(word, hearer_category)
 
             # Weaken associations between other categories and word.
-            speaker.weaken_association_word_other_categories(word, speaker_category)
+            speaker.decrease_weights_for_other_categories(word, speaker_category)
             # Weaken associations between other words and category.
-            hearer.weaken_association_other_word_categories(word, hearer_category)
+            hearer.decrease_weights_for_other_words(word, hearer_category)
 
             # Strengthen memory of category.
             speaker.strengthen_memory_sample_category(speaker_category, topic_index, environment)
@@ -112,8 +112,8 @@ class GuessingGame:
 
         elif result == "Not matching samples.":
 
-            speaker.weaken_association_word_category(word, speaker_category)
-            hearer.weaken_association_word_category(word, hearer_category)
+            speaker.decrease_weight_word_category(word, speaker_category)
+            hearer.decrease_weight_word_category(word, hearer_category)
 
             self.game.learning_after_game(hearer, topic_index, environment, hearer_category, result=False)
 

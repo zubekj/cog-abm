@@ -3,6 +3,7 @@ Module provides parser for json documents.
 """
 import json
 import cPickle
+import os.path
 from cog_simulations.cog_abm.core.network import Network
 from cog_simulations.cog_abm.generators.graph_generator import graph_generator
 
@@ -119,6 +120,8 @@ class Parser(object):
         environments = []
         for environment in environment_source:
             environment_source = self.value_if_exist("source", environment)
+            if not os.path.isabs(environment_source):
+                environment_source = "%s/%s" % (os.path.dirname(source), environment_source)
             environment["source"] = self.parse_environment(environment_source)
             environments.append(environment)
 
