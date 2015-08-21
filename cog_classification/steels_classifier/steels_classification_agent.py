@@ -1,5 +1,3 @@
-""" Module implementing steels agent used in classification task. """
-
 from sklearn import naive_bayes
 from sklearn.utils.validation import NotFittedError
 
@@ -10,6 +8,16 @@ from itertools import izip
 
 
 class SteelsClassificationAgent(SteelsAgent):
+    """
+    Class implementing steels agent used in classification task.
+
+    :param hashable aid: Agent's id. Unique identifier of agent.
+    :param Lexicon lexicon: Agent's storage of associations between categories and words.
+    :param classifier: The classifier that implements three functions: fit, predict and predict_proba.
+    :param SampleStorage sample_storage: Agent's storage of samples that represents knowledge about environment.
+
+    Steels agent can associate words with categories, remember samples from environment and can classify given sample.
+    """
 
     def __init__(self, aid=None, lexicon=None, classifier=None, sample_storage=None):
         SteelsAgent.__init__(self, aid, lexicon)
@@ -17,13 +25,18 @@ class SteelsClassificationAgent(SteelsAgent):
         self.sample_storage = sample_storage or SampleStorage()
 
     def add_sample(self, sample_index, environment, category=None):
-        """
-        Adds sample_index form environment to storage.
-        """
         return self.sample_storage.add_sample(sample_index, environment, category)
 
     def the_best_sample_for_category(self, category, samples):
+        """
+        :param hashable category: The category for which sample is chosen.
+        :param samples: The list of samples from which the best sample is chosen.
+        :type samples: list of sample
 
+        :raise: **IndexError** - if samples is empty.
+
+        :return: The sample with the highest probability of belonging to given category.
+        """
         the_best_sample = samples[0]
         the_best_probability = -float('inf')
 
@@ -40,8 +53,12 @@ class SteelsClassificationAgent(SteelsAgent):
         """
         Classify given specific sample.
 
+        :param sample: The sample that is classified.
+
+        :return: class of sample or None if agent doesn't know any class.
+        :rtype: hashable or None
+
         If agent known only one class, it return the class.
-        If agent hasn't taught any classification yet, it  return None.
         """
         if self.sample_storage.get_categories_size() == 1:
             return self.sample_storage.get_categories()[0]
@@ -59,46 +76,38 @@ class SteelsClassificationAgent(SteelsAgent):
         """
         self.get_categories_size()
         self.sample_storage.decrease_weights()
-        removed_categories = self.sample_storage.remove_weak_samples()
+        removed_categories = self.sample_storage.remove_samples_with_low_weights()
         for category in removed_categories:
             self.lexicon.remove_category(category)
         self.get_categories_size()
 
-    def strengthen_memory_sample_category(self, category, sample_index, environment):
-        """
-        Strengthen memory of sample storage samples in category that are similar to sample form environment.
-        """
+    def increase_weights_sample_category(self, sample_index, environment, category):
         self.sample_storage.increase_weights_in_category(sample_index, environment, category)
 
     def learn(self):
         """
-        Teaches classifier using samples and class from sample storage.
+        Teaches classifier using samples and classes from sample storage.
         """
         data, decisions = self.sample_storage.export()
         if len(decisions) > 0 and self.sample_storage.get_categories_size() > 1:
             self.classifier.fit(data, decisions)
 
-    def get_categories_size(self, category=None):
-        if category is not None:
-            assert category in self.sample_storage.get_categories()
-        try:
-            assert all([category in self.sample_storage.get_categories() for category in self.lexicon.get_categories()])
-        except AssertionError:
-            print(self.lexicon.get_categories())
-            print(self.sample_storage.get_categories())
-            raise AssertionError
-        size_sample_storage = self.sample_storage.get_categories_size()
-        size_lexicon = self.lexicon.get_categories_size()
-        assert size_sample_storage >= size_lexicon
-        return size_sample_storage
+    def get_categories_size(self):
+        return self.sample_storage.get_categories_size()
 
     def get_category_class(self, category):
-        """"
-        Returns class of given category.
-        """
         return self.sample_storage.get_class(category)
 
     def get_probability(self, sample, sample_category):
+        """
+        :param sample: The sample.
+        :param hashable sample_category: The category for which probability of sample belonging is calculated.
+
+        :return: Probability of sample belonging to sample category.
+        :rtype: float
+
+        Returns 0 if no category known and, if hasn't learn categorisation yet.
+        """
         if self.sample_storage.get_categories_size() == 1:
                 return sample_category in self.sample_storage.get_categories()
         else:

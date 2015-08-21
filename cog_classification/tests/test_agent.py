@@ -30,14 +30,14 @@ class TestAgent:
     Functions not tested:
     - __init__
     - add_sample
-    - weaken_association_word_category
+    - decrease_weight_word_category
     - forget
-    - strengthen_memory_sample_category
-    - strengthen_association_word_category
+    - increase_weights_sample_category
+    - increase_weight_word_category
     - learn
     - update_fitness
-    - weaken_association_word_other_categories
-    - weaken_association_other_word_categories
+    - decrease_weights_for_other_categories
+    - decrease_weights_for_other_words
     - get_category_class
     - get_id
     - get_fitness_measure
@@ -58,13 +58,13 @@ class TestAgent:
     def classify(self, sample=None):
         if sample is None:
             sample = self.environment.get_random_sample()
-        return self.agent.classify(sample)
+        return self.agent.predict(sample)
 
     def setup(self):
         self.agent = SteelsAgent()
 
     def test_classify(self):
-        sample_index = self.environment.get_random_sample_index()
+        sample_index, _, _ = self.environment.get_random_sample()
         sample = self.environment.get_sample(sample_index)
 
         # Classify with no samples returns None
@@ -104,10 +104,10 @@ class TestAgent:
                 self.add(sample_index)
                 value = 0
             elif env.get_class(sample_index) == agent.get_category_class(category):
-                agent.strengthen_memory_sample_category(category, sample_index, env)
+                agent.increase_weights_sample_category(sample_index, env, category)
                 value = 1
             elif agent.get_fitness_measure("DF") > 0.95:
-                agent.strengthen_memory_sample_category(category, sample_index, env)
+                agent.increase_weights_sample_category(sample_index, env, category)
                 value = 0
             else:
                 self.add(sample_index)

@@ -1,4 +1,4 @@
-class ChangingClass:
+class BehaviorSwitcher:
     """ This class implements behavior changing in time. """
 
     def __init__(self, behaviors, changes=None):
@@ -32,7 +32,7 @@ class ChangingClass:
         Adds behaviors and changes moved by time from changing class to self.
 
         Args:
-            changing_class (ChangingClass): instance whose content is added to self.
+            changing_class (BehaviorSwitcher): instance whose content is added to self.
             time (number): how much should be changes form changing class moved forward.
         """
         self.behaviors.update(changing_class.get_behaviors())

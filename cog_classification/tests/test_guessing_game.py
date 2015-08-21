@@ -1,16 +1,12 @@
+from sklearn import datasets
+from nose.tools import assert_equal
+
 from cog_classification.steels_universal.guessing_game import GuessingGame
 from cog_classification.steels_universal.discrimination_game import DiscriminationGame
 from cog_classification.steels_classifier.steels_classification_agent import SteelsClassificationAgent
-
-from cog_classification.data_storage.changing_class import ChangingClass
-
+from cog_classification.core.behavior_switcher import BehaviorSwitcher
 from cog_classification.core import *
-
 from cog_classification.tools.topology_generator import generate_topology
-
-from sklearn import datasets
-
-from nose.tools import assert_equal
 
 
 class TestGuessingGame:
@@ -39,8 +35,8 @@ class TestGuessingGame:
         iris = datasets.load_iris()
         the_environment = environment.Environment(iris.data, iris.target)
 
-        sim = simulation.Simulation(complete_network, ChangingClass({"a": GuessingGame()}),
-                                    ChangingClass({"a": the_environment}), result.StandardResult(),
+        sim = simulation.Simulation(complete_network, BehaviorSwitcher({"a": GuessingGame()}),
+                                    BehaviorSwitcher({"a": the_environment}), result.StandardResult(),
                                     condition.IterationCondition(3200))
 
         sim.run()

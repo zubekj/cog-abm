@@ -3,12 +3,11 @@ class Simulation:
 
     def __init__(self, agents, interactions, environment, result, end_condition):
         """
-        Args:
-            agents (Network): source of agents.
-            interactions (ChangingClass): source of interactions for agents.
-            environment (ChangingClass): source of samples for interactions.
-            result (Result): object that will accumulate statistics of simulation.
-            end_condition (Condition): object that determines end of simulation.
+        :param Network agents: source of agents.
+        :param BehaviorSwitcher interactions: source of interactions for agents.
+        :param BehaviorSwitcher environment: source of samples for interactions.
+        :param Result result: object that will accumulate statistics of simulation.
+        :param Condition end_condition: object that determines end of simulation.
         """
 
         self.agents = agents

@@ -11,10 +11,10 @@ class TestLexicon:
     - add_word_to_category
     - find_category_for_word
     - remove_category
-    - strengthen_association
-    - weaken_association
+    - increase_weight
+    - decrease_weight
     - weaken_other_associations_for_categories
-    - weaken_other_associations_for_words
+    - decrease_weights_for_other_words
     - find_word_for_category
 
     Functions not tested:
@@ -53,31 +53,31 @@ class TestLexicon:
 
     @raises(AssertionError)
     def test__init__forbidden_value_decrease_strength_bigger_than_max_strength(self):
-        l = Lexicon(decrease_strength=1, max_strength=0)
+        l = Lexicon(weight_decrease=1, max_weight=0)
 
     @raises(AssertionError)
     def test__init__forbidden_value_decrease_strength_lower_than_0(self):
-        l = Lexicon(decrease_strength=-1)
+        l = Lexicon(weight_decrease=-1)
 
     @raises(AssertionError)
     def test__init__forbidden_value_increase_strength_bigger_than_max_strength(self):
-        l = Lexicon(increase_strength=1, max_strength=0)
+        l = Lexicon(weight_increase=1, max_weight=0)
 
     @raises(AssertionError)
     def test__init__forbidden_value_increase_strength_lower_than_0(self):
-        l = Lexicon(increase_strength=-1)
+        l = Lexicon(weight_increase=-1)
 
     @raises(AssertionError)
     def test__init__forbidden_value_initial_strength_bigger_than_max_strength(self):
-        l = Lexicon(max_strength=1, initial_strength=2)
+        l = Lexicon(max_weight=1, new_weight=2)
 
     @raises(AssertionError)
     def test__init__forbidden_value_initial_strength_lower_than_min_strength(self):
-        l = Lexicon(min_strength=1, initial_strength=0)
+        l = Lexicon(min_weight=1, new_weight=0)
 
     @raises(AssertionError)
     def test__init__forbidden_value_lateral_inhibition_bigger_than_max_strength(self):
-        l = Lexicon(lateral_inhibition=1, max_strength=0)
+        l = Lexicon(lateral_inhibition=1, max_weight=0)
 
     @raises(AssertionError)
     def test__init__forbidden_value_lateral_inhibition_lower_than_0(self):
@@ -85,11 +85,11 @@ class TestLexicon:
 
     @raises(AssertionError)
     def test__init__forbidden_value_max_lower_than_min(self):
-        l = Lexicon(min_strength=1, max_strength=0)
+        l = Lexicon(min_weight=1, max_weight=0)
 
     @raises(AssertionError)
     def test__init__forbidden_value_min_lower_than_0(self):
-        l = Lexicon(min_strength=-1)
+        l = Lexicon(min_weight=-1)
 
     def test_add_new_category_returns_good_values(self):
         assert_equals(self.add_category(1, 1), 1)
@@ -138,8 +138,8 @@ class TestLexicon:
         self.category_and_word(1, 2)
         self.category_for_word(1, 1)
 
-        self.lexicon.strengthen_association(1, 1)
-        self.lexicon.strengthen_association(1, 1)
+        self.lexicon.increase_weight(1, 1)
+        self.lexicon.increase_weight(1, 1)
 
         self.category_and_word(1, 1)
         self.category_for_word(1, 2)
@@ -149,8 +149,8 @@ class TestLexicon:
         self.add_category(2, 1)
         self.add_word(1, 2)
 
-        self.lexicon.weaken_association(2, 1)
-        self.lexicon.weaken_association(1, 2)
+        self.lexicon.decrease_weight(2, 1)
+        self.lexicon.decrease_weight(1, 2)
 
         self.category_and_word(1, 1)
 
@@ -161,9 +161,9 @@ class TestLexicon:
         self.add_category(4, 1, 0.3)
         self.category_and_word(4, 1)
 
-        self.lexicon.weaken_other_associations_for_categories(1, 1)
-        self.lexicon.weaken_other_associations_for_categories(1, 1)
-        self.lexicon.weaken_other_associations_for_categories(1, 1)
+        self.lexicon.decrease_weights_for_other_categories(1, 1)
+        self.lexicon.decrease_weights_for_other_categories(1, 1)
+        self.lexicon.decrease_weights_for_other_categories(1, 1)
 
         self.category_and_word(1, 1)
         self.word_for_category(2, 1)
@@ -177,9 +177,9 @@ class TestLexicon:
         self.add_word(1, 4, 0.3)
         self.category_and_word(1, 4)
 
-        self.lexicon.weaken_other_associations_for_words(1, 1)
-        self.lexicon.weaken_other_associations_for_words(1, 1)
-        self.lexicon.weaken_other_associations_for_words(1, 1)
+        self.lexicon.decrease_weights_for_other_words(1, 1)
+        self.lexicon.decrease_weights_for_other_words(1, 1)
+        self.lexicon.decrease_weights_for_other_words(1, 1)
 
         self.category_and_word(1, 1)
         self.category_for_word(1, 2)

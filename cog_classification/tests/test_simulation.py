@@ -4,7 +4,7 @@ from cog_classification.core.network import Network
 from cog_classification.core.result import StandardResult
 from cog_classification.core.simulation import Simulation
 
-from cog_classification.data_storage.changing_class import ChangingClass
+from cog_classification.core.behavior_switcher import BehaviorSwitcher
 
 from cog_classification.tools.topology_generator import generate_topology
 
@@ -41,10 +41,10 @@ class TestSimulation:
         network = Network(agents, {"clique": topology}, changes)
 
         # Interaction construction.
-        interactions = ChangingClass({"infection": InfectInteraction()}, {1: "infection"})
+        interactions = BehaviorSwitcher({"infection": InfectInteraction()}, {1: "infection"})
 
         # Environment construction.
-        environment = ChangingClass({}, {})
+        environment = BehaviorSwitcher({}, {})
 
         # Results construction.
         result = StandardResult(1)
