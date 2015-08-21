@@ -3,84 +3,83 @@ import random
 
 class Lexicon:
     """
-    Class that contains information about associations between words and categories.
+    Storage of associations between categories and words.
+
+    :param dictionary dictionary: representation of associations between words and categories. \
+        Words are keys and dictionaries - {category: weight} are values.
+    :param dictionary categories: represents lists of words that have association with given category. \
+        Categories are keys and lists of words are values.
+    :param float min_weight: minimal weight of association. Values from 0 to infinity.
+    :param float max_weight: maximal weight of association. Values from min weight to infinity.
+    :param float new_weight: the weight of new association added to lexicon. Value form min_weight to max weight.
+    :param float weight_increase: how much weight of association will be increased. Value from 0 to max weight.
+    :param float weight_decrease: how much weights of associations will be decreased when we inhibit associations \
+        between category and words. value from 0 to max weight.
+    :param float lateral_inhibition: how much weights of associations will be decreased when we inhibit associations \
+        between word and categories. value from 0 to max weight.
+    :param long word_range: the size of pool of words in word generator. \
+        The generated words are longs from range(word_range). Value from 0 to infinity.
 
     Every word can be associated with multiple categories and vice versa.
 
     Association is described by weight.
     """
 
-    def __init__(self, dictionary=None, categories=None, min_strength=0, max_strength=1, increase_strength=0.1,
-                 lateral_inhibition=0.1, decrease_strength=0.1, initial_strength=0.5, word_range=100000):
-        """
-        Parameters explanation:
-        dictionary - dictionary which represents association between words and categories.
-            Keys are words and values are dictionaries {category: weight}.
+    def __init__(self, dictionary=None, categories=None, min_weight=0, max_weight=1, new_weight=0.5,
+                 weight_increase=0.1, weight_decrease=0.1, lateral_inhibition=0.1, word_range=100000):
 
-        categories - dictionary which represents association between categories and words.
-            Keys are words and values are lists of words.
-
-        min_strength - minimal strength of association. Value from 0 to infinity.
-
-        max_strength - maximal strength of association. Value from min strength to infinity.
-
-        increase_strength - how much increase association strength when strengthen. Value form 0 to max strength.
-
-        lateral_inhibition - how much decrease association strength
-            when weaken associations for list of words for category
-            or for list of categories for word. Value from 0 to max strength.
-
-        decrease_strength - how much decrease association strength
-            when weaken association between specified word and category.
-            Value from 0 to max strength.
-
-        initial_strength - default strength in new association. Value from min strength to max strength.
-
-        word_range - the pool of words (expressed as numbers) from which new words will be taken.
-            Value from 1 to infinity.
-        """
         self.dictionary = dictionary or {}
         self.categories = categories or {}
 
-        assert min_strength >= 0
-        self.min_strength = min_strength
+        assert min_weight >= 0
+        self.min_weight = min_weight
 
-        assert max_strength >= min_strength
-        self.max_strength = max_strength
+        assert max_weight >= min_weight
+        self.max_weight = max_weight
 
-        assert increase_strength >= 0
-        assert increase_strength <= max_strength
-        self.increase_strength = increase_strength
+        assert new_weight >= min_weight
+        assert new_weight <= max_weight
+        self.new_weight = new_weight
+
+        assert weight_increase >= 0
+        assert weight_increase <= max_weight
+        self.weight_increase = weight_increase
 
         assert lateral_inhibition >= 0
-        assert lateral_inhibition <= max_strength
+        assert lateral_inhibition <= max_weight
         self.lateral_inhibition = lateral_inhibition
 
-        assert decrease_strength >= 0
-        assert decrease_strength <= max_strength
-        self.decrease_strength = decrease_strength
+        assert weight_decrease >= 0
+        assert weight_decrease <= max_weight
+        self.weight_decrease = weight_decrease
 
-        assert initial_strength >= min_strength
-        assert initial_strength <= max_strength
-        self.initial_strength = initial_strength
-
+        assert word_range > 0
         self.word_range = word_range
 
     def add_new_category(self, category, word=None, weight=None):
         """
         Adds new category to lexicon.
 
+        :param hashable category: The category that is added.
+        :param hashable word: The word that should be associated with category.
+        :param float weight: The weight of association between word (given or created) and category. \
+            Value from min weight to max weight.
+
+        :return: The word that is associated with new category or None if category already in lexicon.
+        :rtype: hashable or None
+
         If word isn't specified lexicon creates new unique word for category.
-        If weight isn't specified lexicon uses initial strength.
+        If weight isn't specified lexicon uses new weight.
         If category already in lexicon - returns None.
         """
         if category in self.categories:
             return None
         else:
             if weight is None:
-                weight = self.initial_strength
-            weight = min(self.max_strength, weight)
-            weight = max(self.min_strength, weight)
+                weight = self.new_weight
+            else:
+                assert weight <= self.max_weight
+                assert weight >= self.min_weight
 
             if word is None:
                 word = self.generate_word()
@@ -98,17 +97,23 @@ class Lexicon:
         """
         Add new word to category.
 
-        If weight isn't specified lexicon uses initial strength.
+        :param hashable word: The word that is added.
+        :param hashable category: The category that should be associated with the word.
+        :param float weight: The weight of association between word and category. Value from min weight to max weight.
+
+        :raise ValueError: if category is None.
+
+        If weight isn't specified lexicon uses new weight.
         If category doesn't exist, lexicon adds new category.
-        If category is None, lexicon raises ValueError.
         If word already in category, nothing happens.
         """
         if category in self.categories:
             if word not in self.categories[category]:
                 if weight is None:
-                    weight = self.initial_strength
-                weight = min(self.max_strength, weight)
-                weight = max(self.min_strength, weight)
+                    weight = self.new_weight
+                else:
+                    assert weight <= self.max_weight
+                    assert weight >= self.min_weight
 
                 self.categories[category].append(word)
 
@@ -117,13 +122,18 @@ class Lexicon:
                 else:
                     self.dictionary[word] = {category: weight}
         elif category is not None:
-            self.add_new_category(category, word)
+            self.add_new_category(category, word, weight)
         else:
             raise ValueError
 
     def find_category_for_word(self, word):
         """
         Finds category with the strongest association with word.
+
+        :param hashable word: The word for which the best category is searched.
+
+        :return: The category with the strongest association with word or None if word isn't in lexicon.
+        :rtype: hashable or None
         """
         best_category = None
         best_weight = -float('inf')
@@ -138,6 +148,10 @@ class Lexicon:
         return best_category
 
     def generate_word(self):
+        """
+        :return: New word that isn't in lexicon.
+        :rtype: long
+        """
         new_word = random.randrange(self.word_range)
         while new_word in self.dictionary:
             new_word = random.randrange(self.word_range)
@@ -146,6 +160,8 @@ class Lexicon:
     def remove_category(self, category):
         """
         Removes given category.
+
+        :param hashable category: The category to remove.
 
         If it was the last category for word it removes this word, too.
         """
@@ -162,42 +178,69 @@ class Lexicon:
             for word in words_to_remove:
                 self.dictionary.pop(word)
 
-    def strengthen_association(self, word, category):
+    def increase_weight(self, word, category):
         """
-        Strengthen association between word and category.
+        Increase association's weight between word and category.
+
+        :param hashable word: The word.
+        :param hashable category: The category.
+
+        If word and category don't have any association yet, then new association between them is added.
         """
         if category in self.dictionary[word]:
-            new_strength = min(self.max_strength, self.dictionary[word][category] + self.increase_strength)
-            self.dictionary[word][category] = new_strength
+            new_weight = min(self.max_weight, self.dictionary[word][category] + self.weight_increase)
+            self.dictionary[word][category] = new_weight
         else:
             self.add_word_to_category(category, word)
 
-    def weaken_association(self, word, category):
+    def decrease_weight(self, word, category):
         """
-        Weaken association between word and category.
-        """
-        self.dictionary[word][category] -= self.decrease_strength
+        Decrease association's weight between word and category.
 
-    def weaken_other_associations_for_categories(self, word, category):
+        :param hashable word: The word.
+        :param hashable category: The category.
+
+        :raise KeyError: if word isn't in lexicon or no association between word and category.
         """
-        Weaken association between categories other than specified and word.
+        self.dictionary[word][category] -= self.weight_decrease
+
+    def decrease_weights_for_other_categories(self, word, category):
+        """
+        Decrease association's weights between categories other than specified and word.
+
+        :param hashable word: The word.
+        :param hashable category: The only category which association's weight won't be decreased.
+
+        :raise KeyError: if word isn't in lexicon.
         """
         for other_category in self.dictionary[word]:
             if not other_category == category:
                 self.dictionary[word][other_category] -= self.lateral_inhibition
 
-    def weaken_other_associations_for_words(self, word, category):
+    def decrease_weights_for_other_words(self, word, category):
         """
-        Weaken association between words other than specified and category.
+        Decrease association's weights between words other than specified and category.
+
+        :param hashable word: The only word, which association's weight won't be decreased.
+        :param hashable category: The category.
+
+        :raise KeyError: if word or category isn't in lexicon or no association between word and category.
         """
         for other_word in self.categories[category]:
             if not other_word == word:
-                new_strength = max(self.min_strength, self.dictionary[word][category] - self.lateral_inhibition)
-                self.dictionary[other_word][category] = new_strength
+                new_weight = max(self.min_weight, self.dictionary[word][category] - self.lateral_inhibition)
+                self.dictionary[other_word][category] = new_weight
 
     def find_word_for_category(self, category):
         """
         Finds word with the strongest association with category.
+
+        :param hashable category: The category for which the best word is searched.
+
+        :return: The word with the strongest association with category.
+        :rtype: hashable
+
+        If no such category in lexicon then category is added in lexicon and returned is new generated word.
         """
         best_word = None
         best_weight = -float('inf')
@@ -214,22 +257,29 @@ class Lexicon:
         return best_word
 
     def get_categories(self):
+        """
+        :return: all categories of lexicon.
+        :rtype: list of hashable
+        """
         return self.categories.keys()
 
     def get_categories_size(self):
         """
-        Returns number of categories in lexicon.
+        :return: number of categories in the lexicon.
+        :rtype: long
         """
         return len(self.categories)
 
     def get_words(self):
         """
-        Returns all known words.
+        :return: all words of lexicon.
+        :rtype: list of hashable
         """
         return self.dictionary
 
     def get_words_size(self):
         """
-        Returns number of words in lexicon.
+        :return: number of words in the lexicon.
+        :rtype: long
         """
         return len(self.dictionary)

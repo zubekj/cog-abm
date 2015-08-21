@@ -5,7 +5,7 @@ import numpy as np
 
 class SampleStorage:
     """
-    Storage of samples that represents agents knowledge about environment.
+    Storage of samples that represents knowledge about environment.
 
     :param float alpha: how fast samples are forgotten. Values from 0 (total sclerosis) to 1 (perfect memory).
     :param float beta: how much weights of samples will be increased. Values from 0 (no strengthening) to infinity.
@@ -36,7 +36,7 @@ class SampleStorage:
 
     Weights can be increased and decreased but it will not remove samples from category directly. Even if weight of
     sample will drop to 0 (minimum weight), sample will be still part of category. To remove sample with weights lower
-    than forgetting threshold methods remove weak samples and remove weak samples from category should be used.
+    than forgetting threshold, should be used methods remove weak samples and remove weak samples from category.
 
     Sample storage is implementation of the class described in Konrad Kurdej's master's thesis:
     "Modelowanie procesow poznawczych: konsensusowa metoda klasyfikacji z komunikacja miedzy agentami".
@@ -311,7 +311,7 @@ class SampleStorage:
         :returns: The name of removed category or None if category hasn't removed.
         :rtype: hashable or None
 
-        | **One of the sample or index should be specified.**
+        | **Sample or index should be specified.**
         | If it was the last sample in the category, then category is removed, too.
         """
 
@@ -483,7 +483,7 @@ class SampleStorage:
         :raise AssertionError: if new_weight is out of range.
         :raise AssertionError: if both sample_index and index aren't defined.
 
-        | **One of the sample or index should be specified.**
+        | **Sample or index should be specified.**
         | If sample isn't in category then it is added to it with weight equals to new_weight.
         """
         assert new_weight >= 0
