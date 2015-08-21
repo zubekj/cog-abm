@@ -6,7 +6,7 @@ class Result:
     def __init__(self):
         self.results = {}
 
-    def save(self, agents, interactions, environment, result, end_condition, iteration):
+    def save(self, simulation):
         pass
 
     def get_results(self):
@@ -21,15 +21,17 @@ class StandardResult(Result):
         Result.__init__(self)
         self.gap = gap
 
-    def save(self, agents, interactions, environment, result, end_condition, iteration):
+    def save(self, simulation):
         """
         Saves all agents fitness measures if iteration number is divided by gap.
         """
+        iteration = simulation.iteration
+
         if iteration % self.gap == 0:
 
             results = {"iteration": iteration}
 
-            for agent in agents.get_all_agents():
+            for agent in simulation.agents.get_all_agents():
                 for fitness_name in agent.get_fitness_measures():
 
                     fitness_measure = agent.get_fitness_measure(fitness_name)

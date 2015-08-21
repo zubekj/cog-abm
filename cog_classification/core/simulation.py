@@ -25,10 +25,10 @@ class Simulation:
         Returns:
             (Result) result of simulation.
         """
-        self.result.save(**self.__dict__)
+        self.result.save(self)
 
         # Main loop of simulation.
-        while not self.end_condition.end(**self.__dict__):
+        while not self.end_condition.end(self):
             self.iteration += 1
 
             self.interactions.change(self.iteration)
@@ -40,7 +40,7 @@ class Simulation:
 
             interaction.interact(self.agents, environment)
 
-            self.result.save(**self.__dict__)
+            self.result.save(self)
 
         return self.result
 

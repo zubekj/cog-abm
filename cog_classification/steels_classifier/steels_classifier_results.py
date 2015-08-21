@@ -11,15 +11,14 @@ class SteelsClassifierResults(Result):
     def __init__(self):
         Result.__init__(self)
 
-    def save(self, agents, interactions, environment, result, end_condition, iteration):
+    def save(self, simulation):
         """
         Save agents if it is the last iteration of simulation.
 
-        :param Network agents: The source of agents.
-        :param Condition end_condition: The condition that tells whether simulation ends.
+        :param Simulation simulation: Simulation whose agents will be saved.
         """
-        if end_condition.end(agents, interactions, environment, result, end_condition, iteration):
-            self.results['agents'] = agents.get_all_agents()
+        if simulation.end_condition.end(simulation):
+            self.results['agents'] = simulation.agents.get_all_agents()
 
     def predict(self, sample):
         """
