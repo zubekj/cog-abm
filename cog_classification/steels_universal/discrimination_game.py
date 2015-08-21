@@ -70,7 +70,14 @@ class DiscriminationGame:
     @staticmethod
     def play_with_given_samples(agent, topic, other_samples):
         """
-        The implementation
+        The implementation of single game with given topic and other samples.
+
+        :param Agent agent: The agents that plays the game.
+        :param topic: The highlighted stimulus.
+        :param list other_samples: Stimuli from classes other than class of topic.
+
+        :returns: * The result of the game. *(bool)*
+            * The category that was chosen for topic. *(hashable)*
         """
         topic_category = agent.classify(topic)
         other_categories = [agent.classify(sample) for sample in other_samples]
@@ -86,6 +93,11 @@ class DiscriminationGame:
     def sample_from_other_class(sample_class, environment):
         """
         Finds in environment sample that has different class than sample class.
+
+        :param hashable sample_class: The prohibited class.
+        :param Environment environment: The environment from which sample will be picked.
+
+        :return: The sample that has class other than sample class.
         """
         while True:
             index, sample, taken_class = environment.get_random_sample()
