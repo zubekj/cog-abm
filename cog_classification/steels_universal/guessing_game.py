@@ -4,6 +4,16 @@ from cog_classification.steels_universal.discrimination_game import Discriminati
 
 
 class GuessingGame:
+    """
+    This class implements steels guessing game.
+
+    :param long samples_number: the number of samples shown to agent in one interaction including topic. \
+        Value from 2 to infinity.
+    :param float good_agent_measure: the threshold which affects generation of new categories. Value from 0 to 1.
+
+    Guessing game was described in Luc Steels and Tony Belpaeme
+    "Coordinating perceptually grounded categories through language: A case study for colour".
+    """
 
     def __init__(self, samples_number=4, good_agent_measure=0.95):
         self.samples_number = samples_number
@@ -12,6 +22,12 @@ class GuessingGame:
         self.game = DiscriminationGame(samples_number, good_agent_measure)
 
     def interact(self, agents, environment):
+        """
+        One turn of interaction in guessing game.
+
+        :param Network agents: Source of agents for discrimination game.
+        :param Environment environment: Source of stimuli for discrimination game.
+        """
         agents = agents.get_agents(2)
         speaker = agents[0]
         hearer = agents[1]

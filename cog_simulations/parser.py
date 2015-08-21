@@ -42,7 +42,7 @@ class Parser(object):
 
         self.load_parameters(dictionary, source)
         self.load_agents(dictionary, source)
-        self.load_networks(dictionary, source)
+        self.load_networks(dictionary, source, source_name)
         self.load_environments(dictionary, source, source_name)
         self.load_to_dictionary(dictionary, "interactions", source)
 
@@ -99,7 +99,7 @@ class Parser(object):
 
         dictionary["agents"] = agents
 
-    def load_networks(self, dictionary, source):
+    def load_networks(self, dictionary, source, source_name):
         """ Load simulation networks given in source. """
 
         networks_source = self.value_if_exist("networks", source) or [{"type": "clique", "start": 1}]
@@ -108,7 +108,10 @@ class Parser(object):
         for network in networks_source:
             g_type = self.value_if_exist("type", network)
             n = self.value_if_exist("num_agents", source)
-            g = graph_generator(g_type, n, self.value_if_exist("source", network))
+            network_source = self.value_if_exist("source", network)
+            if network_source is not None and not os.path.isabs(network_source):
+                network_source = "%s/%s" % (os.path.dirname(source_name), network_source)
+            g = graph_generator(g_type, n, network_source)
             networks.append({"start": network["start"], "graph": Network(g)})
 
         dictionary["networks"] = networks
