@@ -14,16 +14,31 @@ class Condition:
 
 
 class IterationCondition(Condition):
-    """ Class implementing plain stop iteration. """
+    """
+    Class implementing plain stop iteration.
+
+    :param long max_iterations: number of last iteration before stop. Value from 1 to infinite.
+    """
 
     def __init__(self, max_iterations):
+        assert max_iterations > 0
         self.max_iterations = max_iterations
 
     def end(self, simulation):
+        """
+        Test whether simulation iteration number is suitable for simulation end.
+
+        :param Simulation simulation: The tested simulation.
+
+        :return: Whether simulation should end.
+        :rtype: bool
+        """
         return simulation.iteration >= self.max_iterations
 
     def update(self, condition):
-        self.max_iterations += condition.get_max_iterations
+        """
+        Increase self max_iterations by condition max_iterations number.
 
-    def get_max_iterations(self):
-        return self.max_iterations
+        :param IterationCondition condition: The condition which max_iteration will increase self max_iterations.
+        """
+        self.max_iterations += condition.max_iterations
