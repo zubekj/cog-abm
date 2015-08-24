@@ -1,4 +1,13 @@
 def generate_clique_topology(agents_names):
+    """
+    Generates clique.
+
+    :param list agents_names: The names of agent that will be used to name all nodes.
+
+    :return: Dictionary in which agents names are the keys \
+        and lists of neighbours agents names are values.
+    :rtype: dictionary
+    """
     topology = {}
 
     for agent_name in agents_names:
@@ -8,6 +17,15 @@ def generate_clique_topology(agents_names):
     return topology
 
 def generate_hub_topology(agents_names):
+    """
+    Generates hub.
+
+    :param list agents_names: The names of agent that will be used to name all nodes.
+
+    :return: Dictionary in which agents names are the keys \
+        and lists of neighbours agents names are values.
+    :rtype: dictionary
+    """
     topology = {}
 
     hub_agent_name = agents_names[0]
@@ -20,6 +38,15 @@ def generate_hub_topology(agents_names):
     return topology
 
 def generate_line_topology(agents_names):
+    """
+    Generates line.
+
+    :param list agents_names: The names of agent that will be used to name all nodes.
+
+    :return: Dictionary in which agents names are the keys \
+        and lists of neighbours agents names are values.
+    :rtype: dictionary
+    """
     topology = {}
 
     for i in range(len(agents_names)):
@@ -33,6 +60,15 @@ def generate_line_topology(agents_names):
     return topology
 
 def generate_ring_topology(agents_names):
+    """
+    Generates ring.
+
+    :param list agents_names: The names of agent that will be used to name all nodes.
+
+    :return: Dictionary in which agents names are the keys \
+        and lists of neighbours agents names are values.
+    :rtype: dictionary
+    """
     topology = generate_line_topology(agents_names)
 
     last_index = len(agents_names) - 1
@@ -43,6 +79,17 @@ def generate_ring_topology(agents_names):
     return topology
 
 def generate_standard_topology(topology_type, agents_names=None, agents_number=None):
+    """
+    Generates topology of given type ("clique", "line", "ring", "hub").
+
+    :param string topology_type: The type of topology to be created.
+    :param list agents_names: The names of agent that will be used to name all nodes.
+    :param long agents_number: The number of agents for which the topology is created. (Used if agents_names = None.)
+
+    :return: Dictionary in which agents names are the keys \
+        and lists of neighbours agents names are values.
+    :rtype: dictionary
+    """
     if agents_names is None:
         agents_names = range(agents_number)
 
@@ -52,12 +99,34 @@ def generate_standard_topology(topology_type, agents_names=None, agents_number=N
             "hub": generate_hub_topology(agents_names)}[topology_type]
 
 def generate_topology(topology_type, file_name=None, agents_names=None, agents_number=None):
+    """
+    Generates or load topology of given type ("clique", "line", "ring", "hub", "file").
+
+    :param string topology_type: The type of topology to be created.
+    :param string file_name: Path to saved topology file. (If "file" topology_type was selected.)
+    :param list agents_names: The names of agent that will be used to name all nodes. \
+        (If "file" topology_type wasn't selected.)
+    :param long agents_number: The number of agents for which the topology is created. (Used if agents_names = None.)
+
+    :return: Dictionary in which agents names are the keys \
+        and lists of neighbours agents names are values.
+    :rtype: dictionary
+    """
     if topology_type == "file":
         return read_topology_from_file(file_name)
     else:
         return generate_standard_topology(topology_type, agents_names, agents_number)
 
 def read_topology_from_file(file_name):
+    """
+    Read saved topology.
+
+    :param string file_name: Path to saved topology file.
+
+    :return: Dictionary in which agents names are the keys \
+        and lists of neighbours agents names are values.
+    :rtype: dictionary
+    """
     import json
     with open(file_name, 'r') as f:
         return json.loads(f.read())

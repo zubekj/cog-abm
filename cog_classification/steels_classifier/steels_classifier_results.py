@@ -2,35 +2,53 @@ from cog_classification.core.result import Result
 
 
 class SteelsClassifierResults(Result):
+    """
+    Set of agents which have taken part in steels simulation.
+
+    They can serves as classifier.
+    """
 
     def __init__(self):
         Result.__init__(self)
 
-    def save(self, agents, interactions, environment, result, end_condition, iteration):
-        if end_condition.end(agents, interactions, environment, result, end_condition, iteration):
-            self.results['agents'] = agents.get_all_agents()
+    def save(self, simulation):
+        """
+        Save agents if it is the last iteration of simulation.
 
-    def predict(self, sample):
-        classes_voting = {}
+        :param Simulation simulation: Simulation whose agents will be saved.
+        """
+        if simulation.end_condition.end(simulation):
+            self.results['agents'] = simulation.agents.get_all_agents()
 
-        for agent in self.results['agents']:
-            class_vote = int(agent.get_category_class(agent.classify(sample)))
-            if class_vote in classes_voting:
-                classes_voting[class_vote] += 1
-            else:
-                classes_voting[class_vote] = 1
+    def predict(self, samples):
+        """
+        Predicts classes of samples based on voting of agents.
 
-        best_class = None
-        most_votes = 0
+        :param list samples: The samples which classes are predicted.
 
-        for class_vote, number in classes_voting.iteritems():
-            if number > most_votes:
-                most_votes = number
-                best_class = class_vote
+        :return: Predicted classes of sample.
+        :rtype: list
+        """
+        predicted_classes = []
 
-        return best_class
+        for sample in samples:
+            classes_voting = {}
 
-    def test_agents(self):
-        for agent in self.results['agents']:
-            print("Words: %s" % len(agent.get_words()))
-            print("Categories: %s" % agent.get_categories_size())
+            for agent in self.results['agents']:
+                class_vote = int(agent.get_category_class(agent.classify(sample)))
+                if class_vote in classes_voting:
+                    classes_voting[class_vote] += 1
+                else:
+                    classes_voting[class_vote] = 1
+
+            best_class = None
+            most_votes = 0
+
+            for class_vote, number in classes_voting.iteritems():
+                if number > most_votes:
+                    most_votes = number
+                    best_class = class_vote
+
+            predicted_classes.append(best_class)
+
+        return predicted_classes

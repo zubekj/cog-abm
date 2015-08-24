@@ -164,7 +164,15 @@ class GuessingGame(Interaction):
                 max_reaction, max_sample = strength, sample
         return max_sample
 
-    def interact(self, speaker, hearer):
+    def interact(self, agent1, agent2):
+
+        if random.randint(0, 1):
+            speaker = agent1
+            hearer = agent2
+        else:
+            speaker = agent2
+            hearer = agent1
+
         r = self.guess_game(speaker, hearer)
         self.save_result(speaker, r)
         self.save_result(hearer, r)

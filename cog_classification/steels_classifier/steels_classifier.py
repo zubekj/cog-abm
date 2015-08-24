@@ -25,7 +25,7 @@ class SteelsClassifier:
         self.simulation = None
         self.result = None
         self.condition = IterationCondition(1000)
-        self.interactions = BehaviorSwitcher({'i': GuessingGame()})
+        self.interactions = BehaviorSwitcher(GuessingGame())
 
     def fit(self, x, y):
         """
@@ -40,7 +40,7 @@ class SteelsClassifier:
         agents = {}
 
         if self.classifiers is None:
-            for _ in range(10):
+            for _ in range(15):
                 agent = SteelsClassificationAgent()
                 agents[agent.id] = agent
         else:
@@ -52,23 +52,23 @@ class SteelsClassifier:
             agent.set_fitness("DG", CurrentFitness())
             agent.set_fitness("GG", CurrentFitness())
 
-        network = Network(agents, {'a': generate_topology("clique", agents_names=agents.keys())}, {1: 'a'})
+        network = Network(agents, {1: generate_topology("clique", agents_names=agents.keys())})
 
-        self.simulation = Simulation(network, self.interactions, BehaviorSwitcher({'e': environment}, {1: 'e'}),
+        self.simulation = Simulation(network, self.interactions, BehaviorSwitcher(environment),
                                      SteelsClassifierResults(), self.condition)
 
         self.result = self.simulation.run()
 
-    def predict(self, sample):
+    def predict(self, samples):
         """
-        :param sample: The sample which class is predicted.
+        :param list samples: The samples which classes are predicted.
 
         :raise: **NotFittedError** - if no data have been fitted yet.
 
-        :return: The predicted class of sample.
-        :rtype: hashable
+        :return: The predicted classes of sample.
+        :rtype: list
         """
         if self.result is not None:
-            return self.result.predict(sample)
+            return self.result.predict(samples)
         else:
             raise NotFittedError

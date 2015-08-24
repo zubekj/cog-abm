@@ -1,8 +1,8 @@
-""" Module implementing steels agent used in simulation. """
-
 from cog_classification.steels_universal.steels_agent import SteelsAgent
 
+
 class SteelsSimulationAgent(SteelsAgent):
+    """ Module implementing steels agent used in simulation. """
 
     def __init__(self, aid=None, lexicon=None, adaptive_network=None):
         SteelsAgent.__init__(self, aid, lexicon)

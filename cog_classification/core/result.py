@@ -6,30 +6,44 @@ class Result:
     def __init__(self):
         self.results = {}
 
-    def save(self, agents, interactions, environment, result, end_condition, iteration):
+    def save(self, simulation):
+        """
+        Save results of simulation.
+
+        :param Simulation simulation: The simulation that will be saved.
+        """
         pass
 
     def get_results(self):
+        """
+        Returns all saved results.
+        """
         return self.results
 
 class StandardResult(Result):
     """
     Class that saves all agents statistics every given time.
+
+    :param long gap: how often results will be saved.
     """
 
     def __init__(self, gap=50):
         Result.__init__(self)
         self.gap = gap
 
-    def save(self, agents, interactions, environment, result, end_condition, iteration):
+    def save(self, simulation):
         """
-        Saves all agents fitness measures if iteration number is divided by gap.
+        Saves all agents fitness measures if simulation's iteration number is divided by gap.
+
+        :param Simulation simulation: The simulation that will be saved.
         """
+        iteration = simulation.iteration
+
         if iteration % self.gap == 0:
 
             results = {"iteration": iteration}
 
-            for agent in agents.get_all_agents():
+            for agent in simulation.agents.get_all_agents():
                 for fitness_name in agent.get_fitness_measures():
 
                     fitness_measure = agent.get_fitness_measure(fitness_name)
