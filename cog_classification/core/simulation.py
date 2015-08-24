@@ -1,15 +1,15 @@
 class Simulation:
-    """ This class represents general logic of multi-agent simulation. """
+    """
+    This class represents general logic of multi-agent simulation.
+
+    :param Network agents: source of agents.
+    :param BehaviorSwitcher interactions: source of interactions for agents.
+    :param BehaviorSwitcher environment: source of samples for interactions.
+    :param Result result: object that will accumulate statistics of simulation.
+    :param Condition end_condition: object that determines end of simulation.
+    """
 
     def __init__(self, agents, interactions, environment, result, end_condition):
-        """
-        :param Network agents: source of agents.
-        :param BehaviorSwitcher interactions: source of interactions for agents.
-        :param BehaviorSwitcher environment: source of samples for interactions.
-        :param Result result: object that will accumulate statistics of simulation.
-        :param Condition end_condition: object that determines end of simulation.
-        """
-
         self.agents = agents
         self.interactions = interactions
         self.environment = environment
@@ -22,8 +22,8 @@ class Simulation:
         """
         Starts simulation.
 
-        Returns:
-            (Result) result of simulation.
+        :return: Results of simulation.
+        :rtype: Result
         """
         self.result.save(self)
 
@@ -48,11 +48,13 @@ class Simulation:
         """
         Starts completed simulation from termination point with additional parameters.
 
-        Args:
-            like in __init__.
+        :param Network agents: additional source of agents.
+        :param BehaviorSwitcher interactions: additional source of interactions for agents.
+        :param BehaviorSwitcher environment: additional source of samples for interactions.
+        :param Condition end_condition: new object that determines end of simulation.
 
-        Returns:
-            (Result) result of whole simulation - form start of original simulation to the end of extended simulation.
+        :return: Results of whole simulation - form start of original simulation to the end of extended simulation.
+        :rtype: Result
         """
         self.agents.update(agents, self.iteration)
         self.interactions.update(interactions, self.iteration)
