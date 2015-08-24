@@ -29,8 +29,13 @@ class GuessingGame:
         :param Environment environment: Source of stimuli for discrimination game.
         """
         agents = agents.get_agents(2)
-        speaker = agents[0]
-        hearer = agents[1]
+
+        if random.randint(0, 1):
+            speaker = agents[0]
+            hearer = agents[1]
+        else:
+            speaker = agents[1]
+            hearer = agents[0]
 
         topic_index, topic, topic_class = environment.get_random_sample()
 
