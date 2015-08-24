@@ -7,7 +7,7 @@ import numpy as np
 
 networks = ["max_avg_bet", "max_avg_clust", "max_max_bet", "max_max_clos",
             "max_var_cons", "min_avg_bet", "min_avg_clust", "min_max_clos"]
-networks2= ["line", "hub", "ring"]
+networks2= ["line", "hub", "ring", "clique"]
 results = {"CSA", "DSA", "CLA", "DG_CLA"}
 
 
@@ -28,7 +28,7 @@ for i in xrange(20):
 
 # pandas
 # czy wywalamy co drugi wiersz?
-index = range(0, 2010, 50)
+index = range(0, 20010, 50)
 columns = []
 
 for result in results:
