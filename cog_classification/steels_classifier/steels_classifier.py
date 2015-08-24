@@ -40,7 +40,7 @@ class SteelsClassifier:
         agents = {}
 
         if self.classifiers is None:
-            for _ in range(10):
+            for _ in range(15):
                 agent = SteelsClassificationAgent()
                 agents[agent.id] = agent
         else:
