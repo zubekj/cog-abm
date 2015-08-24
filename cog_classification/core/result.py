@@ -7,14 +7,24 @@ class Result:
         self.results = {}
 
     def save(self, simulation):
+        """
+        Save results of simulation.
+
+        :param Simulation simulation: The simulation that will be saved.
+        """
         pass
 
     def get_results(self):
+        """
+        Returns all saved results.
+        """
         return self.results
 
 class StandardResult(Result):
     """
     Class that saves all agents statistics every given time.
+
+    :param long gap: how often results will be saved.
     """
 
     def __init__(self, gap=50):
@@ -23,7 +33,9 @@ class StandardResult(Result):
 
     def save(self, simulation):
         """
-        Saves all agents fitness measures if iteration number is divided by gap.
+        Saves all agents fitness measures if simulation's iteration number is divided by gap.
+
+        :param Simulation simulation: The simulation that will be saved.
         """
         iteration = simulation.iteration
 
