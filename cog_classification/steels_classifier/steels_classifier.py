@@ -52,7 +52,7 @@ class SteelsClassifier:
             agent.set_fitness("DG", CurrentFitness())
             agent.set_fitness("GG", CurrentFitness())
 
-        network = Network(agents, generate_topology("clique", agents_names=agents.keys()))
+        network = Network(agents, {1: generate_topology("clique", agents_names=agents.keys())})
 
         self.simulation = Simulation(network, self.interactions, BehaviorSwitcher(environment),
                                      SteelsClassifierResults(), self.condition)

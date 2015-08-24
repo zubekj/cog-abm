@@ -16,7 +16,7 @@ class Network(BehaviorSwitcher):
     """
 
     def __init__(self, agents, topologies):
-        BehaviorSwitcher.__init__(self, {1: topologies})
+        BehaviorSwitcher.__init__(self, topologies)
         self.agents = agents
 
     def get_agent(self):
