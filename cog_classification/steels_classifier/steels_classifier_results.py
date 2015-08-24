@@ -20,30 +20,35 @@ class SteelsClassifierResults(Result):
         if simulation.end_condition.end(simulation):
             self.results['agents'] = simulation.agents.get_all_agents()
 
-    def predict(self, sample):
+    def predict(self, samples):
         """
-        Predicts class of sample based on voting of agents.
+        Predicts classes of samples based on voting of agents.
 
-        :param sample: The sample which class is predicted.
+        :param list samples: The samples which classes are predicted.
 
-        :return: Predicted class of sample.
-        :rtype: hashable
+        :return: Predicted classes of sample.
+        :rtype: list
         """
-        classes_voting = {}
+        predicted_classes = []
 
-        for agent in self.results['agents']:
-            class_vote = int(agent.get_category_class(agent.classify(sample)))
-            if class_vote in classes_voting:
-                classes_voting[class_vote] += 1
-            else:
-                classes_voting[class_vote] = 1
+        for sample in samples:
+            classes_voting = {}
 
-        best_class = None
-        most_votes = 0
+            for agent in self.results['agents']:
+                class_vote = int(agent.get_category_class(agent.classify(sample)))
+                if class_vote in classes_voting:
+                    classes_voting[class_vote] += 1
+                else:
+                    classes_voting[class_vote] = 1
 
-        for class_vote, number in classes_voting.iteritems():
-            if number > most_votes:
-                most_votes = number
-                best_class = class_vote
+            best_class = None
+            most_votes = 0
 
-        return best_class
+            for class_vote, number in classes_voting.iteritems():
+                if number > most_votes:
+                    most_votes = number
+                    best_class = class_vote
+
+            predicted_classes.append(best_class)
+
+        return predicted_classes

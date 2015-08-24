@@ -59,16 +59,16 @@ class SteelsClassifier:
 
         self.result = self.simulation.run()
 
-    def predict(self, sample):
+    def predict(self, samples):
         """
-        :param sample: The sample which class is predicted.
+        :param list samples: The samples which classes are predicted.
 
         :raise: **NotFittedError** - if no data have been fitted yet.
 
-        :return: The predicted class of sample.
-        :rtype: hashable
+        :return: The predicted classes of sample.
+        :rtype: list
         """
         if self.result is not None:
-            return self.result.predict(sample)
+            return self.result.predict(samples)
         else:
             raise NotFittedError
