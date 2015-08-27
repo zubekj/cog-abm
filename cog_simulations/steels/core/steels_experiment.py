@@ -87,16 +87,22 @@ def load_interactions(interactions):
     interaction_list = []
 
     for interaction in interactions:
-        game_name = None
-        if "game_name" in interaction:
-            game_name = interaction["game_name"]
 
         context_size = interaction["context_size"]
         learning = interaction["learning"]
         start = interaction["start"]
         inc_category_threshold = interaction["inc_category_threshold"]
+
+        game_name = None
+        if "game_name" in interaction:
+            game_name = interaction["game_name"]
+
+        role_model = "RANDOM"
+        if "role_model" in interaction:
+            role_model = interaction["role_model"]
+
         if interaction["type"] == "GuessingGame":
-            inter = GuessingGame(learning_mode=learning, game_name=game_name)
+            inter = GuessingGame(learning_mode=learning, game_name=game_name, role_model=role_model)
         else:
             inter = DiscriminationGame(context_size, float(inc_category_threshold), game_name=game_name)
         interaction_list.append({"start": start, "interaction": inter})

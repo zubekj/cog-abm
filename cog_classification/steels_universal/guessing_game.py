@@ -15,9 +15,10 @@ class GuessingGame:
     "Coordinating perceptually grounded categories through language: A case study for colour".
     """
 
-    def __init__(self, samples_number=4, good_agent_measure=0.95):
+    def __init__(self, samples_number=4, good_agent_measure=0.95, role_model="RANDOM"):
         self.samples_number = samples_number
         self.good_agent_measure = good_agent_measure
+        self.role_model = role_model
 
         self.game = DiscriminationGame(samples_number, good_agent_measure)
 
@@ -29,8 +30,22 @@ class GuessingGame:
         :param Environment environment: Source of stimuli for discrimination game.
         """
         agents = agents.get_agents(2)
-        speaker = agents[0]
-        hearer = agents[1]
+
+        if self.role_model == "RANDOM":
+            if random.randint(0, 1):
+                speaker = agents[0]
+                hearer = agents[1]
+            else:
+                speaker = agents[1]
+                hearer = agents[0]
+        elif self.role_model == "SPEAKER":
+            speaker = agents[0]
+            hearer = agents[1]
+        elif self.role_model == "HEARER":
+            speaker = agents[1]
+            hearer = agents[0]
+        else:
+            raise ValueError
 
         topic_index, topic, topic_class = environment.get_random_sample()
 
