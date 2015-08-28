@@ -17,11 +17,12 @@ for i in xrange(20):
 
 # analyzer
 for i in xrange(20):
-    for result in results:
+    for result in results: #bez tej petli w cc?
         for network in networks+networks2:
             res_fname = "results_of_simulation/shift_sim_data/data_{0}_to_clique_{2}{1}".format(network, i, result)
             if not os.path.isfile(res_fname):
                 os.system("python2 cog_simulations/steels/analyzer.py -r results_of_simulation/shift_sim_results/results_{0}_to_clique{1} it {2} > {3}".format(network, i, result, res_fname))
+                # tutaj CC os.system("python2 cog_simulations/steels/analyzer.py -r results_of_simulation/shift_sim_results/results_{0}_to_clique{1} cc > {2}cc".format(network, i, res_fname))
 
 # pandas
 # czy wywalamy co drugi wiersz?
@@ -35,7 +36,7 @@ for result in results:
 mindex = pd.MultiIndex.from_product((networks + networks2, index))
 data = pd.DataFrame(index=mindex, columns=columns)
 
-for result in results:
+for result in results:  #bez tej petli w cc?
     for network in networks+networks2:
         mean = pd.DataFrame(index=index)
         var = pd.DataFrame(index=index)
@@ -43,6 +44,8 @@ for result in results:
             data_sim = pd.read_csv(
                 "results_of_simulation/shift_sim_data/data_{0}_to_clique_{1}{2}".format(network, result, i),
                 delim_whitespace=True, header=None, index_col=0)
+                # tutaj CC data_sim = pd.read_csv("results_of_simulation/shift_sim_data/data_{0}_to_clique_{1}cc".format(network, i),delim_whitespace=True, header=None, index_col=0)
+        
             mean[i] = (data_sim.mean(1))
             var[i] = (data_sim.var(1))
         data[result + "_mean"][network] = mean.mean(1)
