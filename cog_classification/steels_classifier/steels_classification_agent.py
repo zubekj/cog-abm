@@ -19,10 +19,10 @@ class SteelsClassificationAgent(SteelsAgent):
     Steels agent can associate words with categories, remember samples from environment and can classify given sample.
     """
 
-    def __init__(self, aid=None, lexicon=None, classifier=None, sample_storage=None):
+    def __init__(self, aid=None, lexicon=None, classifier=None, sample_storage=None, alpha=0.99):
         SteelsAgent.__init__(self, aid, lexicon)
         self.classifier = classifier or naive_bayes.GaussianNB()
-        self.sample_storage = sample_storage or SampleStorage()
+        self.sample_storage = sample_storage or SampleStorage(alpha=alpha)
 
     def add_sample(self, sample_index, environment, category=None):
         return self.sample_storage.add_sample(sample_index, environment, category)
@@ -60,7 +60,9 @@ class SteelsClassificationAgent(SteelsAgent):
 
         If agent known only one class, it return the class.
         """
-        if self.sample_storage.get_categories_size() == 1:
+        if self.sample_storage.get_categories_size() == 0:
+            return None
+        elif self.sample_storage.get_categories_size() == 1:
             return self.sample_storage.get_categories()[0]
         else:
             try:
@@ -70,16 +72,22 @@ class SteelsClassificationAgent(SteelsAgent):
             except NotFittedError:
                 return None
 
+    def correct_sample_lexicon(self):
+            try:
+                assert all([any([c1 == c for c in self.sample_storage.get_categories()])
+                            for c1 in self.lexicon.get_categories()])
+            except AssertionError:
+                print [c for c in self.lexicon.get_categories() if c not in self.sample_storage.get_categories()]
+                raise AssertionError
+
     def forget(self):
         """
         Weakens agent's memory of all known samples and removes categories that become scarcely known.
         """
-        self.get_categories_size()
         self.sample_storage.decrease_weights()
         removed_categories = self.sample_storage.remove_samples_with_low_weights()
         for category in removed_categories:
             self.lexicon.remove_category(category)
-        self.get_categories_size()
 
     def increase_weights_sample_category(self, sample_index, environment, category):
         self.sample_storage.increase_weights_in_category(sample_index, environment, category)
@@ -97,6 +105,9 @@ class SteelsClassificationAgent(SteelsAgent):
 
     def get_category_class(self, category):
         return self.sample_storage.get_class(category)
+
+    def get_category_size(self, category):
+        return len(self.sample_storage.get_category_samples(category))
 
     def get_probability(self, sample, sample_category):
         """

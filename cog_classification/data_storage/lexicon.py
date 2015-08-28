@@ -283,4 +283,3 @@ class Lexicon:
 
             for word in words_to_remove:
                 self.dictionary.pop(word)
-

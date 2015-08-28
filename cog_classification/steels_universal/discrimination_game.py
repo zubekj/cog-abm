@@ -85,7 +85,7 @@ class DiscriminationGame:
         if topic_category is None:
             result = False
         else:
-            result = topic_category in other_categories
+            result = topic_category not in other_categories
 
         return result, topic_category
 

@@ -171,6 +171,8 @@ class SampleStorage:
         self.categories[category] = {}
         self.classes[category] = sample_class
 
+        assert category is not None
+
         return category
 
     def decrease_weights(self):
@@ -488,6 +490,8 @@ class SampleStorage:
         """
         assert new_weight >= 0
         assert new_weight <= self.max_weight
+
+        assert category is not None
 
         the_category = self.categories[category]
         if environment not in the_category:

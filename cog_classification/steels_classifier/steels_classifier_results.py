@@ -35,11 +35,13 @@ class SteelsClassifierResults(Result):
             classes_voting = {}
 
             for agent in self.results['agents']:
-                class_vote = int(agent.get_category_class(agent.classify(sample)))
-                if class_vote in classes_voting:
-                    classes_voting[class_vote] += 1
-                else:
-                    classes_voting[class_vote] = 1
+                prediction = agent.classify(sample)
+                if prediction is not None:
+                    class_vote = int(agent.get_category_class(prediction))
+                    if class_vote in classes_voting:
+                        classes_voting[class_vote] += 1
+                    else:
+                        classes_voting[class_vote] = 1
 
             best_class = None
             most_votes = 0

@@ -16,7 +16,8 @@ class Result:
 
     def get_results(self):
         """
-        Returns all saved results.
+        :return: All saved results.
+        :rtype: dictionary
         """
         return self.results
 
@@ -54,3 +55,36 @@ class StandardResult(Result):
                         results[fitness_name] = [fitness_measure]
 
             self.results[iteration / self.gap] = results
+
+
+class ResultsContainer(Result):
+    """
+    Class that can contains other results and gather all of them at the same time.
+
+    :param dictionary results: dictionary of gathered results with their names as keys.
+    """
+
+    def __init__(self, results):
+        self.results = results
+
+    def save(self, simulation):
+        """
+        Saves all containing results.
+
+        :param Simulation simulation: The simulation that will be saved.
+        """
+
+        for result in self.results.values():
+            result.save(simulation)
+
+    def get_results(self):
+        """
+        :return: All saved results.
+        :rtype: dictionary
+        """
+        results = {}
+
+        for name, results in self.results.iteritems():
+            results[name] = self.results.get_results()
+
+        return results
