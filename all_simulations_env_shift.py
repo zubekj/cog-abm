@@ -1,22 +1,29 @@
-
 # -*- coding: utf-8 -*-
 # /COG_SIM
 import os
+from multiprocessing import Pool
 import pandas as pd # must be python2
-import numpy as np
+
+N_PROC = 4
 
 networks = ["max_avg_bet", "max_avg_clust", "max_max_bet", "max_max_clos",
             "max_var_cons", "min_avg_bet", "min_avg_clust", "min_max_clos"]
 networks2= ["line", "hub", "ring", "clique"]
-results = {"CSA", "DSA", "CLA", "DG_CLA"}
+results = {"CSA", "DSA", "CLA", "DG_CLA", "cc"}
 
+pool = Pool(processes=N_PROC)
 
 # simulations
 for i in xrange(20):
     for network in networks+networks2:
         res_fname = "results_of_simulation/env_shift_sim_results/results_{0}_to_clique{1}".format(network, i)
         if not os.path.isfile(res_fname):
-            os.system("python2 cog_simulations/steels/steels_main.py -s examples/simulations/shift_simulations/simulation_{0}_to_clique.json -r {1}".format(network, res_fname))
+            pool.apply_async(os.system, ["python2 cog_simulations/steels/steels_main.py -s examples/simulations/shift_simulations/simulation_{0}_to_clique.json -r {1}".format(network, res_fname)])
+
+pool.close()
+pool.join()
+
+pool = Pool(processes=N_PROC)
 
 # analyzer
 for i in xrange(20):
@@ -24,7 +31,10 @@ for i in xrange(20):
         for network in networks+networks2:
             res_fname = "results_of_simulation/env_shift_sim_data/data_env_training{0}{2}_{1}".format(network, i, result)
             if not os.path.isfile(res_fname):
-                os.system("python2 cog_simulations/steels/analyzer.py -r results_of_simulation/env_shift_sim_results/results_{0}_to_clique{1} it {2} > {3}".format(network, i, result, res_fname))
+                pool.apply_async(os.system, ["python2 cog_simulations/steels/analyzer.py -r results_of_simulation/env_shift_sim_results/results_{0}_to_clique{1} it {2} > {3}".format(network, i, result, res_fname)])
+
+pool.close()
+pool.join()
 
 # pandas
 # czy wywalamy co drugi wiersz?
