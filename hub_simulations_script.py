@@ -30,7 +30,7 @@ for i in xrange(20):
         for network in networks:
             res_fname = "results_of_simulation/hub_sim_data/data{0}{2}_{1}".format(network, i, result)
             if not os.path.isfile(res_fname):
-                pool.apply_async(os.system, ["python2 cog_simulations/steels/analyzer.py -r results_of_simulation/hub_sim_results/results_{0}_to_clique{1} it {2} > {3}".format
+                pool.apply_async(os.system, ["python2 cog_simulations/steels/analyzer.py -r results_of_simulation/hub_sim_results/results_{0}_to_clique{1} it {2} > {3}".format(network, i, result, res_fname)])
 
 pool.close()
 pool.join()
