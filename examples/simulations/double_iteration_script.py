@@ -7,13 +7,13 @@ for i in range(5000):
         {
         "type": "Clique", "start": %s
         },
-        """ % (2 * i + 1)
+        """ % (10000 + 2 * i + 1)
     s2 = """
         {
         "type": "Line", "start": %s
         },
-        """ % (2 * i + 2)
+        """ % (10000 + 2 * i + 2)
     interactions = interactions + s + s2
-f = open('simulations.txt', 'w')
+f = open('iterations.txt', 'w')
 f.write(interactions)
 f
