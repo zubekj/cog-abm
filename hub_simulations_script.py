@@ -53,8 +53,7 @@ for result in results:
         var = pd.DataFrame(index=index)
         for i in xrange(20):
             data_sim = pd.read_csv(
-                "results_of_simulation/hub_sim_results/data{0}{1}_{2}".format(network, result, i),
-                delim_whitespace=True, header=None, index_col=0)
+                "results_of_simulation/hub_sim_results/data{0}{1}_{2}".format(network, result, i), delim_whitespace=True, header=None, index_col=0)
             mean[i] = (data_sim.mean(1))
             var[i] = (data_sim.var(1))
         data[result + "_mean"][network] = mean.mean(1)
