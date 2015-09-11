@@ -16,9 +16,9 @@ pool = Pool(processes=N_PROC)
 # simulations
 for i in xrange(20):
     for network in networks+networks2:
-        res_fname = "results_of_simulation/env_shift_sim_results/results_{0}_to_clique{1}".format(network, i)
+        res_fname = "results_of_simulation/env_shift_sim_results/results_{0}{1}".format(network, i)
         if not os.path.isfile(res_fname):
-            pool.apply_async(os.system, ["python2 cog_simulations/steels/steels_main.py -s examples/simulations/shift_simulations/simulation_{0}_to_clique.json -r {1}".format(network, res_fname)])
+            pool.apply_async(os.system, ["python2 cog_simulations/steels/steels_main.py -s examples/simulations/env_shift_simulations/simulation_env_shift_training_{0}.json -r {1}".format(network, res_fname)])
 
 pool.close()
 pool.join()
@@ -31,7 +31,7 @@ for i in xrange(20):
         for network in networks+networks2:
             res_fname = "results_of_simulation/env_shift_sim_data/data_env_training{0}{2}_{1}".format(network, i, result)
             if not os.path.isfile(res_fname):
-                pool.apply_async(os.system, ["python2 cog_simulations/steels/analyzer.py -r results_of_simulation/env_shift_sim_results/results_{0}_to_clique{1} it {2} > {3}".format(network, i, result, res_fname)])
+                pool.apply_async(os.system, ["python2 cog_simulations/steels/analyzer.py -r results_of_simulation/env_shift_sim_results/results_{0}{1} it {2} > {3}".format(network, i, result, res_fname)])
 
 pool.close()
 pool.join()
@@ -61,5 +61,14 @@ for result in results:
         data[result + "_mean"][network] = mean.mean(1)
         data[result + "_var"][network] = var.mean(1)
 
-with open("simulations_env_shift_results.csv", 'w') as f:
+for network in networks+networks2:
+    data2 = pd.read_csv("results_of_simulation/env/shift_sim_data/data_env_training{0}cc_0".format(network), delim_whitespace=True, header=None, index_col=0)
+    for i in xrange(19):
+        data2 = data2 + pd.read_csv("results_of_simulation/env/shift_sim_data/data_env_training{0}cc_{1}".format(network, i+1), delim_whitespace=True, header=None, index_col=0)
+    data2 = data/20
+
+
+with open("env_shift_sim_results.csv", 'w') as f:
+    data.to_csv(g)
+with open("env_shift_sim_cc_extended.csv", 'w') as g:
     data.to_csv(f)
