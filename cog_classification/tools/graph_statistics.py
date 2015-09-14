@@ -31,14 +31,14 @@ for graph in graphs:
     write_graph(graph, g)
 
 path = "../../examples/networks/"
-files = ["graph_max_avg_bet.json",
-         "graph_max_avg_clust.json",
-         "graph_max_max_bet.json",
-         "graph_max_max_clos.json",
-         "graph_max_var_cons.json",
-         "graph_min_avg_bet.json",
-         "graph_min_avg_clust.json",
-         "graph_min_max_clos.json"]
+files = ["max_avg_bet.json",
+         "max_avg_clust.json",
+         "max_max_bet.json",
+         "max_max_clos.json",
+         "max_var_cons.json",
+         "min_avg_bet.json",
+         "min_avg_clust.json",
+         "min_max_clos.json"]
 
 for f in files:
     source = gen.generate_topology("file", file_name=path+f)
