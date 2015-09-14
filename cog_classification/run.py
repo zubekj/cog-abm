@@ -29,7 +29,7 @@ def add_arguments(pars):
     pars.add_argument('-a', '--alpha', dest='alpha', action='store', default=0.99, type=float,
                       help='How fast agents forget. Values from 0 (total sclerosis) to 1 (perfect memory).')
 
-    pars.add_argument('-t', '--threshold', dest='threshold', action='store', default=0.95, type=float,
+    pars.add_argument('-g', '--good_agent_measure', dest='good_agent_measure', action='store', default=0.95, type=float,
                       help="The threshold which affects generation of new categories. "
                            "Value from 0 (as rarely as possible) to 1 (always).")
 
@@ -96,7 +96,7 @@ def run(classifier_file, task_file, alpha, threshold):
     if 'alpha' not in task_source:
         task_source['alpha'] = alpha
 
-    if 'threshold' not in task_source:
+    if 'good_agent_measure' not in task_source:
         task_source['threshold'] = threshold
 
     return run_task(classifier_source, task_source)
@@ -108,4 +108,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     with open(args.output_file, 'w') as f:
-        json.dump(run(args.classifier_file, args.task_file, args.alpha, args.threshold), f)
+        json.dump(run(args.classifier_file, args.task_file, args.alpha, args.good_agent_measure), f)

@@ -125,6 +125,7 @@ class SteelsClassifierExtended(SteelsClassifier):
 
         avg_agent_sum = 0
         avg_total_sum = 0
+        samples_max = 0
 
         for category_number, list_of_stimuli in categories:
             if category_number > categories_max:
@@ -136,6 +137,7 @@ class SteelsClassifierExtended(SteelsClassifier):
             if category_number > 0:
                 avg_agent_sum += float(sum(list_of_stimuli)) / category_number
                 avg_total_sum += sum(list_of_stimuli)
+                samples_max = max(samples_max, max(list_of_stimuli))
 
         category_avenge = float(categories_sum) / len(categories)
 
@@ -150,4 +152,5 @@ class SteelsClassifierExtended(SteelsClassifier):
                 "category_avenge": category_avenge,
                 "agent_avenge_sample": agent_avenge_sample_number,
                 "avenge_sample_number": avenge_sample_number,
+                "max_samples": samples_max,
                 "accuracy": self.accuracy(self, samples[border:], classes[border:])}

@@ -52,27 +52,16 @@ class GuessingGame:
         other_samples = [DiscriminationGame.sample_from_other_class(topic_class, environment)
                          for _ in range(self.samples_number - 1)]
 
-        speaker.correct_sample_lexicon()
         # Speaker is trying to discriminate topic from other samples.
         result, speaker_category = self.game.play_with_given_samples(speaker, topic, other_samples)
-        cs = speaker.sample_storage.categories.keys()
-        speaker.correct_sample_lexicon()
 
         # If speaker can discriminate topic from other_samples.
         if result:
             # Speaker is looking for word that suits topic category.
-            speaker.correct_sample_lexicon()
             word = speaker.find_word_for_category(speaker_category)
-            try:
-                speaker.correct_sample_lexicon()
-            except AssertionError:
-                print("Speaker category: %s" % speaker_category)
-                print("Sample storage categories: %s" % cs)
-                raise AssertionError
+
             # Hearer is looking for category that suits speaker word.
-            hearer.correct_sample_lexicon()
             hearer_category = hearer.find_category_for_word(word)
-            hearer.correct_sample_lexicon()
 
             # If hearer finds such category.
             if hearer_category is not None:
@@ -80,9 +69,7 @@ class GuessingGame:
                 all_samples = other_samples + [topic]
                 random.shuffle(all_samples)
 
-                hearer.correct_sample_lexicon()
                 guessed_topic = hearer.the_best_sample_for_category(hearer_category, all_samples)
-                hearer.correct_sample_lexicon()
 
                 # If hearer correctly assumed that topic belongs to guesses category the most.
                 if all(topic == guessed_topic):
@@ -104,49 +91,27 @@ class GuessingGame:
         if result == "Success":
 
             # Strengthen association between word and category.
-            speaker.correct_sample_lexicon()
             speaker.increase_weight_word_category(word, speaker_category)
-            speaker.correct_sample_lexicon()
             # Strengthen association between word and category.
-            hearer.correct_sample_lexicon()
             hearer.increase_weight_word_category(word, hearer_category)
-            hearer.correct_sample_lexicon()
 
             # Weaken associations between other categories and word.
-            speaker.correct_sample_lexicon()
             speaker.decrease_weights_for_other_categories(word, speaker_category)
-            speaker.correct_sample_lexicon()
             # Weaken associations between other words and category.
-            hearer.correct_sample_lexicon()
             hearer.decrease_weights_for_other_words(word, hearer_category)
-            hearer.correct_sample_lexicon()
 
             # Strengthen memory of category.
-            speaker.correct_sample_lexicon()
             speaker.increase_weights_sample_category(topic_index, environment, speaker_category)
-            speaker.correct_sample_lexicon()
             # Strengthen memory of category.
-            hearer.correct_sample_lexicon()
             hearer.increase_weights_sample_category(topic_index, environment, hearer_category)
-            hearer.correct_sample_lexicon()
 
-            speaker.correct_sample_lexicon()
             speaker.update_fitness("GG", True)
-            speaker.correct_sample_lexicon()
             speaker.update_fitness("DG", True)
-            speaker.correct_sample_lexicon()
 
-            hearer.correct_sample_lexicon()
             hearer.update_fitness("GG", True)
-            hearer.correct_sample_lexicon()
 
-            speaker.correct_sample_lexicon()
             speaker.forget()
-            speaker.correct_sample_lexicon()
-
-            hearer.correct_sample_lexicon()
             hearer.forget()
-            hearer.correct_sample_lexicon()
 
         elif result == "Speaker failed discrimination.":
             self.game.learning_after_game(speaker, topic_index, environment, speaker_category, False)
