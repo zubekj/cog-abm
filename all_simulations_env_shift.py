@@ -10,7 +10,7 @@ N_SIM = 20
 
 networks = ["max_avg_bet", "max_avg_clust", "max_max_bet", "max_max_clos",
             "max_var_cons", "min_avg_bet", "min_avg_clust", "min_max_clos"]
-networks2= ["line", "hub", "ring", "clique", "hub_speaker", "hub_hearer"]
+networks2= ["line", "hub", "clique", "hub_speaker", "hub_hearer"]
 results = {"CSA", "DSA", "CLA", "DG_CLA", "cc"}
 
 pool = Pool(processes=N_PROC)
