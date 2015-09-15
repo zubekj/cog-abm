@@ -21,6 +21,7 @@ class IterationCondition(Condition):
     """
 
     def __init__(self, max_iterations):
+        Condition.__init__(self)
         assert max_iterations > 0
         self.max_iterations = max_iterations
 
@@ -39,6 +40,6 @@ class IterationCondition(Condition):
         """
         Increase self max_iterations by condition max_iterations number.
 
-        :param IterationCondition condition: The condition which max_iteration will increase self max_iterations.
+        :param IterationCondition condition: the condition which max_iteration will increase self max_iterations.
         """
         self.max_iterations += condition.max_iterations

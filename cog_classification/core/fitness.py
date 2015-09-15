@@ -19,7 +19,7 @@ class Fitness:
         """
         Adds new information about agent fitness.
 
-        :param value: The new information about agent fitness.
+        :param value: the new information about agent fitness.
         """
         pass
 
@@ -35,7 +35,7 @@ class StandardFitness(Fitness):
 
     def get_measure(self):
         """
-        :return: Total win rate of agent.
+        :return: total win rate of agent.
         :rtype: float
         """
 
@@ -46,7 +46,7 @@ class StandardFitness(Fitness):
 
     def update(self, value):
         """
-        :param value: The information about success or loss of agent.
+        :param value: the information about success or loss of agent.
         :type value: bool
         """
         self.all += 1
@@ -57,7 +57,7 @@ class CurrentFitness(Fitness):
     """
     Monitors current win rate of agent.
 
-    :param long scope: On how many last games the win rate will be calculated?
+    :param long scope: on how many last games the win rate will be calculated?
     """
 
     def __init__(self, scope=50):
@@ -66,7 +66,7 @@ class CurrentFitness(Fitness):
 
     def get_measure(self):
         """
-        :return: Current win rate of agent.
+        :return: current win rate of agent.
         :rtype: float
         """
         if len(self.memories) < 1:
@@ -76,7 +76,7 @@ class CurrentFitness(Fitness):
 
     def update(self, value):
         """
-        :param value: The information about success or loss of agent.
+        :param value: the information about success or loss of agent.
         :type value: bool
         """
         while len(self.memories) >= self.scope:

@@ -22,7 +22,7 @@ class Simulation:
         """
         Starts simulation.
 
-        :return: Results of simulation.
+        :return: results of simulation.
         :rtype: Result
         """
         self.result.save(self)
@@ -53,7 +53,7 @@ class Simulation:
         :param BehaviorSwitcher environment: additional source of samples for interactions.
         :param Condition end_condition: new object that determines end of simulation.
 
-        :return: Results of whole simulation - form start of original simulation to the end of extended simulation.
+        :return: results of whole simulation - form start of original simulation to the end of extended simulation.
         :rtype: Result
         """
         self.agents.update(agents, self.iteration)

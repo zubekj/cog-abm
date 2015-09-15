@@ -7,9 +7,9 @@ class Network(BehaviorSwitcher):
     """
     This class implements set of agents with changing topology.
 
-    :param dictionary agents: Dictionary of agents in which agents names are keys and agents are values.
+    :param dictionary agents: dictionary of agents in which agents names are keys and agents are values.
     :param dictionary topologies: \
-        Dictionary of topologies in which times since when topologies is activated are the keys \
+        dictionary of topologies in which times since when topologies is activated are the keys \
         and topologies are values. \
         Topology is represented as dictionary in which agents names are the keys \
         and lists of neighbours agents names are values.
@@ -21,7 +21,7 @@ class Network(BehaviorSwitcher):
 
     def get_agent(self):
         """
-        :return: Random agent from network.
+        :return: random agent from network.
         :rtype: Agent
         """
         return random.choice(self.agents.values())
@@ -30,14 +30,15 @@ class Network(BehaviorSwitcher):
         """"
         Returns list of names of agents.
 
-        :param long number_of_agents: The length of necessary list.
+        :param long number_of_agents: the length of necessary list.
 
-        :return: List of agents in which each two agent are connected by path created by other agents in list.
+        :return: list of agents in which each two agent are connected by path created by other agents in list.
         :rtype: list of Agents
 
         Each two agents in list are connected by the path created by agents in list.
         | If in network are isolated subgraph of size less than number of agent then this method can return empty list.
         """
+        # agents will contains all chosen agents. agents type - list of Agents.
         agents = []
         agents_names = []
         candidates = []
@@ -72,7 +73,7 @@ class Network(BehaviorSwitcher):
 
     def get_all_agents(self):
         """
-        :return: All network's agents.
-        :rtype: List of Agents
+        :return: all network's agents.
+        :rtype: list of Agents
         """
         return self.agents.values()

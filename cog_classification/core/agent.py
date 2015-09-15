@@ -20,15 +20,6 @@ class Agent:
         # Fitness is dictionary of agent's fitness measures.
         self.fitness = {}
 
-    def update_fitness(self, name, information):
-        """
-        Gives information to fitness measure with a specific name.
-
-        :param hashable name: name of fitness measure.
-        :param information: information given to fitness measure.
-        """
-        self.fitness[name].update(information)
-
     @classmethod
     def get_next_id(cls):
         """
@@ -65,3 +56,12 @@ class Agent:
         :param fitness fitness_measure: the fitness measure that will be used by agent.
         """
         self.fitness[name] = fitness_measure
+
+    def update_fitness_measure(self, name, information):
+        """
+        Gives information to fitness measure with a specific name.
+
+        :param hashable name: name of fitness measure.
+        :param information: information given to fitness measure.
+        """
+        self.fitness[name].update(information)

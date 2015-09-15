@@ -10,13 +10,13 @@ class Result:
         """
         Save results of simulation.
 
-        :param Simulation simulation: The simulation that will be saved.
+        :param Simulation simulation: the simulation that will be saved.
         """
         pass
 
     def get_results(self):
         """
-        :return: All saved results.
+        :return: all saved results.
         :rtype: dictionary
         """
         return self.results
@@ -36,7 +36,7 @@ class StandardResult(Result):
         """
         Saves all agents fitness measures if simulation's iteration number is divided by gap.
 
-        :param Simulation simulation: The simulation that will be saved.
+        :param Simulation simulation: the simulation that will be saved.
         """
         iteration = simulation.iteration
 
@@ -71,7 +71,7 @@ class ResultsContainer(Result):
         """
         Saves all containing results.
 
-        :param Simulation simulation: The simulation that will be saved.
+        :param Simulation simulation: the simulation that will be saved.
         """
 
         for result in self.results.values():
@@ -79,7 +79,7 @@ class ResultsContainer(Result):
 
     def get_results(self):
         """
-        :return: All saved results.
+        :return: all saved results.
         :rtype: dictionary
         """
         results = {}

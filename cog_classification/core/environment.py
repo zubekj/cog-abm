@@ -8,8 +8,8 @@ class Environment:
     """
     Stores samples and their classes.
 
-    :param list samples: List of samples. Not empty.
-    :param list classes: List of samples' classes. Not empty.
+    :param list samples: list of samples. Not empty.
+    :param list classes: list of samples' classes. Not empty.
     :param distance: distance function between two samples.
     :type distance: function(sample, sample)
 
@@ -34,10 +34,10 @@ class Environment:
         """
         Calculates standard distance between two samples of numerical values.
 
-        :param iterable sample1: First sample.
-        :param iterable sample2: Second sample.
+        :param iterable sample1: first sample.
+        :param iterable sample2: second sample.
 
-        :return: The calculated distance.
+        :return: the calculated distance.
         :rtype: float
         """
 
@@ -49,8 +49,8 @@ class Environment:
 
     def get_all(self):
         """
-        :returns: * List of all samples *(list)*
-            * List of all classes *(list)*
+        :returns: * list of all samples *(list)*
+            * list of all classes *(list)*
         """
         return self.samples, self.classes
 
@@ -58,9 +58,9 @@ class Environment:
         """
         Returns class of sample with given index.
 
-        :param long index: The index of the sample whose class is needed.
+        :param long index: the index of the sample whose class is needed.
 
-        :return: Class of sample with given index.
+        :return: class of sample with given index.
         :rtype: numpy array
         """
         return np.array(self.classes[index])
@@ -69,9 +69,9 @@ class Environment:
         """
         Return a random sample from all samples.
 
-        :returns: * Index of drawn sample *(long)*
-            * Drawn sample *(list)*
-            * Class of drawn sample
+        :returns: * index of drawn sample *(long)*
+            * drawn sample *(list)*
+            * class of drawn sample
         """
         index = random.randrange(len(self.samples))
         sample = self.get_sample(index)
@@ -82,20 +82,18 @@ class Environment:
         """
         Returns sample with specified index.
 
-        :param long index: Specified index.
+        :param long index: specified index.
 
-        :return: Sample associated with given index.
+        :return: sample associated with given index.
         :rtype: numpy array
         """
         return np.array(self.samples[index])
 
     def get_samples(self, indexes):
         """
-        Returns list of samples with given indexes.
+        :param iterable indexes: specified indexes.
 
-        :param iterable indexes: Specified indexes.
-
-        :return: Samples associated with given indexes.
+        :return: samples associated with given indexes.
         :rtype: numpy array
         """
         return np.array([self.samples[index] for index in indexes])
