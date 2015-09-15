@@ -4,7 +4,7 @@ import os
 from multiprocessing import Pool
 import pandas as pd # must be python2
 
-N_PROC = 4
+N_PROC = 2
 ITER = 1500
 N_SIM = 20
 
@@ -64,14 +64,12 @@ for result in results:
         data[result + "_var"][network] = var.mean(1)
 
 for network in networks+networks2:
-    data2 = pd.read_csv("results_of_simulation/env/shift_sim_data/data_env_training{0}cc_0".format(network), delim_whitespace=True, header=None, index_col=0)
-    for i in xrange(N_SIM-1):
-        data2 = data2 + pd.read_csv("results_of_simulation/env/shift_sim_data/data_env_training{0}cc_{1}".format(network, i+1), delim_whitespace=True, header=None, index_col=0)
-    data2 = data2/N_SIM
-
+    data2 = pd.concat([pd.read_csv("results_of_simulation/env/shift_sim_data/data_env_training{0}cc_{1}".format(network, i), delim_whitespace=True, header=None, index_col=0)
+                       for i in xrange(20)], axis=2)
+    data2 = data2.mean(axis=2)
 
 with open("env_shift_sim_results.csv", 'w') as f:
     data.to_csv(f)
-#mean of category number per agent
+
 with open("env_shift_sim_cc_extended.csv", 'w') as f:
     data2.to_csv(f)
