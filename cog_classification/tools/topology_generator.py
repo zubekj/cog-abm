@@ -2,9 +2,9 @@ def generate_clique_topology(agents_names):
     """
     Generates clique.
 
-    :param list agents_names: The names of agent that will be used to name all nodes.
+    :param list agents_names: the names of agent that will be used to name all nodes.
 
-    :return: Dictionary in which agents names are the keys \
+    :return: dictionary in which agents names are the keys \
         and lists of neighbours agents names are values.
     :rtype: dictionary
     """
@@ -20,9 +20,9 @@ def generate_hub_topology(agents_names):
     """
     Generates hub.
 
-    :param list agents_names: The names of agent that will be used to name all nodes.
+    :param list agents_names: the names of agent that will be used to name all nodes.
 
-    :return: Dictionary in which agents names are the keys \
+    :return: dictionary in which agents names are the keys \
         and lists of neighbours agents names are values.
     :rtype: dictionary
     """
@@ -41,9 +41,9 @@ def generate_line_topology(agents_names):
     """
     Generates line.
 
-    :param list agents_names: The names of agent that will be used to name all nodes.
+    :param list agents_names: the names of agent that will be used to name all nodes.
 
-    :return: Dictionary in which agents names are the keys \
+    :return: dictionary in which agents names are the keys \
         and lists of neighbours agents names are values.
     :rtype: dictionary
     """
@@ -63,9 +63,9 @@ def generate_ring_topology(agents_names):
     """
     Generates ring.
 
-    :param list agents_names: The names of agent that will be used to name all nodes.
+    :param list agents_names: the names of agent that will be used to name all nodes.
 
-    :return: Dictionary in which agents names are the keys \
+    :return: dictionary in which agents names are the keys \
         and lists of neighbours agents names are values.
     :rtype: dictionary
     """
@@ -82,11 +82,11 @@ def generate_standard_topology(topology_type, agents_names=None, agents_number=N
     """
     Generates topology of given type ("clique", "line", "ring", "hub").
 
-    :param string topology_type: The type of topology to be created.
-    :param list agents_names: The names of agent that will be used to name all nodes.
-    :param long agents_number: The number of agents for which the topology is created. (Used if agents_names = None.)
+    :param string topology_type: the type of topology to be created.
+    :param list agents_names: the names of agent that will be used to name all nodes.
+    :param long agents_number: the number of agents for which the topology is created. (Used if agents_names = None.)
 
-    :return: Dictionary in which agents names are the keys \
+    :return: dictionary in which agents names are the keys \
         and lists of neighbours agents names are values.
     :rtype: dictionary
     """
@@ -102,13 +102,13 @@ def generate_topology(topology_type, file_name=None, agents_names=None, agents_n
     """
     Generates or load topology of given type ("clique", "line", "ring", "hub", "file").
 
-    :param string topology_type: The type of topology to be created.
-    :param string file_name: Path to saved topology file. (If "file" topology_type was selected.)
-    :param list agents_names: The names of agent that will be used to name all nodes. \
+    :param string topology_type: the type of topology to be created.
+    :param string file_name: path to saved topology file. (If "file" topology_type was selected.)
+    :param list agents_names: the names of agent that will be used to name all nodes. \
         (If "file" topology_type wasn't selected.)
-    :param long agents_number: The number of agents for which the topology is created. (Used if agents_names = None.)
+    :param long agents_number: the number of agents for which the topology is created. (Used if agents_names = None.)
 
-    :return: Dictionary in which agents names are the keys \
+    :return: dictionary in which agents names are the keys \
         and lists of neighbours agents names are values.
     :rtype: dictionary
     """
@@ -123,7 +123,7 @@ def read_topology_from_file(file_name):
 
     :param string file_name: Path to saved topology file.
 
-    :return: Dictionary in which agents names are the keys \
+    :return: dictionary in which agents names are the keys \
         and lists of neighbours agents names are values.
     :rtype: dictionary
     """
