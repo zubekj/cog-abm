@@ -21,6 +21,7 @@ class Result:
         """
         return self.results
 
+
 class StandardResult(Result):
     """
     Class that saves all agents statistics every given time.
@@ -65,6 +66,7 @@ class ResultsContainer(Result):
     """
 
     def __init__(self, results):
+        Result.__init__(self)
         self.results = results
 
     def save(self, simulation):
@@ -85,6 +87,6 @@ class ResultsContainer(Result):
         results = {}
 
         for name, results in self.results.iteritems():
-            results[name] = self.results.get_results()
+            results[name] = results.get_results()
 
         return results

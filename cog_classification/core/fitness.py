@@ -30,6 +30,7 @@ class StandardFitness(Fitness):
     """
 
     def __init__(self):
+        Fitness.__init__(self)
         self.success = 0
         self.all = 0
 
@@ -61,6 +62,7 @@ class CurrentFitness(Fitness):
     """
 
     def __init__(self, scope=50):
+        Fitness.__init__(self)
         self.scope = scope
         self.memories = deque([])
 

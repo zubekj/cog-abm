@@ -16,6 +16,7 @@ def generate_clique_topology(agents_names):
 
     return topology
 
+
 def generate_hub_topology(agents_names):
     """
     Generates hub.
@@ -36,6 +37,7 @@ def generate_hub_topology(agents_names):
         topology[agent_name] = [hub_agent_name]
 
     return topology
+
 
 def generate_line_topology(agents_names):
     """
@@ -59,6 +61,7 @@ def generate_line_topology(agents_names):
 
     return topology
 
+
 def generate_ring_topology(agents_names):
     """
     Generates ring.
@@ -77,6 +80,7 @@ def generate_ring_topology(agents_names):
     topology[agents_names[last_index]].append(agents_names[0])
 
     return topology
+
 
 def generate_standard_topology(topology_type, agents_names=None, agents_number=None):
     """
@@ -98,6 +102,7 @@ def generate_standard_topology(topology_type, agents_names=None, agents_number=N
             "ring": generate_ring_topology(agents_names),
             "hub": generate_hub_topology(agents_names)}[topology_type]
 
+
 def generate_topology(topology_type, file_name=None, agents_names=None, agents_number=None):
     """
     Generates or load topology of given type ("clique", "line", "ring", "hub", "file").
@@ -116,6 +121,7 @@ def generate_topology(topology_type, file_name=None, agents_names=None, agents_n
         return read_topology_from_file(file_name)
     else:
         return generate_standard_topology(topology_type, agents_names, agents_number)
+
 
 def read_topology_from_file(file_name):
     """
