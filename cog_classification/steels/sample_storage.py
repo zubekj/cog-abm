@@ -78,17 +78,17 @@ class SampleStorage:
         """
         Adds sample to sample storage.
 
-        :param sample_index: The index of sample in environment.
+        :param sample_index: the index of sample in environment.
         :type sample_index: int or long
-        :param Environment environment: The environment from which sample origins.
-        :param hashable category: The category which sample will be add.
-        :param float sample_weight: The initial weight of sample. (>=0; <=max_weight)
+        :param Environment environment: the environment from which sample origins.
+        :param hashable category: the category which sample will be add.
+        :param float sample_weight: the initial weight of sample. (>=0; <=max_weight)
 
         :raise IndexError: if the sample index doesn't correspond to any sample in the environment.
         :raise TypeError: if the category isn't hashable.
         :raise AssertionError: if the sample_weight out of range.
 
-        :return: The name of category which sample was added.
+        :return: the name of category which sample was added.
         :rtype: hashable
 
         | Adds the sample to given category. If no category is given, adds sample to new created category.
@@ -118,7 +118,7 @@ class SampleStorage:
             if sample_class == self.classes[category]:
                 # No difference between class of sample and class of category.
                 if not self.sample_in_category(sample_index, environment, category):
-                    # Adding new sample to category
+                    # Adding new sample to category.
                     self.set_weight(environment, category, sample_weight, sample_index=sample_index)
             else:
                 # There is difference in class of sample and class of category.
@@ -137,12 +137,12 @@ class SampleStorage:
         """
         Creates new empty category in sample storage.
 
-        :param sample_class: The class of all samples in this category.
-        :param hashable category: The name of category.
+        :param sample_class: the class of all samples in this category.
+        :param hashable category: the name of category.
 
         :raise: **AssertionError** - if category has already been in sample storage categories.
 
-        :return: The name of category.
+        :return: the name of category.
         :rtype: hashable
         """
 
@@ -190,7 +190,7 @@ class SampleStorage:
         """
         Decrease weights in category.
 
-        :param hashable category: The category which sample will be add.
+        :param hashable category: the category which sample will be add.
 
         :raise: **KeyError** - if category doesn't exist in sample storage.
 
@@ -257,7 +257,7 @@ class SampleStorage:
 
     def get_category_samples(self, category):
         """
-        :param hashable category: The category which samples weights will be increased.
+        :param hashable category: the category which samples weights will be increased.
 
         :raise: **KeyError** - if category doesn't exist in sample storage.
 
@@ -282,7 +282,7 @@ class SampleStorage:
 
     def get_category_samples_size(self, category):
         """
-        :param hashable category: The category which samples weights will be increased.
+        :param hashable category: the category which samples weights will be increased.
 
         :raise: **KeyError** - if category doesn't exist in sample storage.
 
@@ -300,7 +300,7 @@ class SampleStorage:
 
     def get_class(self, category):
         """
-        :param hashable category: The category.
+        :param hashable category: the category.
 
         :raise: **KeyError** - if category doesn't exist in sample storage.
 
@@ -312,10 +312,10 @@ class SampleStorage:
         """
         Increase the weights of samples in category.
 
-        :param sample_index: The index of sample in environment.
+        :param sample_index: the index of sample in environment.
         :type sample_index: int or long
-        :param Environment environment: The environment from which sample origins.
-        :param hashable category: The category which samples weights will be increased.
+        :param Environment environment: the environment from which sample origins.
+        :param hashable category: the category which samples weights will be increased.
 
         :raise: **KeyError** - if category doesn't exist in sample storage.
 
@@ -350,7 +350,7 @@ class SampleStorage:
         """
         Removes category and all its samples from sample storage.
 
-        :param hashable category: The removed category.
+        :param hashable category: the removed category.
         """
         try:
             self.categories.pop(category)
@@ -368,16 +368,16 @@ class SampleStorage:
         """
         Removes sample from given category.
 
-        :param Environment environment: The environment from which removed sample origins.
-        :param hashable category: The category of removed sample.
-        :param sample_index: The index of sample in environment.
+        :param Environment environment: the environment from which removed sample origins.
+        :param hashable category: the category of removed sample.
+        :param sample_index: the index of sample in environment.
         :type sample_index: int or long
-        :param index: The index of sample in category environment list.
+        :param index: the index of sample in category environment list.
 
         :raise TypeError: if both sample_index and index aren't defined.
         :raise KeyError: if category doesn't exist in sample storage.
 
-        :returns: The name of removed category or None if category hasn't removed.
+        :returns: the name of removed category or None if category hasn't removed.
         :rtype: hashable or None
 
         | **Sample or index should be specified.**
@@ -408,7 +408,7 @@ class SampleStorage:
         """
         Removes every sample with low weight.
 
-        :returns: List of names of all removed category. (Can be empty.)
+        :returns: list of names of all removed category. (Can be empty.)
         :rtype: hashable or None
 
         | Removed will be samples with weight lower than forgetting threshold.
@@ -423,11 +423,11 @@ class SampleStorage:
         """
         Removes every sample in category with low weight.
 
-        :param hashable category: The category which samples weights will be increased.
+        :param hashable category: the category which samples weights will be increased.
 
         :raise: **KeyError** - if category doesn't exist in sample storage.
 
-        :returns: The name of removed category or None if category hasn't removed.
+        :returns: the name of removed category or None if category hasn't removed.
         :rtype: hashable or None
 
         | Removed will be samples with weight lower than forgetting threshold.
@@ -454,10 +454,10 @@ class SampleStorage:
         """
         Checks if given sample_index is in category.
 
-        :param sample_index: The index of sample in environment.
+        :param sample_index: the index of sample in environment.
         :type sample_index: int or long
-        :param Environment environment: The environment from which sample origins.
-        :param hashable category: The category which samples weights will be increased.
+        :param Environment environment: the environment from which sample origins.
+        :param hashable category: the category which samples weights will be increased.
 
         :raise: **KeyError** - if category doesn't exist in sample storage.
 
@@ -474,12 +474,12 @@ class SampleStorage:
         """
         Sets weight of sample in category.
 
-        :param Environment environment: The environment from which sample origins.
-        :param hashable category: The category of sample.
-        :param float new_weight: The weight to be set for sample in category. (>=0, <=max_weight)
-        :param sample_index: The index of sample in environment.
+        :param Environment environment: the environment from which sample origins.
+        :param hashable category: the category of sample.
+        :param float new_weight: the weight to be set for sample in category. (>=0, <=max_weight)
+        :param sample_index: the index of sample in environment.
         :type sample_index: int or long
-        :param index: The index of sample in category environment list.
+        :param index: the index of sample in category environment list.
 
         :raise KeyError: if category doesn't exist in sample storage.
         :raise AssertionError: if new_weight is out of range.

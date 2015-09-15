@@ -18,8 +18,8 @@ class SteelsClassifier:
     """
     Classifier founded on Steels and Belpaeme multi-agent network and interactions concept.
 
-    :param classifiers: Classifiers that will be used with agents creation.
-    :type classifiers: List of classifiers.
+    :param classifiers: classifiers that will be used with agents creation.
+    :type classifiers: list of classifiers.
     """
 
     def __init__(self, classifiers=None, alpha=0.99, good_agent_measure=0.95):
@@ -35,8 +35,8 @@ class SteelsClassifier:
         """
         Fit the steels classifier according to the given training data.
 
-        :param list x: Samples.
-        :param list y: Samples' classes.
+        :param list x: samples.
+        :param list y: samples' classes.
         """
 
         environment = Environment(x, y)
@@ -65,11 +65,11 @@ class SteelsClassifier:
 
     def predict(self, samples):
         """
-        :param list samples: The samples which classes are predicted.
+        :param list samples: the samples which classes are predicted.
 
         :raise: **NotFittedError** - if no data have been fitted yet.
 
-        :return: The predicted classes of sample.
+        :return: the predicted classes of sample.
         :rtype: list
         """
         if self.result is not None:
@@ -83,29 +83,51 @@ class SteelsClassifierExtended(SteelsClassifier):
     Classifier founded on Steels and Belpaeme multi-agent network and interactions concept.
 
     This classifier extends standard classifier on data access options.
-
-    :param classifiers: Classifiers that will be used with agents creation.
-    :type classifiers: List of classifiers.
     """
 
     @staticmethod
     def accuracy(classifier, x, y):
+        """
+
+        :param classifier: tested classifier.
+        :type classifier: classifier
+        :param x: samples
+        :type x: iterable of samples
+        :param y: classes
+        :type y: iterable of classes
+
+        :return: percentage of correct classifications.
+        :rtype: float
+        """
         predicted_y = classifier.predict(x)
         return float(len([i for i in range(len(y)) if y[i] == predicted_y[i]])) / len(y)
 
     def get_results(self, samples, classes):
+        """
+        :param samples: samples
+        :type samples: list of samples
+        :param classes: classes
+        :type classes: list of classes
 
-        def categories_count(agent):
-            categories = []
+        :return: statistics of steels classifier
+        :rtype: dictionary
+
+        2/3 of samples and classes will be used to learning. \
+        1/3 of samples and classes will be used to calculate statistics.
+        """
+
+        def categories_count(individual):
+            used_categories = []
 
             for sample in samples:
-                category = agent.classify(sample)
+                category = individual.classify(sample)
                 if category is not None:
-                    if all([category != c for c in categories]):
-                        categories.append(category)
+                    if all([category != c for c in used_categories]):
+                        used_categories.append(category)
 
-            return len(categories), [agent.get_category_size(category) for category in categories]
+            return len(used_categories), [individual.get_category_size(category) for category in used_categories]
 
+        # Shuffling of given data.
         data = zip(samples, classes)
         random.shuffle(data)
         samples, classes = zip(*data)

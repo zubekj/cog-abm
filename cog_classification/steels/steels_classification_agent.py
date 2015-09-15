@@ -12,10 +12,10 @@ class SteelsClassificationAgent(SteelsAgent):
     """
     Class implementing steels agent used in classification task.
 
-    :param hashable aid: Agent's id. Unique identifier of agent.
-    :param Lexicon lexicon: Agent's storage of associations between categories and words.
-    :param classifier: The classifier that implements three functions: fit, predict and predict_proba.
-    :param SampleStorage sample_storage: Agent's storage of samples that represents knowledge about environment.
+    :param hashable aid: agent's id. Unique identifier of agent.
+    :param Lexicon lexicon: agent's storage of associations between categories and words.
+    :param classifier: the classifier that implements three functions: fit, predict and predict_proba.
+    :param SampleStorage sample_storage: agent's storage of samples that represents knowledge about environment.
 
     Steels agent can associate words with categories, remember samples from environment and can classify given sample.
     """
@@ -30,13 +30,13 @@ class SteelsClassificationAgent(SteelsAgent):
 
     def the_best_sample_for_category(self, category, samples):
         """
-        :param hashable category: The category for which sample is chosen.
-        :param samples: The list of samples from which the best sample is chosen.
+        :param hashable category: the category for which sample is chosen.
+        :param samples: the list of samples from which the best sample is chosen.
         :type samples: list of sample
 
         :raise: **IndexError** - if samples is empty.
 
-        :return: The sample with the highest probability of belonging to given category.
+        :return: the sample with the highest probability of belonging to given category.
         """
         the_best_sample = samples[0]
         the_best_probability = -float('inf')
@@ -54,7 +54,7 @@ class SteelsClassificationAgent(SteelsAgent):
         """
         Classify given specific sample.
 
-        :param sample: The sample that is classified.
+        :param sample: the sample that is classified.
 
         :return: class of sample or None if agent doesn't know any class.
         :rtype: hashable or None
@@ -74,12 +74,23 @@ class SteelsClassificationAgent(SteelsAgent):
                 return None
 
     def correct_sample_lexicon(self):
-            try:
-                assert all([any([c1 == c for c in self.sample_storage.get_categories()])
-                            for c1 in self.lexicon.get_categories()])
-            except AssertionError:
-                print [c for c in self.lexicon.get_categories() if c not in self.sample_storage.get_categories()]
-                raise AssertionError
+        """
+        Test if there is any category in lexicon that isn't present in sample storage.
+
+        :raise: **AssertionError** - if there is any category in lexicon that isn't present in sample storage.
+
+        :return: True
+        :rtype: bool
+
+        If AssertionError is raised, method prints all categories from lexicon absent in lexicon.
+        """
+
+        try:
+            assert all([any([c1 == c for c in self.sample_storage.get_categories()])
+                        for c1 in self.lexicon.get_categories()])
+        except AssertionError:
+            print [c for c in self.lexicon.get_categories() if c not in self.sample_storage.get_categories()]
+            raise AssertionError
 
     def forget(self):
         """
@@ -112,10 +123,10 @@ class SteelsClassificationAgent(SteelsAgent):
 
     def get_probability(self, sample, sample_category):
         """
-        :param sample: The sample.
-        :param hashable sample_category: The category for which probability of sample belonging is calculated.
+        :param sample: the sample.
+        :param hashable sample_category: the category for which probability of sample belonging is calculated.
 
-        :return: Probability of sample belonging to sample category.
+        :return: probability of sample belonging to sample category.
         :rtype: float
 
         Returns 0 if no category known and, if hasn't learn categorisation yet.

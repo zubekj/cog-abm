@@ -6,8 +6,8 @@ class SteelsAgent(Agent):
     """
     Class representing universal steels agent in the system.
 
-    :param hashable aid: Agent's id. Unique identifier of agent.
-    :param lexicon lexicon: Agent's storage of associations between categories and words.
+    :param hashable aid: agent's id. Unique identifier of agent.
+    :param lexicon lexicon: agent's storage of associations between categories and words.
 
     Steels agent can associate words with categories but cannot remember samples from environment.
     """

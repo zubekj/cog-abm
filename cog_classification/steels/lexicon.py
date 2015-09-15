@@ -60,12 +60,12 @@ class Lexicon:
         """
         Adds new category to lexicon.
 
-        :param hashable category: The category that is added.
-        :param hashable word: The word that should be associated with category.
-        :param float weight: The weight of association between word (given or created) and category. \
+        :param hashable category: the category that is added.
+        :param hashable word: the word that should be associated with category.
+        :param float weight: the weight of association between word (given or created) and category. \
             Value from min weight to max weight.
 
-        :return: The word that is associated with new category or None if category already in lexicon.
+        :return: the word that is associated with new category or None if category already in lexicon.
         :rtype: hashable or None
 
         If word isn't specified lexicon creates new unique word for category.
@@ -97,32 +97,46 @@ class Lexicon:
         """
         Add new word to category.
 
-        :param hashable word: The word that is added.
-        :param hashable category: The category that should be associated with the word.
-        :param float weight: The weight of association between word and category. Value from min weight to max weight.
+        :param hashable word: the word that is added.
+        :param hashable category: the category that should be associated with the word.
+        :param float weight: the weight of association between word and category. Value from min weight to max weight.
 
-        :raise: **ValueError** - if category is None.
+        :raise: **ValueError** - if category or word is None.
 
         If weight isn't specified lexicon uses new weight.
         If category doesn't exist, lexicon adds new category.
         If word already in category, nothing happens.
         """
-        if category in self.categories:
-            if word not in self.categories[category]:
-                if weight is None:
-                    weight = self.new_weight
-                else:
-                    assert weight <= self.max_weight
-                    assert weight >= self.min_weight
 
-                self.categories[category].append(word)
+        if word is not None:
+            # If category has already existed.
+            if category in self.categories:
+                # If word hasn't been add already to category.
+                if word not in self.categories[category]:
+                    # Determine weight of association.
+                    if weight is None:
+                        weight = self.new_weight
+                    else:
+                        assert weight <= self.max_weight
+                        assert weight >= self.min_weight
 
-                if word in self.dictionary:
-                    self.dictionary[word][category] = weight
-                else:
-                    self.dictionary[word] = {category: weight}
-        elif category is not None:
-            self.add_new_category(category, word, weight)
+                    # Adding word to category.
+                    self.categories[category].append(word)
+
+                    # Updating or adding word to lexicon's dictionary.
+                    if word in self.dictionary:
+                        self.dictionary[word][category] = weight
+                    else:
+                        self.dictionary[word] = {category: weight}
+
+            # Category doesn't exist so we add it with a word.
+            # Word is updated or added to lexicon's dictionary by add_new_category method.
+            elif category is not None:
+                self.add_new_category(category, word, weight)
+            # If category is None.
+            else:
+                raise ValueError
+        # If word is None.
         else:
             raise ValueError
 
@@ -130,8 +144,8 @@ class Lexicon:
         """
         Decrease association's weight between word and category.
 
-        :param hashable word: The word.
-        :param hashable category: The category.
+        :param hashable word: the word.
+        :param hashable category: the category.
 
         :raise: **KeyError** - if word isn't in lexicon or no association between word and category.
         """
@@ -141,8 +155,8 @@ class Lexicon:
         """
         Decrease association's weights between categories other than specified and word.
 
-        :param hashable word: The word.
-        :param hashable category: The only category which association's weight won't be decreased.
+        :param hashable word: the word.
+        :param hashable category: the only category which association's weight won't be decreased.
 
         :raise: **KeyError** - if word isn't in lexicon.
         """
@@ -154,8 +168,8 @@ class Lexicon:
         """
         Decrease association's weights between words other than specified and category.
 
-        :param hashable word: The only word, which association's weight won't be decreased.
-        :param hashable category: The category.
+        :param hashable word: the only word, which association's weight won't be decreased.
+        :param hashable category: the category.
 
         :raise: **KeyError** - if word or category isn't in lexicon or no association between word and category.
         """
@@ -168,9 +182,9 @@ class Lexicon:
         """
         Finds category with the strongest association with word.
 
-        :param hashable word: The word for which the best category is searched.
+        :param hashable word: the word for which the best category is searched.
 
-        :return: The category with the strongest association with word or None if word isn't in lexicon.
+        :return: the category with the strongest association with word or None if word isn't in lexicon.
         :rtype: hashable or None
         """
         best_category = None
@@ -189,9 +203,9 @@ class Lexicon:
         """
         Finds word with the strongest association with category.
 
-        :param hashable category: The category for which the best word is searched.
+        :param hashable category: the category for which the best word is searched.
 
-        :return: The word with the strongest association with category.
+        :return: the word with the strongest association with category.
         :rtype: hashable
 
         If no such category in lexicon then category is added in lexicon and returned is new generated word.
@@ -212,7 +226,7 @@ class Lexicon:
 
     def generate_word(self):
         """
-        :return: New word that isn't in lexicon.
+        :return: new word that isn't in lexicon.
         :rtype: long
         """
         new_word = random.randrange(self.word_range)
@@ -252,8 +266,8 @@ class Lexicon:
         """
         Increase association's weight between word and category.
 
-        :param hashable word: The word.
-        :param hashable category: The category.
+        :param hashable word: the word.
+        :param hashable category: the category.
 
         If word and category don't have any association yet, then new association between them is added.
         """
@@ -267,7 +281,7 @@ class Lexicon:
         """
         Removes given category.
 
-        :param hashable category: The category to remove.
+        :param hashable category: the category to remove.
 
         If it was the last category for word it removes this word, too.
         """

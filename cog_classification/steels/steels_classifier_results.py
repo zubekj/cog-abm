@@ -15,7 +15,7 @@ class SteelsClassifierResults(Result):
         """
         Save agents if it is the last iteration of simulation.
 
-        :param Simulation simulation: Simulation whose agents will be saved.
+        :param Simulation simulation: simulation whose agents will be saved.
         """
         if simulation.end_condition.end(simulation):
             self.results['agents'] = simulation.agents.get_all_agents()
@@ -24,9 +24,9 @@ class SteelsClassifierResults(Result):
         """
         Predicts classes of samples based on voting of agents.
 
-        :param list samples: The samples which classes are predicted.
+        :param list samples: the samples which classes are predicted.
 
-        :return: Predicted classes of sample.
+        :return: predicted classes of sample.
         :rtype: list
         """
         predicted_classes = []

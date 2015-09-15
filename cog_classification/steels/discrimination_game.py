@@ -4,7 +4,8 @@ class DiscriminationGame:
 
     :param long samples_number: the number of samples shown to agent in one interaction including topic. \
         Value from 2 to infinity.
-    :param float good_agent_measure: the threshold which affects generation of new categories. Value from 0 to 1.
+    :param float good_agent_measure: the threshold which affects generation of new categories. \
+        Value from (as rarely as possible) to 1 (always).
 
     Discrimination game was described in Luc Steels and Tony Belpaeme
     "Coordinating perceptually grounded categories through language: A case study for colour".
@@ -22,11 +23,11 @@ class DiscriminationGame:
         """
         One turn of interaction in discrimination game.
 
-        :param Network agents: Source of agents for discrimination game.
-        :param Environment environment: Source of stimuli for discrimination game.
+        :param Network agents: source of agents for discrimination game.
+        :param Environment environment: source of stimuli for discrimination game.
         """
         agent = agents.get_agent()
-        result, topic_index, topic_category, _ = self.play(agent, environment)
+        (result, topic_category), topic_index = self.play(agent, environment)
         self.learning_after_game(agent, topic_index, environment, topic_category, result)
         agent.forget()
         agent.update_fitness_measure("DG", result)
@@ -35,26 +36,28 @@ class DiscriminationGame:
         """
         Changes given agent state depending on result.
 
-        :param Agent agent: The agent whose state will be changed.
-        :param long topic_index: Index of topic in environment.
-        :param Environment environment: The environment from which topic origins.
-        :param hashable topic_category: The category of topic.
-        :param bool result: The result of the game: True - success, False - failure.
+        :param Agent agent: the agent whose state will be changed.
+        :param long topic_index: index of topic in environment.
+        :param Environment environment: the environment from which topic origins.
+        :param hashable topic_category: the category of topic.
+        :param bool result: the result of the game: True - success, False - failure.
         """
 
         if result:
             agent.increase_weights_sample_category(topic_index, environment, topic_category)
+
         elif agent.get_fitness_measure("DG") >= self.good_agent_measure:
             return agent.add_sample(topic_index, environment, topic_category)
+
         else:
-            return agent.add_sample(topic_index, environment)
+            return agent.add_sample(topic_index, environment), topic_index
 
     def play(self, agent, environment):
         """
         The core implementation of single game without changing agent.
 
-        :param Agent agent: The agents that plays the game.
-        :param Environment environment: The environment form which origins all games stimuli.
+        :param Agent agent: the agents that plays the game.
+        :param Environment environment: the environment form which origins all games stimuli.
 
         SteelsAgent gets sets of samples in which one is chosen as topic.
 
@@ -65,19 +68,19 @@ class DiscriminationGame:
         other_samples = [self.sample_from_other_class(topic_class, environment) for _ in range(self.samples_number - 1)]
 
         topic = environment.get_sample(topic_index)
-        return self.play_with_given_samples(agent, topic, topic_index, other_samples)
+        return self.play_with_given_samples(agent, topic, other_samples)
 
     @staticmethod
     def play_with_given_samples(agent, topic, other_samples):
         """
         The implementation of single game with given topic and other samples.
 
-        :param Agent agent: The agents that plays the game.
-        :param topic: The highlighted stimulus.
-        :param list other_samples: Stimuli from classes other than class of topic.
+        :param Agent agent: the agents that plays the game.
+        :param topic: the highlighted stimulus.
+        :param list other_samples: stimuli from classes other than class of topic.
 
-        :returns: * The result of the game. *(bool)*
-            * The category that was chosen for topic. *(hashable)*
+        :returns: * the result of the game. *(bool)*
+            * the category that was chosen for topic. *(hashable)*
         """
         topic_category = agent.classify(topic)
         other_categories = [agent.classify(sample) for sample in other_samples]
@@ -94,10 +97,10 @@ class DiscriminationGame:
         """
         Finds in environment sample that has different class than sample class.
 
-        :param hashable sample_class: The prohibited class.
-        :param Environment environment: The environment from which sample will be picked.
+        :param hashable sample_class: the prohibited class.
+        :param Environment environment: the environment from which sample will be picked.
 
-        :return: The sample that has class other than sample class.
+        :return: the sample that has class other than sample class.
         """
         while True:
             index, sample, taken_class = environment.get_random_sample()
