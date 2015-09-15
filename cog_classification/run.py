@@ -75,7 +75,7 @@ def make_classifiers(classifiers_names):
 
 def parse(classifier_source, task_source=None):
     classifiers = make_classifiers(classifier_source["classifiers"])
-    return SteelsClassifierExtended(classifiers, alpha=task_source['alpha'])
+    return SteelsClassifierExtended(classifiers, alpha=task_source['alpha'], good_agent_measure=task_source['threshold'])
 
 
 def run_task(classifier_source, task_source):
