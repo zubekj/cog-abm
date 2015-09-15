@@ -1,6 +1,6 @@
 import random
 
-from cog_classification.steels_universal.discrimination_game import DiscriminationGame
+from cog_classification.steels.discrimination_game import DiscriminationGame
 
 
 class GuessingGame:
@@ -105,10 +105,10 @@ class GuessingGame:
             # Strengthen memory of category.
             hearer.increase_weights_sample_category(topic_index, environment, hearer_category)
 
-            speaker.update_fitness("GG", True)
-            speaker.update_fitness("DG", True)
+            speaker.update_fitness_measure("GG", True)
+            speaker.update_fitness_measure("DG", True)
 
-            hearer.update_fitness("GG", True)
+            hearer.update_fitness_measure("GG", True)
 
             speaker.forget()
             hearer.forget()
@@ -116,9 +116,9 @@ class GuessingGame:
         elif result == "Speaker failed discrimination.":
             self.game.learning_after_game(speaker, topic_index, environment, speaker_category, False)
 
-            speaker.update_fitness("GG", False)
-            speaker.update_fitness("DG", False)
-            hearer.update_fitness("GG", False)
+            speaker.update_fitness_measure("GG", False)
+            speaker.update_fitness_measure("DG", False)
+            hearer.update_fitness_measure("GG", False)
 
             speaker.forget()
 
@@ -135,9 +135,9 @@ class GuessingGame:
             # Associating the category for topic with word.
             hearer.add_word_to_category(word, hearer_category)
 
-            speaker.update_fitness("GG", False)
-            speaker.update_fitness("DG", True)
-            hearer.update_fitness("GG", False)
+            speaker.update_fitness_measure("GG", False)
+            speaker.update_fitness_measure("DG", True)
+            hearer.update_fitness_measure("GG", False)
 
             speaker.forget()
             hearer.forget()
@@ -149,9 +149,9 @@ class GuessingGame:
 
             self.game.learning_after_game(hearer, topic_index, environment, hearer_category, result=False)
 
-            speaker.update_fitness("GG", False)
-            speaker.update_fitness("DG", True)
-            hearer.update_fitness("GG", False)
+            speaker.update_fitness_measure("GG", False)
+            speaker.update_fitness_measure("DG", True)
+            hearer.update_fitness_measure("GG", False)
 
             speaker.forget()
             hearer.forget()

@@ -6,7 +6,7 @@ from cog_classification.core.simulation import Simulation
 from cog_classification.core.condition import IterationCondition
 from cog_classification.core.fitness import StandardFitness
 from cog_classification.core.result import StandardResult
-from cog_classification.steels_universal.discrimination_game import DiscriminationGame
+from cog_classification.steels.discrimination_game import DiscriminationGame
 from cog_classification.steels_universal.steels_agent import SteelsAgent
 from cog_classification.tools.topology_generator import generate_topology
 from cog_classification.core.behavior_switcher import BehaviorSwitcher

@@ -1,10 +1,11 @@
+from itertools import izip
+
 from sklearn import naive_bayes
+
 from sklearn.utils.validation import NotFittedError
 
-from cog_classification.steels_universal.steels_agent import SteelsAgent
-from cog_classification.data_storage.sample_storage import SampleStorage
-
-from itertools import izip
+from cog_classification.steels.steels_agent import SteelsAgent
+from cog_classification.steels.sample_storage import SampleStorage
 
 
 class SteelsClassificationAgent(SteelsAgent):

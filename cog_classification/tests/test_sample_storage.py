@@ -2,7 +2,7 @@ from itertools import izip_longest
 
 from nose.tools import assert_equals, raises
 
-from cog_classification.data_storage.sample_storage import SampleStorage
+from cog_classification.steels.sample_storage import SampleStorage
 from dummy_classes.dummy_environment import DummyEnvironment
 
 

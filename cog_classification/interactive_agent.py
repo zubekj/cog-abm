@@ -3,7 +3,7 @@ sys.path.append('../../')
 sys.path.append('../')
 sys.path.append('')
 
-from cog_classification.steels_classifier.steels_classification_agent import SteelsClassificationAgent as Agent
+from cog_classification.steels.steels_classification_agent import SteelsClassificationAgent as Agent
 from cog_classification.core.environment import Environment
 from cog_classification.run import load_dataset
 

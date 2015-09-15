@@ -1,3 +1,5 @@
+import random
+
 from sklearn.utils.validation import NotFittedError
 
 from cog_classification.core.environment import Environment
@@ -5,14 +7,11 @@ from cog_classification.core.fitness import CurrentFitness
 from cog_classification.core.network import Network
 from cog_classification.core.simulation import Simulation
 from cog_classification.core.condition import IterationCondition
-from cog_classification.core.result import ResultsContainer
 from steels_classifier_results import SteelsClassifierResults
-from cog_classification.steels_universal.guessing_game import GuessingGame
-from steels_classification_agent import SteelsClassificationAgent
+from cog_classification.steels.guessing_game import GuessingGame
+from cog_classification.steels.steels_classification_agent import SteelsClassificationAgent
 from cog_classification.tools.topology_generator import generate_topology
 from cog_classification.core.behavior_switcher import BehaviorSwitcher
-
-import random
 
 
 class SteelsClassifier:

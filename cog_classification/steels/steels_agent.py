@@ -1,5 +1,5 @@
 from cog_classification.core.agent import Agent
-from cog_classification.data_storage.lexicon import Lexicon
+from cog_classification.steels.lexicon import Lexicon
 
 
 class SteelsAgent(Agent):

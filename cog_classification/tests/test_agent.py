@@ -1,7 +1,7 @@
 from nose.tools import assert_equals
 from sklearn import datasets
 
-from cog_classification.steels_universal.steels_agent import SteelsAgent
+from cog_classification.steels.steels_agent import SteelsAgent
 from cog_classification.core.environment import Environment
 
 
@@ -35,7 +35,7 @@ class TestAgent:
     - increase_weights_sample_category
     - increase_weight_word_category
     - learn
-    - update_fitness
+    - update_fitness_measure
     - decrease_weights_for_other_categories
     - decrease_weights_for_other_words
     - get_category_class
@@ -113,5 +113,5 @@ class TestAgent:
                 self.add(sample_index)
                 value = 0
 
-            self.agent.update_fitness("DF", value)
+            self.agent.update_fitness_measure("DF", value)
             self.agent.forget()

@@ -12,7 +12,7 @@ import numpy as np
 from sklearn import tree
 from sklearn import neighbors
 
-from cog_classification.steels_classifier.steels_classifier import SteelsClassifierExtended
+from cog_classification.steels.steels_classifier import SteelsClassifierExtended
 
 
 def add_arguments(pars):

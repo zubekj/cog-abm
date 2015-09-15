@@ -1,6 +1,6 @@
 from nose.tools import assert_equals, raises
 
-from cog_classification.data_storage.lexicon import Lexicon
+from cog_classification.steels.lexicon import Lexicon
 
 
 class TestLexicon:

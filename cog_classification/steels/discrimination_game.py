@@ -29,7 +29,7 @@ class DiscriminationGame:
         result, topic_index, topic_category, _ = self.play(agent, environment)
         self.learning_after_game(agent, topic_index, environment, topic_category, result)
         agent.forget()
-        agent.update_fitness("DG", result)
+        agent.update_fitness_measure("DG", result)
 
     def learning_after_game(self, agent, topic_index, environment, topic_category, result):
         """

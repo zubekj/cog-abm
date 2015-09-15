@@ -31,7 +31,7 @@ class TestSimulation:
             agents[agent.get_id()] = agent
 
         for agent in agents:
-            agents[agent].update_fitness("infected", True)
+            agents[agent].update_fitness_measure("infected", True)
             break
 
         topology = generate_topology("clique", agents_names=agents.keys())
@@ -68,7 +68,7 @@ class InfectInteraction:
         agents = agents.get_agents(2)
         if any([agent.get_fitness_measure("infected") for agent in agents]):
             for agent in agents:
-                agent.update_fitness("infected", True)
+                agent.update_fitness_measure("infected", True)
 
 
 class InfectedFitness:

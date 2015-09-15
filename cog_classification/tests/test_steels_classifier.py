@@ -1,6 +1,6 @@
-from cog_classification.steels_classifier.steels_classifier import SteelsClassifier
-
 from sklearn import datasets
+
+from cog_classification.steels.steels_classifier import SteelsClassifier
 
 
 class TestSteelsClassifier:
