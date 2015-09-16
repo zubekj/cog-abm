@@ -74,4 +74,4 @@ with open("env_shift_sim_results.csv", 'w') as f:
     data.to_csv(f)
 #mean of category number per agent
 with open("env_shift_sim_cc_extended.csv", 'w') as f:
-    data2.to_csv(f)
+    data2   .to_csv(f)
