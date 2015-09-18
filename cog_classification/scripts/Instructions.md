@@ -113,7 +113,7 @@ First - change topology_generator.py file in tools directory:
 
 Second - change this file and add your topology name to this file description and application of options.
 
-## run
+### run
 
 Inside the raw_run script there is a method run that can be used in separation. Run takes one argument: dictionary. The structure of this dictionary:
 
@@ -148,3 +148,30 @@ The run function returns dictionary with the following structure:
         * "CS" - communicative success (float)
         * "DS" - discriminative success (float)
 * "accuracy" - the accuracy of steels classifier tested on 1/3 of data (training on 2/3 of rest)
+
+## advanced run
+
+The advanced run is script that uses set of hard coded levels variables to create experiments that uses all combinations of this levels.
+
+ Results of this script are saved in file results_of_steels_classifier.json in the folder of script execution. The results are saved in JSON format as a dictionary with structure:
+
+* "all_levels":
+    * "classifiers" - list of list of classifiers names (list of strings)
+    * "alpha" - list of alpha values (float)
+    * "good_agent_measure" - list of good agent measure values (float)
+    * "role_model" - list of names of role modes (string)
+    * "iteration_number" - list of numbers of iterations (int)
+    * "topology" - list of topology names (string)
+    * "data" - list of names of zubek data files (string)
+* "simulations" - list of dictionaries with structure:
+    * "parameters" - parameters of given classifier test (dictionary)
+        * "classifiers" - list of classifiers names (list of strings)
+        * "alpha" - alpha value (float)
+        * "good_agent_measure" - good agent measure value (float)
+        * "role_model" - name of role modes (string)
+        * "iteration_number" - number of iterations (int)
+        * "topology" - topology name (string)
+        * "data" - dictionary
+            * "label" - name of data set or path to file with data
+    * results - list of results of repetitive testing with constant parameters; the result is identical with the dictionary returned by method run.
+    

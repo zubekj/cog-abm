@@ -55,4 +55,13 @@ if __name__ == "__main__":
                                 all_data.append({"parameters": parameters,
                                                  "results": results})
 
-    json.dumps(all_data, "results_of_steels_classifier.json")
+    raport = {"simulations": all_data}
+    levels = {"classifiers": classifiers,
+              "alpha": alphas,
+              "good_agent_measure": good_agent_measures,
+              "role_model": role_models,
+              "iteration_number": iteration_numbers,
+              "topology": topology,
+              "data": data}
+    raport["all_levels"] = levels
+    json.dumps(raport, "results_of_steels_classifier.json")
