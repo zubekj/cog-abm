@@ -3,9 +3,9 @@ sys.path.append('../../')
 sys.path.append('../')
 sys.path.append('')
 
-from cog_classification.steels.steels_classification_agent import SteelsClassificationAgent as Agent
+from cog_classification.steels.steels_agent import SteelsClassificationAgent as Agent
 from cog_classification.core.environment import Environment
-from cog_classification.run import load_dataset
+from cog_classification.scripts.run import load_dataset
 
 from sklearn import tree
 
@@ -23,7 +23,7 @@ while i:
         agent.add_sample(sample, env, category)
     elif i == 2:
         sample = input("sample\n")
-        print(agent.classify(env.get_sample(sample)))
+        print(agent.predict(env.get_sample(sample)))
     elif i == 3:
         sample, category = input("sample, category\n")
         agent.increase_weights_sample_category(sample, env, category=category)

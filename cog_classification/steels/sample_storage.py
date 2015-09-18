@@ -71,7 +71,9 @@ class SampleStorage:
         # Distance is used only in increase weights.
         self.distance = distance
 
+        # Categories: {category: {environment: ([sample_indexes], [sample_weight])}}
         self.categories = {}
+        # Classes: {category: sample_class}
         self.classes = {}
 
     def add_sample(self, sample_index, environment, category=None, sample_weight=None):

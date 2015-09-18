@@ -11,8 +11,8 @@ def calc_basic_rates(classifier, samples, positive_class):
     sc = [(s, s.get_cls()) for s in samples]
     positive = set(s for s, c in sc if c == positive_class)
     negative = set(s for s, c in sc if c != positive_class)
-    tp = [classifier.classify(s) for s in positive].count(positive_class)
-    fp = [classifier.classify(s) for s in negative].count(positive_class)
+    tp = [classifier.predict(s) for s in positive].count(positive_class)
+    fp = [classifier.predict(s) for s in negative].count(positive_class)
     tn = len(negative) - fp
     fn = len(positive) - tp
     return tuple(float(x) for x in (tp, tn, fp, fn))
@@ -96,7 +96,7 @@ def MCC(classifier, samples, positive_class, basic_rates=None):
 
 
 def correct(classifier, samples):
-    return math.fsum([int(classifier.classify(s) == s.get_cls())
+    return math.fsum([int(classifier.predict(s) == s.get_cls())
                             for s in samples]) / len(samples)
 
 
@@ -106,7 +106,7 @@ ClassifiedSample = namedtuple("ClassifiedSample", "sample cls distribution")
 def classify_samples(classifier, samples):
     def tmp(sample):
         d = classifier.class_probabilities(sample)
-        cls = classifier.classify(sample)
+        cls = classifier.predict(sample)
         return ClassifiedSample(sample, cls, d)
     return map(tmp, samples)
 

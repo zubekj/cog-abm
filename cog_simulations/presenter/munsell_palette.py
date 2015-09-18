@@ -44,7 +44,7 @@ class AgentData(object):
             return
 
         dictionary = {}
-        category_set = [agent.state.classify(stimuli) 
+        category_set = [agent.state.predict(stimuli)
                 for stimuli in self.cielab]
         #print category_set
 
@@ -123,7 +123,7 @@ class AgentDataWithLanguage(AgentData):
         if (iter == 0):
             return
         dictionary = {}
-        category_set = [agent.state.classify(stimuli) 
+        category_set = [agent.state.predict(stimuli)
                 for stimuli in self.cielab]
         #print category_set
 

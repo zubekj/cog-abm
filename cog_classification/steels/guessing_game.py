@@ -135,12 +135,10 @@ class GuessingGame:
             # Hearer plays discrimination game.
             result, hearer_category = self.game.play_with_given_samples(hearer, environment.get_sample(topic_index),
                                                                         other_samples)
-
             # If hearer cannot discriminate topic.
             if not result:
                 # Hearer learns topic.
-                hearer_category = self.game.learning_after_game(hearer, topic_index, environment,
-                                                                hearer_category, result)
+                hearer_category, _ = self.game.learning_after_game(hearer, topic_index, environment, hearer_category, result)
 
             # If hearer cannot learn then crash.
             if hearer_category is None:

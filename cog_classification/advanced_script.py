@@ -1,6 +1,6 @@
 import json
-from run import run
 
+from cog_classification.scripts.run import run
 
 repetition = 10
 

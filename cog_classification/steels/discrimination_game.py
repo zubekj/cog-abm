@@ -47,7 +47,7 @@ class DiscriminationGame:
             agent.increase_weights_sample_category(topic_index, environment, topic_category)
 
         elif agent.get_fitness_measure("DG") >= self.good_agent_measure:
-            return agent.add_sample(topic_index, environment, topic_category)
+            return agent.add_sample(topic_index, environment, topic_category), topic_index
 
         else:
             return agent.add_sample(topic_index, environment), topic_index
@@ -82,8 +82,8 @@ class DiscriminationGame:
         :returns: * the result of the game. *(bool)*
             * the category that was chosen for topic. *(hashable)*
         """
-        topic_category = agent.classify(topic)
-        other_categories = [agent.classify(sample) for sample in other_samples]
+        topic_category = agent.predict(topic)
+        other_categories = [agent.predict(sample) for sample in other_samples]
 
         if topic_category is None:
             result = False

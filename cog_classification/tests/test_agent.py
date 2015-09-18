@@ -99,7 +99,7 @@ class TestAgent:
             agent.learn()
             sample_index = env.get_random_sample_index()
             sample = env.get_sample(sample_index)
-            category = agent.classify(sample)
+            category = agent.predict(sample)
             if category is None:
                 self.add(sample_index)
                 value = 0

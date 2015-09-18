@@ -28,7 +28,9 @@ class Lexicon:
     def __init__(self, dictionary=None, categories=None, min_weight=0, max_weight=1, new_weight=0.5,
                  weight_increase=0.1, weight_decrease=0.1, lateral_inhibition=0.1, word_range=100000):
 
+        # Dictionary: {word: {category: weight}}
         self.dictionary = dictionary or {}
+        # Categories: {category: [words]}
         self.categories = categories or {}
 
         assert min_weight >= 0

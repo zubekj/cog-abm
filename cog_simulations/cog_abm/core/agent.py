@@ -58,7 +58,7 @@ class Agent(object):
 
     # 'sense' is in name to make clear what happens
     def sense_and_classify(self, stimulus):
-        return self.state.classify(self.sense(stimulus))
+        return self.state.predict(self.sense(stimulus))
 
     def sense_and_classify_p_val(self, stimulus):
         return self.state.classify_p_val(self.sense(stimulus))

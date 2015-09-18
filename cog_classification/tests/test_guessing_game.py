@@ -3,7 +3,7 @@ from nose.tools import assert_equal
 
 from cog_classification.steels_universal.guessing_game import GuessingGame
 from cog_classification.steels.discrimination_game import DiscriminationGame
-from cog_classification.steels.steels_classification_agent import SteelsClassificationAgent
+from cog_classification.steels.steels_agent import SteelsClassificationAgent
 from cog_classification.core.behavior_switcher import BehaviorSwitcher
 from cog_classification.core import *
 from cog_classification.tools.topology_generator import generate_topology
@@ -55,7 +55,7 @@ class TestGuessingGame:
         the_agent.forget()
         self.lexicon_and_sample_storage_adequacy(the_agent)
 
-        category = the_agent.classify(the_environment.get_sample(1))
+        category = the_agent.predict(the_environment.get_sample(1))
         self.lexicon_and_sample_storage_adequacy(the_agent)
 
         word = the_agent.find_word_for_category(category)

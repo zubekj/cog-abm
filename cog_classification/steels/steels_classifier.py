@@ -1,6 +1,7 @@
 import random
 
 from sklearn.utils.validation import NotFittedError
+from sklearn import cross_validation
 
 from cog_classification.core.environment import Environment
 from cog_classification.core.fitness import CurrentFitness
@@ -9,7 +10,7 @@ from cog_classification.core.simulation import Simulation
 from cog_classification.core.condition import IterationCondition
 from steels_classifier_results import SteelsClassifierResults
 from cog_classification.steels.guessing_game import GuessingGame
-from cog_classification.steels.steels_classification_agent import SteelsClassificationAgent
+from cog_classification.steels.steels_agent import SteelsClassificationAgent
 from cog_classification.tools.topology_generator import generate_topology
 from cog_classification.core.behavior_switcher import BehaviorSwitcher
 
@@ -20,16 +21,40 @@ class SteelsClassifier:
 
     :param classifiers: classifiers that will be used with agents creation.
     :type classifiers: list of classifiers.
+    :param string role_model: the way of assign agents to roles. Described in GuessingGame.
+    :param string topology: the name of topology used in classifier.
+    :param integer iteration_number: the number of iteration.
     """
 
-    def __init__(self, classifiers=None, alpha=0.99, good_agent_measure=0.95):
+    def __init__(self, classifiers=None, role_model="RANDOM", topology="clique", iteration_number=1000,
+                 alpha=0.99, good_agent_measure=0.95):
         self.classifiers = classifiers
         self.alpha = alpha
+        self.role_model = role_model
         self.good_agent_measure = good_agent_measure
         self.simulation = None
+        self.topology = topology
         self.result = None
-        self.condition = IterationCondition(1000)
-        self.interactions = BehaviorSwitcher(GuessingGame(good_agent_measure=self.good_agent_measure))
+        self.iteration_number = iteration_number
+        self.condition = IterationCondition(self.iteration_number)
+        self.interactions = BehaviorSwitcher(GuessingGame(good_agent_measure=self.good_agent_measure,
+                                                          role_model=self.role_model))
+
+    def clone(self):
+        return type(self)(classifiers=self.classifiers,
+                          role_model=self.role_model,
+                          topology=self.topology,
+                          iteration_number=self.iteration_number,
+                          alpha=self.alpha,
+                          good_agent_measure=self.good_agent_measure)
+
+    def get_params(self, deep):
+        return {"classifiers": self.classifiers,
+                "role_model": self.role_model,
+                "topology": self.topology,
+                "iteration_number": self.iteration_number,
+                "alpha": self.alpha,
+                "good_agent_measure": self.good_agent_measure}
 
     def fit(self, x, y):
         """
@@ -56,7 +81,7 @@ class SteelsClassifier:
             agent.set_fitness("DG", CurrentFitness())
             agent.set_fitness("GG", CurrentFitness())
 
-        network = Network(agents, {1: generate_topology("clique", agents_names=agents.keys())})
+        network = Network(agents, {1: generate_topology(self.topology, agents_names=agents.keys())})
 
         self.simulation = Simulation(network, self.interactions, BehaviorSwitcher(environment),
                                      SteelsClassifierResults(), self.condition)
@@ -88,6 +113,7 @@ class SteelsClassifierExtended(SteelsClassifier):
     @staticmethod
     def accuracy(classifier, x, y):
         """
+        Measure accuracy of classifier on given samples and classes.
 
         :param classifier: tested classifier.
         :type classifier: classifier
@@ -111,6 +137,58 @@ class SteelsClassifierExtended(SteelsClassifier):
 
         :return: statistics of steels classifier
         :rtype: dictionary
+        """
+
+        # Shuffling of given data.
+        data = zip(samples, classes)
+        random.shuffle(data)
+        samples, classes = zip(*data)
+        samples = list(samples)
+        classes = list(classes)
+
+        self.fit(samples, classes)
+        agents = self.result.results['agents']
+
+        x = {"agents": [{"id": agent.id,
+                         "lexicon_words": agent.lexicon.dictionary,
+                         "lexicon_categories": agent.lexicon.categories,
+                         "sample_categories": agent.sample_storage.categories,
+                         "sample_classes": agent.sample_storage.classes,
+                         "CS": agent.get_fitness_measure("GG"),
+                         "DS": agent.get_fitness_measure("DG")
+                         }
+                        for agent in agents]}
+
+        environments = {}
+        number = 0
+        classes = []
+
+        for agent in x["agents"]:
+            for category in agent["sample_categories"]:
+                new_sample_category = {}
+                for environment in agent["sample_categories"][category]:
+                    if environment not in environments:
+                        environments[environment] = number
+                        number += 1
+                    new_sample_category[environments[environment]] = agent["sample_categories"][category][environment]
+                agent["sample_categories"][category] = new_sample_category
+            for category in agent["sample_classes"]:
+                sample_class = agent["sample_classes"][category]
+                if sample_class not in classes:
+                    classes.append(sample_class)
+                agent["sample_classes"][category] = classes.index(sample_class)
+
+        return x
+
+    def get_statistics(self, samples, classes):
+        """
+        :param samples: samples
+        :type samples: list of samples
+        :param classes: classes
+        :type classes: list of classes
+
+        :return: statistics of steels classifier
+        :rtype: dictionary
 
         2/3 of samples and classes will be used to learning. \
         1/3 of samples and classes will be used to calculate statistics.
@@ -120,7 +198,7 @@ class SteelsClassifierExtended(SteelsClassifier):
             used_categories = []
 
             for sample in samples:
-                category = individual.classify(sample)
+                category = individual.predict(sample)
                 if category is not None:
                     if all([category != c for c in used_categories]):
                         used_categories.append(category)

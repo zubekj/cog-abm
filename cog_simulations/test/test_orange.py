@@ -48,10 +48,10 @@ class TestOrange(unittest.TestCase):
         samples = [s for s in self.train_set]
         samples.extend([Sample([1, 0, 0], self.meta), Sample([2, 1, 0], self.meta)])
         for e, s in izip(expected, samples):
-            self.assertEqual(e, classifier.classify(s))
+            self.assertEqual(e, classifier.predict(s))
             k, p = classifier.classify_p_val(s)
             self.assertTrue(0. <= p <= 1.)
-            self.assertEqual(k, classifier.classify(s))
+            self.assertEqual(k, classifier.predict(s))
             p2 = classifier.class_probabilities(s)
             self.assertAlmostEqual(1., sum(p2.values()), delta=0.00001)
 
@@ -61,6 +61,6 @@ class TestOrange(unittest.TestCase):
         classifier = self.knn1
         test_sample = self.train_set[-1]
         classifier.train(self.train_set)
-        self.assertEqual('1', classifier.classify(test_sample))
+        self.assertEqual('1', classifier.predict(test_sample))
         classifier.train_with_weights(samples_with_weights)
-        self.assertEqual('0', classifier.classify(test_sample))
+        self.assertEqual('0', classifier.predict(test_sample))
