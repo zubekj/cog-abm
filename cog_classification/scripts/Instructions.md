@@ -75,6 +75,7 @@ The results of simulation are saved in file in JSON format as dictionary. I pres
             * category - number of class
         * "CS" - communicative success (float)
         * "DS" - discriminative success (float)
+* "accuracy" - the accuracy of steels classifier tested on 1/3 of data (training on 2/3 of rest)
 
 ######  Attention
 
@@ -146,3 +147,4 @@ The run function returns dictionary with the following structure:
             * category - number of class
         * "CS" - communicative success (float)
         * "DS" - discriminative success (float)
+* "accuracy" - the accuracy of steels classifier tested on 1/3 of data (training on 2/3 of rest)

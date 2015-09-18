@@ -146,7 +146,9 @@ class SteelsClassifierExtended(SteelsClassifier):
         samples = list(samples)
         classes = list(classes)
 
-        self.fit(samples, classes)
+        border = len(samples) * 2 / 3
+
+        self.fit(samples[:border], classes[:border])
         agents = self.result.results['agents']
 
         x = {"agents": [{"id": agent.id,
@@ -157,7 +159,8 @@ class SteelsClassifierExtended(SteelsClassifier):
                          "CS": agent.get_fitness_measure("GG"),
                          "DS": agent.get_fitness_measure("DG")
                          }
-                        for agent in agents]}
+                        for agent in agents],
+             "accuracy": self.accuracy(self, samples[border:], classes[border:])}
 
         environments = {}
         number = 0
