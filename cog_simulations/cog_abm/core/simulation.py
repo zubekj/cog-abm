@@ -97,33 +97,33 @@ class Simulation(object):
         for interaction in self.interactions:
             if interaction["start"] == self.iteration_counter:
                 self.interaction = interaction["interaction"]
-                self.interaction.change_environment(self.environment)
+                for inter in self.interaction:
+                    inter.change_environment(self.environment)
                 break
 
     def _change_environment(self):
         for env in self.environments:
             if env["start"] == self.iteration_counter:
                 self.environment = env["environment"]
-                self.interaction.change_environment(env["environment"])
+                for interaction in self.interaction:
+                    interaction.change_environment(env["environment"])
 
-    def _choose_agents(self):
-        if self.interaction.num_agents() == 2:
+    def _choose_agents(self, interaction):
+        if interaction.num_agents() == 2:
             a = random.choice(self.agents)
             b = self.graph.get_random_neighbour(a)
             return [a, b]
         else:
             return [random.choice(self.agents)]
 
-    def _start_interaction(self, agents):
-        self.interaction.interact(*agents)
-
     def _do_iterations(self, num_iter):
         for _ in xrange(num_iter):
             self._change_graph()
             self._change_interaction()
             self._change_environment()
-            agents = self._choose_agents()
-            self._start_interaction(agents)
+            for interaction in self.interaction:
+                agents = self._choose_agents(interaction)
+                interaction.interact(*agents)
             self.iteration_counter += 1
 
     def _do_main_loop(self, iterations, dump_freq):
