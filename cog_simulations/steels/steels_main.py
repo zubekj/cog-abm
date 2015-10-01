@@ -10,7 +10,6 @@ sys.path.append('')
 
 from cog_simulations.parser import Parser
 from cog_simulations.steels.core.steels_experiment import steels_experiment
-from cog_simulations.steels.core.steels_experiment_continuation import steels_experiment_continuation
 
 
 def add_arguments(pars):
@@ -79,19 +78,11 @@ if __name__ == "__main__":
     continue_simulation = args.load_simulation
 
     # Start new simulation.
-    if start_simulation is not None:
-        params = Parser().parse_simulation(args.simulation_file)
-        params["dump_often"] = args.dump
-        # Main part - running steels experiment.
-        results, simulation = steels_experiment(**params)
-    # Continue old simulation.
-    elif continue_simulation is not None:
-        simulation = args.load_simulation
-        networks = args.networks
-        environments = args.environments
-        simulation, old_params, new_params = Parser().parse_simulation_continuation(simulation, networks, environments)
-        # Main part - running steels experiment.
-        results, simulation, params = steels_experiment_continuation(simulation, old_params, new_params)
+    params = Parser().parse_simulation(args.simulation_file)
+    params["dump_often"] = args.dump
+    # Main part - running steels experiment.
+    results, simulation = steels_experiment(**params)
+
 
     # Saving results of simulation - always.
     with open(args.results_file, "w") as f:

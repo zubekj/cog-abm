@@ -5,7 +5,7 @@ class SteelsAgentState(object):
         self.classifier = classifier
 
     def classify(self, sample):
-        return self.classifier.predict(sample)
+        return self.classifier.classify(sample)
 
     def classify_p_val(self, sample):
         return self.classifier.classify_p_val(sample)

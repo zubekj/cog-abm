@@ -1,14 +1,17 @@
-from cog_simulations.steels.metrics import ds_a
+from cog_simulations.steels.metrics import success_of_agent
 from cog_simulations.cog_abm.core.interaction import Interaction
+
+import random
 
 
 class DiscriminationGame(Interaction):
 
-    def __init__(self, context_len=4, inc_category_threshold=0.95, environment=None, game_name=None):
+    def __init__(self, context_len=4, inc_category_threshold=0.95, environment=None, game_name=None, agents=None):
         self.context_len = context_len
         self.inc_category_threshold = inc_category_threshold
         self.environment = environment
         self.game_name = game_name or "DG"
+        self.agents = agents
 
     def change_environment(self, environment):
         self.environment = environment
@@ -37,7 +40,7 @@ class DiscriminationGame(Interaction):
         return count == 1, c_topic
 
     def learning_after(self, agent, topic, success, c_topic=None):
-        success_rate = ds_a(agent)
+        success_rate = success_of_agent(agent, self.game_name)
         sensed_topic = agent.sense(topic)
 
         if success:
@@ -73,14 +76,17 @@ class DiscriminationGame(Interaction):
         # ^^^^ They are already shuffled - and needed when different classes.
         return context, topic
 
-    def interact_one_agent(self, agent, context=None, topic=None):
+    def interact_one_agent(self, context=None, topic=None):
         if context is None or topic is None:
             context, topic = self.get_setup()
+        agent = random.choice(self.agents.agents)
         success, _, _, _ = self.play_with_learning(agent, context, topic)
         self.save_result(agent, success)
         return success
 
-    def interact(self, agent1, agent2):
+    def interact(self):
+
+        agent1, agent2 = self.agents.get_two_agents()
         context, topic = self.get_setup()
         return (
             (self.game_name, self.interact_one_agent(agent1, context, topic)),

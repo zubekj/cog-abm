@@ -4,6 +4,7 @@ Module provides parser for json documents.
 import json
 import cPickle
 import os.path
+
 from cog_simulations.cog_abm.core.network import Network
 from cog_simulations.cog_abm.generators.graph_generator import graph_generator
 
@@ -42,34 +43,41 @@ class Parser(object):
 
         self.load_parameters(dictionary, source)
         self.load_agents(dictionary, source)
-        self.load_networks(dictionary, source, source_name)
-        self.load_environments(dictionary, source, source_name)
-        self.load_to_dictionary(dictionary, "interactions", source)
+
+        self.load_interactions_sets(dictionary, source, source_name)
 
         return dictionary
 
-    def parse_simulation_continuation(self, old_simulation, networks, environments):
+    def load_interactions_sets(self, dictionary, source, source_name):
+        interactions_sets = {}
 
-        with open(old_simulation, 'r') as f:
-            (old_simulation, parameters) = cPickle.load(f)
+        for start, interactions_set in source["interactions_sets"].iteritems():
+            interactions_sets[int(start)] = self.load_interactions_set(interactions_set, source_name, dictionary)
 
-        with open(networks, 'r') as f:
-            networks_source = json.load(f)
+        dictionary["interactions_sets"] = interactions_sets
 
-        with open(networks, 'r') as f:
-            parameters_source = json.load(f)
+    def load_interactions_set(self, source, source_name, dictionary):
 
-        with open(environments, 'r') as f:
-            environments_source = json.load(f)
+        for interaction in source:
+            interaction["agents"] = self.load_network(interaction["network"], source_name, dictionary)
+            interaction["environment"] = self.load_environment(interaction["environment"], source_name)
 
-        dictionary = {}
+        return source
 
-        self.load_parameters(dictionary, parameters_source)
-        networks_source["num_agents"] = parameters["num_agents"]
-        self.load_networks(dictionary, networks_source)
-        self.load_environments(dictionary, environments_source)
+    def load_network(self, source, source_name, dictionary):
+        g_type = self.value_if_exist("type", source)
+        network_source = self.value_if_exist("source", source)
+        if network_source is not None and not os.path.isabs(network_source):
+            network_source = "%s/%s" % (os.path.dirname(source_name), network_source)
+        g = graph_generator(g_type, len(dictionary["agents"]), network_source)
+        return Network(g)
 
-        return old_simulation, parameters, dictionary
+    def load_environment(self, source, source_name):
+        environment_source = self.value_if_exist("source", source)
+        if not os.path.isabs(environment_source):
+            environment_source = "%s/%s" % (os.path.dirname(source_name), environment_source)
+        source["source"] = self.parse_environment(environment_source)
+        return source
 
     def load_parameters(self, dictionary, source):
         """ Load general simulation parameters given in source. """
@@ -98,38 +106,6 @@ class Parser(object):
                 agents.append({"node_name": i})
 
         dictionary["agents"] = agents
-
-    def load_networks(self, dictionary, source, source_name):
-        """ Load simulation networks given in source. """
-
-        networks_source = self.value_if_exist("networks", source) or [{"type": "clique", "start": 1}]
-
-        networks = []
-        for network in networks_source:
-            g_type = self.value_if_exist("type", network)
-            n = self.value_if_exist("num_agents", source)
-            network_source = self.value_if_exist("source", network)
-            if network_source is not None and not os.path.isabs(network_source):
-                network_source = "%s/%s" % (os.path.dirname(source_name), network_source)
-            g = graph_generator(g_type, n, network_source)
-            networks.append({"start": network["start"], "graph": Network(g)})
-
-        dictionary["networks"] = networks
-
-    def load_environments(self, dictionary, source, source_name):
-        """ Load simulation environments given in source. """
-
-        environment_source = self.value_if_exist("environments", source)
-
-        environments = []
-        for environment in environment_source:
-            environment_source = self.value_if_exist("source", environment)
-            if not os.path.isabs(environment_source):
-                environment_source = "%s/%s" % (os.path.dirname(source_name), environment_source)
-            environment["source"] = self.parse_environment(environment_source)
-            environments.append(environment)
-
-        dictionary["environments"] = environments
 
     @staticmethod
     def parse_environment(doc):

@@ -167,3 +167,8 @@ class Network(object):
         agent_node_name = self.agents[agent_name]
         node_name = choice(self.get_neighbour_nodes(agent_node_name))
         return self.nodes[node_name].get_agents()
+
+    def get_two_agents(self):
+        agent1 = choice(self.agents.keys())
+        agent2 = self.get_random_neighbour(agent1)
+        return agent1, agent2

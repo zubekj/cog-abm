@@ -19,48 +19,30 @@ class Simulation(object):
     This class defines what happens and when.
     """
 
-    def __init__(self, graphs=None, interactions=None, environments=None, agents=None, pb=False,
-                 colour_order=None, dump_often=None):
+    def __init__(self, interactions_sets=None, pb=False, colour_order=None, dump_often=None):
         """
-        @type graphs: List of Maps
-        @param graphs: List of Maps with two keys:
-            'graph' - Network
-            'start' - number of iteration when this Network begin to be used
-
-        @type interactions: List of Maps
-        @param interactions: List of Maps with two keys:
-            'interaction' - Interaction
-            'start' - number of iteration when this Interaction begin to be used
-
-        @type environments: List of Maps
-        @param environments: List of Maps with two keys:
-            'environment' - Environment
-            'start' - number of iteration when this Environment begin to be used
-
-        @type agents: List of Agents
-        @param agents: Agents used in simulation.
+        @type interactions_sets: Map of Lists of Interactions
+        @param interactions_sets: List of Maps with two keys:
+            'graph' - List of Interactions
+            'start' - number of iteration when this List of Interactions begin to be used
 
         @type pb: Bool
         @param pb: Show progress bar.
 
-        @type environments: List of Colours
         @param colour_order: List of Colours in the order used when storing Agents words.
         """
         self.iteration_counter = 1
-        self.environments = environments
-        self.environment = None
-        self.graph = None
-        self.graphs = graphs
-        self.interaction = None
-        self.interactions = interactions
-        self.agents = tuple(agents)
+
+        self.interactions_set = interactions_sets[1]
+        self.interactions_sets = interactions_sets
+
         self.statistic = []
         self.dump_often = dump_often
         self.pb = True
         self.colour_order = colour_order
 
     def dump_results(self, iter_num):
-        cc = copy.deepcopy(self.agents)
+        cc = copy.deepcopy(self.get_agents())
         kr = (iter_num, cc)
         self.statistic.append(kr)
         if self.dump_often:
@@ -68,62 +50,26 @@ class Simulation(object):
             cPickle.dump(kr, f, PICKLE_PROTOCOL)
             f.close()
             if self.colour_order:
-                store_words(self.agents, self.colour_order, str(iter_num)+"words.pout")
+                store_words(self.get_agents(), self.colour_order, str(iter_num)+"words.pout")
 
     def get_iteration_counter(self):
         return self.iteration_counter
-
-    def set_networks(self, networks):
-        self.graphs = networks
-
-    def set_environments(self, environments):
-        self.environments = environments
 
     def set_colour_order(self, colour_order):
         self.colour_order = colour_order
 
     def get_agents(self):
-        return self.agents
+        return self.interactions_set[0].agents
 
-    def _change_graph(self):
-        for graph in self.graphs:
-            if graph["start"] == self.iteration_counter:
-                self.graph = graph["graph"]
-                for agent in self.agents:
-                    self.graph.add_agent(agent)
-                break
-
-    def _change_interaction(self):
-        for interaction in self.interactions:
-            if interaction["start"] == self.iteration_counter:
-                self.interaction = interaction["interaction"]
-                for inter in self.interaction:
-                    inter.change_environment(self.environment)
-                break
-
-    def _change_environment(self):
-        for env in self.environments:
-            if env["start"] == self.iteration_counter:
-                self.environment = env["environment"]
-                for interaction in self.interaction:
-                    interaction.change_environment(env["environment"])
-
-    def _choose_agents(self, interaction):
-        if interaction.num_agents() == 2:
-            a = random.choice(self.agents)
-            b = self.graph.get_random_neighbour(a)
-            return [a, b]
-        else:
-            return [random.choice(self.agents)]
+    def _change_interactions_set(self):
+        if self.iteration_counter in self.interactions_sets:
+            self.interactions_set = self.interactions_sets[self.iteration_counter]
 
     def _do_iterations(self, num_iter):
         for _ in xrange(num_iter):
-            self._change_graph()
-            self._change_interaction()
-            self._change_environment()
-            for interaction in self.interaction:
-                agents = self._choose_agents(interaction)
-                interaction.interact(*agents)
+            self._change_interactions_set()
+            for interaction in self.interactions_set:
+                interaction.interact()
             self.iteration_counter += 1
 
     def _do_main_loop(self, iterations, dump_freq):

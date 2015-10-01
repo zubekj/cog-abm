@@ -10,7 +10,7 @@ class GuessingGame(Interaction):
     """
 
     def __init__(self, disc_game=None, context_size=None, learning_mode=True, environment=None, game_name=None,
-                 inc_category_threshold=0.95, role_model="RANDOM"):
+                 inc_category_threshold=0.95, agents=None, role_model="RANDOM"):
 
         if disc_game is None:
 
@@ -28,6 +28,7 @@ class GuessingGame(Interaction):
         self.environment = environment
 
         self.game_name = game_name or 'GG'
+        self.agents = agents
         self.role_model = role_model
 
     def change_environment(self, environment):
@@ -165,7 +166,9 @@ class GuessingGame(Interaction):
                 max_reaction, max_sample = strength, sample
         return max_sample
 
-    def interact(self, agent1, agent2):
+    def interact(self):
+
+        agent1, agent2 = self.agents.get_two_agents()
 
         if self.role_model == "RANDOM":
             if random.randint(0, 1):
