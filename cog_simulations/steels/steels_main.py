@@ -81,8 +81,8 @@ if __name__ == "__main__":
     params = Parser().parse_simulation(args.simulation_file)
     params["dump_often"] = args.dump
     # Main part - running steels experiment.
-    results, simulation = steels_experiment(**params)
 
+    results, simulation = steels_experiment(**params)
 
     # Saving results of simulation - always.
     with open(args.results_file, "w") as f:

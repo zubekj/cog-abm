@@ -78,7 +78,10 @@ if __name__ == "__main__":
     functions = [functions_dictionary.get(statistic, default(statistic)) for statistic in arguments.statistics]
 
     pb = get_progressbar()
-    statistic_values = [[x for f in functions for x in f(agents_set, it)] for it, agents_set in pb(results)]
+    statistic_values = [
+        [x for f in functions for x in f(agents_set.agents.keys(), it)]
+        for it, agents_set in pb(results)
+        ]
 
     if arguments.chart:
         from cog_simulations.presenter.charts import chart

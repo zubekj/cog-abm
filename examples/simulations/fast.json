@@ -1,6 +1,6 @@
 {
-  "dump_freq": 1,
-  "num_iter": 100,
+  "dump_freq": 100,
+  "num_iter": 10000,
   "num_agents": 20,
   "alpha" : 0.1,
   "beta" : 1,
@@ -39,7 +39,7 @@
         }
       }
     ],
-    "50": [
+    "5000": [
       {
         "id": 1,
         "type": "GuessingGame",

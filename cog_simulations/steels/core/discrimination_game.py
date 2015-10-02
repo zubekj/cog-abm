@@ -47,7 +47,7 @@ class DiscriminationGame(Interaction):
             agent.state.classifier.increase_samples_category(sensed_topic)
         elif success_rate >= self.inc_category_threshold:
             if c_topic is None:
-                c_topic = agent.state.classifier.predict(sensed_topic)
+                c_topic = agent.state.classifier.classify(sensed_topic)
             agent.state.classifier.add_category(sensed_topic, c_topic)
         else:
             agent.state.classifier.add_category(sensed_topic)

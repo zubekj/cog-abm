@@ -26,9 +26,9 @@ def steels_experiment(num_iter=1000, dump_freq=50, alpha=0.1, beta=1, sigma=10, 
     agents = load_agents(agents, games_labels)
 
     for interactions_set in interactions_sets.values():
-        for interaction in interactions_set:
+        for interaction_data in interactions_set:
             for agent in agents:
-                interaction["agents"].add_agent(agent)
+                interaction_data["agents"].add_agent(agent)
 
     interactions_sets, colour_order = load_interactions_sets(interactions_sets)
 
@@ -46,17 +46,14 @@ def steels_experiment(num_iter=1000, dump_freq=50, alpha=0.1, beta=1, sigma=10, 
 
 
 def load_games_labels(interactions_sets):
-    labels = ["DG"]
+    labels = ["DG", "GG"]
 
     for interactions_set in interactions_sets.values():
-        for interaction in interactions_set:
-            if "game_name" in interaction:
-                labels.append(interaction["game_name"])
-                if interaction["type"] == "GuessingGame":
-                    labels.append("DG_%s" % interaction["game_name"])
-            else:
-                if interaction["type"] == "GuessingGame":
-                    labels.append("GG")
+        for interaction_data in interactions_set:
+            if "game_name" in interaction_data:
+                labels.append(interaction_data["game_name"])
+                if interaction_data["type"] == "GuessingGame":
+                    labels.append("DG_%s" % interaction_data["game_name"])
 
     return list(set(labels))
 
@@ -75,10 +72,10 @@ def load_agents(agents, games_labels):
     for _ in agents:
         state = SteelsAgentStateWithLexicon(classifier(*classifier_arg))
         true_agent = Agent(state=state, sensor=SimpleSensor())
-        true_agent.set_fitness_measure("DG", metrics.get_ds_fitness())
+
         for label in games_labels:
-            metric = metrics.get_cs_fitness()
-            true_agent.set_fitness_measure(label, metric)
+            true_agent.set_fitness_measure(label, metrics.get_cs_fitness())
+
         true_agents.append(true_agent)
 
     return true_agents
@@ -97,27 +94,27 @@ def load_interactions_sets(interactions_sets):
     new_interactions_sets = {}
     for start, interactions_set in interactions_sets.iteritems():
         new_interactions_set = []
-        for interaction in interactions_set:
-            context_size = interaction["context_size"]
-            learning = interaction["learning"]
-            inc_category_threshold = interaction["inc_category_threshold"]
+        for interaction_data in interactions_set:
+            context_size = interaction_data["context_size"]
+            learning = interaction_data["learning"]
+            inc_category_threshold = interaction_data["inc_category_threshold"]
 
             game_name = None
-            if "game_name" in interaction:
-                game_name = interaction["game_name"]
+            if "game_name" in interaction_data:
+                game_name = interaction_data["game_name"]
 
             role_model = "RANDOM"
-            if "role_model" in interaction:
-                role_model = interaction["role_model"]
+            if "role_model" in interaction_data:
+                role_model = interaction_data["role_model"]
 
-            if interaction["type"] == "GuessingGame":
-                inter = GuessingGame(learning_mode=learning, game_name=game_name, role_model=role_model,
-                                     agents=interaction["agents"])
+            if interaction_data["type"] == "GuessingGame":
+                interaction = GuessingGame(learning_mode=learning, game_name=game_name, role_model=role_model,
+                                           agents=interaction_data["agents"])
             else:
-                inter = DiscriminationGame(context_size, float(inc_category_threshold), game_name=game_name,
-                                           agents=interaction["agents"])
+                interaction = DiscriminationGame(context_size, float(inc_category_threshold), game_name=game_name,
+                                                 agents=interaction_data["agents"])
 
-            environment = interaction["environment"]
+            environment = interaction_data["environment"]
             list_of_stimuli = []
 
             for stimulus in environment["source"]["stimuli"]:
@@ -139,9 +136,9 @@ def load_interactions_sets(interactions_sets):
                 general_colour_order = colour_order
 
             env = Environment(list_of_stimuli, chooser, colour_order)
-            inter.change_environment(env)
+            interaction.change_environment(env)
 
-            new_interactions_set.append(inter)
+            new_interactions_set.append(interaction)
 
         new_interactions_sets[start] = new_interactions_set
 
