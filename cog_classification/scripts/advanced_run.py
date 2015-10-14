@@ -64,4 +64,6 @@ if __name__ == "__main__":
               "topology": topology,
               "data": data}
     raport["all_levels"] = levels
-    json.dumps(raport, "results_of_steels_classifier.json")
+
+    with open("results_of_steels_classifier.json", "w") as f:
+        json.dump(raport, f)

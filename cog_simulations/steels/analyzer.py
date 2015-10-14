@@ -3,6 +3,10 @@ import sys
 import cPickle
 import logging
 
+import os
+
+sys.path.append(os.path.dirname(__file__) + '/../')
+sys.path.append(os.path.dirname(__file__) + '/../../')
 sys.path.append('../')
 sys.path.append('../../')
 
@@ -91,4 +95,4 @@ if __name__ == "__main__":
 
     else:
         for r in statistic_values:
-            print "\t".join(imap(str, r))
+            print("\t".join(imap(str, r)))
