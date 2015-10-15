@@ -5,13 +5,17 @@ from multiprocessing import Pool
 import pandas as pd # must be python2
 
 N_PROC = 2
-ITER = 1500
-N_SIM = 20
+ITER = 10000
+DUMP_FREQ = 50
+N_SIM = 5
 
-networks = ["max_avg_bet", "max_avg_clust", "max_max_bet", "max_max_clos",
-            "max_var_cons", "min_avg_bet", "min_avg_clust", "min_max_clos"]
-networks2= ["line", "hub", "clique", "hub_speaker", "hub_hearer"]
-results = {"CSA", "DSA", "CLA", "DG_CLA", "cc"}
+#networks = ["max_avg_bet", "max_avg_clust", "max_max_bet", "max_max_clos",
+#            "max_var_cons", "min_avg_bet", "min_avg_clust", "min_max_clos"]
+#networks2 = ["line", "hub", "clique", "hub_speaker", "hub_hearer"]
+networks = []
+networks2 = ["hub", "clique"]
+#results = {"CSA", "DSA", "CLA", "DG_CLA", "cc"}
+results = {"CSA", "DSA", "CLA", "DG_CLA"}
 
 pool = Pool(processes=N_PROC)
 
@@ -40,7 +44,7 @@ pool.join()
 
 # pandas
 # czy wywalamy co drugi wiersz?
-index = range(0, ITER+10, 50)
+index = range(0, ITER+10, DUMP_FREQ)
 columns = []
 
 for result in results:
@@ -63,13 +67,13 @@ for result in results:
         data[result + "_mean"][network] = mean.mean(1)
         data[result + "_var"][network] = var.mean(1)
 
-for network in networks+networks2:
-    data2 = pd.concat([pd.read_csv("results_of_simulation/env/shift_sim_data/data_env_training{0}cc_{1}".format(network, i), delim_whitespace=True, header=None, index_col=0)
-                       for i in xrange(20)], axis=2)
-    data2 = data2.mean(axis=2)
+#for network in networks+networks2:
+#    data2 = pd.concat([pd.read_csv("results_of_simulation/env/shift_sim_data/data_env_training{0}cc_{1}".format(network, i), delim_whitespace=True, header=None, index_col=0)
+#                       for i in xrange(20)], axis=2)
+#    data2 = data2.mean(axis=2)
 
 with open("env_shift_sim_results.csv", 'w') as f:
     data.to_csv(f)
 
-with open("env_shift_sim_cc_extended.csv", 'w') as f:
-    data2   .to_csv(f)
+#with open("env_shift_sim_cc_extended.csv", 'w') as f:
+#    data2.to_csv(f)

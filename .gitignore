@@ -5,8 +5,7 @@
 */.coverage
 #SIMULATION RESULTS:
 *.pout
-*result
-*results
 #PROJECT FILES:
 *.project
 *.pydevproject
+!results_of_simulation
