@@ -4,16 +4,14 @@ import os
 from multiprocessing import Pool
 import pandas as pd # must be python2
 
-N_PROC = 2
-ITER = 10000
+N_PROC = 4
+ITER = 20000
 DUMP_FREQ = 50
-N_SIM = 5
+N_SIM = 10
 
-#networks = ["max_avg_bet", "max_avg_clust", "max_max_bet", "max_max_clos",
-#            "max_var_cons", "min_avg_bet", "min_avg_clust", "min_max_clos"]
-#networks2 = ["line", "hub", "clique", "hub_speaker", "hub_hearer"]
-networks = []
-networks2 = ["hub", "clique"]
+networks = ["max_avg_bet", "max_avg_clust", "max_max_bet", "max_max_clos",
+            "max_var_cons", "min_avg_bet", "min_avg_clust", "min_max_clos"]
+networks2 = ["hub", "clique", "hub_speaker", "hub_hearer"]
 #results = {"CSA", "DSA", "CLA", "DG_CLA", "cc"}
 results = {"CSA", "DSA", "CLA", "DG_CLA"}
 
