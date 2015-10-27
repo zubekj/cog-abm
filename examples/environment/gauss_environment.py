@@ -21,7 +21,6 @@ def gauss_divide(output_name, stim=STIM, stimuli_num=STIMULI_NUM, cov=COV, stimu
     stimuli = []
     g = open(stimuli_file, 'r')
     stimuli = json.load(g)
-    #stimuli = json.lo      ads(read_data)
     for i in stimuli['stimuli']:
         list = list+[i.values()]
     g.close()
@@ -36,18 +35,4 @@ def gauss_divide(output_name, stim=STIM, stimuli_num=STIMULI_NUM, cov=COV, stimu
     f = open(output_name+".json", 'w')
     json.dump({"stimuli": list, "type": "CIELab"}, f)
 
-   # {"nodes": nodes, "edges": edges}
     f.close()
-
-#        if x out of borders
-#            i = i-1
-#        else:
-#            gauss_divided = gauss_divided+x
-#    
-#    
-#        
-
-        
-    #with open(STIMULI_FILE, 'r') as f:
-    #    stimuli = json.loads(f)
-
