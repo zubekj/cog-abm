@@ -23,7 +23,8 @@ def fun(stimuli_file=STIMULI_FILE):
     return min_dist
 
 
-def gauss_divide(output_name, stim=STIM, stimuli_num=STIMULI_NUM, stimuli_file=STIMULI_FILE, cov=COV):
+def gauss_divide(output_name, stim=STIM, stimuli_num=STIMULI_NUM,
+                 stimuli_file=STIMULI_FILE, cov=COV):
     with open(stimuli_file, 'r') as g:
         stimuli = json.load(g)
     chips = [i.values() for i in stimuli['stimuli']]
@@ -38,3 +39,22 @@ def gauss_divide(output_name, stim=STIM, stimuli_num=STIMULI_NUM, stimuli_file=S
     with open(output_name+".json", 'w') as f:
         json.dump({"stimuli": random_chips, "type": "CIELab"}, f)
 
+
+def find_focal_points(stimuli_file=STIMULI_FILE):
+    with open(stimuli_file, 'r') as g:
+        stimuli = json.load(g)
+    chips = [i.values() for i in stimuli['stimuli']]
+
+    max_idx = distance.squareform(distance.pdist(chips)).argmax()
+    p1, p2 = (np.array(chips[max_idx / len(chips)]),
+              np.array(chips[max_idx % len(chips)]))
+
+    return p1+(p2-p1)*0.33, p1+(p2-p1)*0.66
+
+
+if __name__ == "__main__":
+    stim1, stim2 = find_focal_points()
+
+    np.random.seed(13)
+    gauss_divide("600_munsell_chips_gauss_1", stim=stim1, stimuli_num=600)
+    gauss_divide("600_munsell_chips_gauss_2", stim=stim2, stimuli_num=600)
