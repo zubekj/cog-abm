@@ -54,7 +54,21 @@ def find_focal_points(stimuli_file=STIMULI_FILE):
 
 if __name__ == "__main__":
     stim1, stim2 = find_focal_points()
+    scale = distance.euclidean(stim1, stim2)
+    print(scale)
 
     np.random.seed(13)
-    gauss_divide("600_munsell_chips_gauss_1", stim=stim1, stimuli_num=600)
-    gauss_divide("600_munsell_chips_gauss_2", stim=stim2, stimuli_num=600)
+    gauss_divide("600_munsell_chips_gauss_1", stim=stim1, stimuli_num=600,
+                 cov=COV*scale*10)
+    gauss_divide("600_munsell_chips_gauss_2", stim=stim2, stimuli_num=600,
+                 cov=COV*scale*10)
+
+
+    with open("600_munsell_chips_gauss_1.json", 'r') as g:
+    #with open("635_munsell_chips_rand_1.json", 'r') as g:
+    #with open(STIMULI_FILE, 'r') as g:
+        stimuli = json.load(g)
+    chips = [i.values() for i in stimuli['stimuli']]
+
+    dists = distance.pdist(chips)
+    print(dists.max(), dists.min(), dists.mean())

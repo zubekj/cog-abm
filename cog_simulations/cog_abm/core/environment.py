@@ -2,6 +2,9 @@
 Module providing environment and it's functionality
 """
 
+import numpy as np
+from sklearn.neighbors import BallTree
+
 from random import choice, shuffle
 from itertools import imap
 
@@ -14,7 +17,7 @@ class StimuliChooser(object):
     def get_stimulus(self, stimuli):
         return choice(stimuli)
 
-    def get_stimuli(self, stimuli, n=None):
+    def get_stimuli(self, stimuli, stimuli_tree=None, n=None):
         pass
 
 
@@ -25,7 +28,7 @@ class RandomStimuliChooser(StimuliChooser):
         self.use_distance = use_distance
         self.distance = distance
 
-    def get_stimuli(self, stimuli, n=None):
+    def get_stimuli(self, stimuli, stimuli_tree=None, n=None):
         """
         Be careful with this - can take some time when using the distance!
         """
@@ -36,17 +39,14 @@ class RandomStimuliChooser(StimuliChooser):
         dist, get_stimulus = self.distance, self.get_stimulus
         # ^^ abandoning dots - small speed up ..
         for _ in xrange(250):
-            ret = [get_stimulus(stimuli)]
-            for _ in xrange(n - 1):
-                mind = 0
-                try_limit = 10
-                while mind < dist and try_limit > 0:
-                    tmp = get_stimulus(stimuli)
-                    mind = min(imap(tmp.distance, ret))
-                    try_limit -= 1
-                if mind < dist:
+            ret = []
+            avail_stimuli = np.ones(len(stimuli), dtype=np.bool)
+            for _ in xrange(n):
+                ret.append(get_stimulus(stimuli[avail_stimuli]))
+                apoint = (ret[-1].L, ret[-1].a, ret[-1].b)
+                avail_stimuli[stimuli_tree.query_radius(apoint, 50.0)[0]] = 0
+                if sum(avail_stimuli) == 0:
                     break
-                ret.append(tmp)
             if len(ret) == n:
                 shuffle(ret)
                 return ret
@@ -66,7 +66,7 @@ class OneDifferentClass(StimuliChooser):
     def __init__(self, n=None):
         self.n = n
 
-    def get_stimuli(self, stimuli, n=None):
+    def get_stimuli(self, stimuli, stimuli_tree=None, n=None):
         n = n or self.n
         for _ in xrange(100):
             ret = [self.get_stimulus(stimuli)]
@@ -95,7 +95,8 @@ class Environment(object):
     It's main function is to provide stimuli for agents
     """
 
-    def __init__(self, stimuli, stimuli_chooser=None, colour_order=None):
+    def __init__(self, stimuli, stimuli_chooser=None, colour_order=None,
+                 metric='euclidean'):
         """
         Initialize environment
 
@@ -104,9 +105,11 @@ class Environment(object):
         @param colour_order: list of distinct stimuli in order of saving to a file (if needed)
         @type colour_order: sequence
         """
-        self.stimuli = stimuli
+        self.stimuli = np.array(stimuli)
         self.stimuli_chooser = stimuli_chooser or RandomStimuliChooser(1)
         self.colour_order = colour_order
+        self.ball_tree = BallTree([(s.L, s.a, s.b) for s in stimuli],
+                                  metric=metric)
 
     def get_stimulus(self):
         """
@@ -127,4 +130,4 @@ class Environment(object):
         return self.stimuli
 
     def get_stimuli(self, n):
-        return self.stimuli_chooser.get_stimuli(self.stimuli, n)
+        return self.stimuli_chooser.get_stimuli(self.stimuli, self.ball_tree, n)
