@@ -3,7 +3,7 @@ Module providing environment and it's functionality
 """
 
 import numpy as np
-from sklearn.neighbors import BallTree
+from sklearn.neighbors import KDTree
 
 from random import choice, shuffle
 from itertools import imap
@@ -108,8 +108,8 @@ class Environment(object):
         self.stimuli = np.array(stimuli)
         self.stimuli_chooser = stimuli_chooser or RandomStimuliChooser(1)
         self.colour_order = colour_order
-        self.ball_tree = BallTree([(s.L, s.a, s.b) for s in stimuli],
-                                  metric=metric)
+        self.ball_tree = KDTree([(s.L, s.a, s.b) for s in stimuli],
+                                metric=metric)
 
     def get_stimulus(self):
         """
