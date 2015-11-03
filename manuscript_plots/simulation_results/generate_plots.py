@@ -83,7 +83,7 @@ with open("top_shift_mason.tikz", "w") as f:
     f.write("\\end{tikzpicture}\n")
 
 
-with open("top_shift_hub.tikz", "w") as f:
+with open("top_shift_star.tikz", "w") as f:
     f.write("\\begin{tikzpicture}\n")
     f.write("\\begin{axis}[width=.7\\linewidth, height=.45\\linewidth, ymax=0.9,"\
             "xlabel=Iterations, "\
