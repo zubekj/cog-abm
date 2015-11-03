@@ -1,0 +1,44 @@
+\documentclass{standalone}
+
+\usepackage{tikz}
+\usepackage{pgfplots}
+
+\begin{document}
+
+\footnotesize
+
+\begin{tikzpicture}
+\begin{axis}[stack plots=y, stack dir=minus,
+xmajorgrids=true,
+every major grid/.style={black, opacity=0.1},
+ytick={-1, -2, -3, -4, -5, -6, -7, -8},
+yticklabels={max avg bet, max avg clust, max max bet, max max clos, max var cons, min avg bet, min avg clust, min max clos}
+]
+\addplot+[color=black, mark=*, solid, thick, mark options={fill=black}, error bars/.cd,x dir=both,x explicit] coordinates {
+(0.29000000000000004,1) +- (0.02028900952070114,0.02028900952070114)
+};
+\addplot+[color=black, mark=*, solid, thick, mark options={fill=black}, error bars/.cd,x dir=both,x explicit] coordinates {
+(0.32475,1) +- (0.02028900952070114,0.02028900952070114)
+};
+\addplot+[color=black, mark=*, solid, thick, mark options={fill=black}, error bars/.cd,x dir=both,x explicit] coordinates {
+(0.318,1) +- (0.02028900952070114,0.02028900952070114)
+};
+\addplot+[color=black, mark=*, solid, thick, mark options={fill=black}, error bars/.cd,x dir=both,x explicit] coordinates {
+(0.43325,1) +- (0.02028900952070114,0.02028900952070114)
+};
+\addplot+[color=black, mark=*, solid, thick, mark options={fill=black}, error bars/.cd,x dir=both,x explicit] coordinates {
+(0.39437500000000003,1) +- (0.02028900952070114,0.02028900952070114)
+};
+\addplot+[color=black, mark=*, solid, thick, mark options={fill=black}, error bars/.cd,x dir=both,x explicit] coordinates {
+(0.47437499999999994,1) +- (0.02028900952070114,0.02028900952070114)
+};
+\addplot+[color=black, mark=*, solid, thick, mark options={fill=black}, error bars/.cd,x dir=both,x explicit] coordinates {
+(0.46662499999999996,1) +- (0.02028900952070114,0.02028900952070114)
+};
+\addplot+[color=black, mark=*, solid, thick, mark options={fill=black}, error bars/.cd,x dir=both,x explicit] coordinates {
+(0.321625,1) +- (0.02028900952070114,0.02028900952070114)
+};
+\end{axis}
+\end{tikzpicture}
+
+\end{document}
