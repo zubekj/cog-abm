@@ -1,32 +1,3 @@
-\documentclass{standalone}
-
-\usepackage{tikz}
-\usepackage{pgfplots}
-
-\begin{document}
-
-\footnotesize
-
-\begin{tikzpicture}
-\begin{axis}[stack plots=y, stack dir=minus, 
-xmajorgrids=true,
-every major grid/.style={black, opacity=0.1},
-ytick={-1, -2, -3, -4},
-yticklabels={hub, clique, hub hearer, hub speaker}
-]
-\addplot+[color=black, mark=*, solid, thick, mark options={fill=black}, error bars/.cd,x dir=both,x explicit] coordinates {
-(0.498625,1) +- (0.02527673794089221,0.02527673794089221)
-};
-\addplot+[color=black, mark=*, solid, thick, mark options={fill=black}, error bars/.cd,x dir=both,x explicit] coordinates {
-(0.6919999999999998,1) +- (0.02527673794089221,0.02527673794089221)
-};
-\addplot+[color=black, mark=*, solid, thick, mark options={fill=black}, error bars/.cd,x dir=both,x explicit] coordinates {
-(0.6575000000000001,1) +- (0.02527673794089221,0.02527673794089221)
-};
-\addplot+[color=black, mark=*, solid, thick, mark options={fill=black}, error bars/.cd,x dir=both,x explicit] coordinates {
-(0.251375,1) +- (0.02527673794089221,0.02527673794089221)
-};
-\end{axis}
-\end{tikzpicture}
-
-\end{document}
+\documentclass{standalone}\usepackage{pgfplots}\pgfplotsset{compat=newest}\usepgfplotslibrary{colorbrewer}
+\begin{document}\footnotesize\begin{tikzpicture}\begin{axis}[stack plots=y, stack dir=minus,width=.7\linewidth,height=3.8cm,xmajorgrids=true,xminorgrids=true,minor x tick num=1,axis background/.style={fill=gray!7},every major grid/.style={white},every minor grid/.style={white},cycle multi list={Dark2-8},
+ytick={-1, -2, -3, -4},yticklabels={clique, star, star speaker, star hearer}]\addplot+[mark=*, solid, thick, error bars/.cd,x dir=both,x explicit] coordinates {(0.6919999999999998,1) +- (0.02527673794089221,0.02527673794089221)};\addplot+[mark=*, solid, thick, error bars/.cd,x dir=both,x explicit] coordinates {(0.498625,1) +- (0.02527673794089221,0.02527673794089221)};\addplot+[mark=*, solid, thick, error bars/.cd,x dir=both,x explicit] coordinates {(0.6575000000000001,1) +- (0.02527673794089221,0.02527673794089221)};\addplot+[mark=*, solid, thick, error bars/.cd,x dir=both,x explicit] coordinates {(0.251375,1) +- (0.02527673794089221,0.02527673794089221)};\end{axis}\end{tikzpicture}\end{document}

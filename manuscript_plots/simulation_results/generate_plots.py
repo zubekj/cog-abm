@@ -23,7 +23,7 @@ with open("top_shift_mason.tikz", "w") as f:
     f.write("\\begin{tikzpicture}\n")
     f.write("\\begin{axis}[width=.7\\linewidth, height=.45\\linewidth, ymax=0.9,"\
             "xlabel=Iterations, "\
-            "axis background/.style={fill=gray!10},"\
+            "axis background/.style={fill=gray!7},"\
             "grid=both, grid style={white},"\
             "legend style={\n"\
             "at={(1.05, 1.0)}, anchor=north west},"\
@@ -56,7 +56,7 @@ with open("top_shift_mason.tikz", "w") as f:
 
     f.write("\\begin{axis}[width=.7\\linewidth, height=.45\\linewidth, ymax=0.9,"\
             "at={(0, -.41\\linewidth)}, xlabel=Iterations,"\
-            "axis background/.style={fill=gray!10},"\
+            "axis background/.style={fill=gray!7},"\
             "grid=both, grid style={white},"\
             "cycle multi list={Dark2-8},"\
             "legend style={\n"\
@@ -89,7 +89,7 @@ with open("top_shift_star.tikz", "w") as f:
     f.write("\\begin{tikzpicture}\n")
     f.write("\\begin{axis}[width=.7\\linewidth, height=.45\\linewidth, ymax=0.9,"\
             "xlabel=Iterations, "\
-            "axis background/.style={fill=gray!10},"\
+            "axis background/.style={fill=gray!7},"\
             "grid=both, grid style={white},"\
             "cycle multi list={Dark2-8},"\
             "legend style={\n"\
@@ -122,7 +122,7 @@ with open("top_shift_star.tikz", "w") as f:
     f.write("\\begin{axis}[width=.7\\linewidth, height=.45\\linewidth, ymax=0.9,"\
             "at={(0, -.41\\linewidth)}, xlabel=Iterations,"\
             "cycle multi list={Dark2-8},"\
-            "axis background/.style={fill=gray!10},"\
+            "axis background/.style={fill=gray!7},"\
             "grid=both, grid style={white},"\
             "legend style={\n"\
             "at={(0, -0.2)}, anchor=north west}, ylabel=Mean GCS]\n")
@@ -149,7 +149,7 @@ with open("env_shift.tikz", "w") as f:
     f.write("\\begin{axis}[width=.7\\linewidth, height=.45\\linewidth, ymax=0.9,"\
             "xlabel=Iterations, "\
             "cycle multi list={Dark2-8},"\
-            "axis background/.style={fill=gray!10},"\
+            "axis background/.style={fill=gray!7},"\
             "grid=both, grid style={white},"\
             "legend style={\n"\
             "at={(1.05, 1.0)}, anchor=north west},"\
@@ -187,7 +187,7 @@ with open("env_shift.tikz", "w") as f:
 
     f.write("\\begin{axis}[width=.7\\linewidth, height=.45\\linewidth, ymax=0.9,"\
             "at={(0, -.41\\linewidth)}, xlabel=Iterations,"\
-            "axis background/.style={fill=gray!10},"\
+            "axis background/.style={fill=gray!7},"\
             "grid=both, grid style={white},"\
             "cycle multi list={Dark2-8},"\
             "legend style={\n"\
@@ -221,7 +221,7 @@ with open("env_shift_gauss.tikz", "w") as f:
     f.write("\\begin{axis}[width=.7\\linewidth, height=.45\\linewidth, ymax=0.9,"\
             "xlabel=Iterations, "\
             "cycle multi list={Dark2-8},"\
-            "axis background/.style={fill=gray!10},"\
+            "axis background/.style={fill=gray!7},"\
             "grid=both, grid style={white},"\
             "legend style={\n"\
             "at={(1.05, 1.0)}, anchor=north west},"\
@@ -230,7 +230,7 @@ with open("env_shift_gauss.tikz", "w") as f:
     for g in ["clique"]:
             f.write("\\addplot +[mark=none, dotted, thick] table[col sep=comma, x=Iteration, "\
                     "y=CSA_mean] "\
-                    "{{simulation_results/env_shift_{0}.csv}};\n".format(g))
+                    "{{simulation_results/env_shift_gauss_{0}.csv}};\n".format(g))
             label = g.replace("_", " ")
             f.write("\\addlegendentry{{{0}}}\n".format(label))
 
@@ -259,7 +259,7 @@ with open("env_shift_gauss.tikz", "w") as f:
 
     f.write("\\begin{axis}[width=.7\\linewidth, height=.45\\linewidth, ymax=0.9,"\
             "at={(0, -.41\\linewidth)}, xlabel=Iterations,"\
-            "axis background/.style={fill=gray!10},"\
+            "axis background/.style={fill=gray!7},"\
             "grid=both, grid style={white},"\
             "cycle multi list={Dark2-8},"\
             "legend style={\n"\
