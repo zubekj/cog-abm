@@ -21,13 +21,16 @@ for g in es.index.levels[0]:
 
 with open("top_shift_mason.tikz", "w") as f:
     f.write("\\begin{tikzpicture}\n")
+    f.write("\\definecolor{color0}{rgb}{0.917647058823529,0.917647058823529,0.949019607843137}")
     f.write("\\begin{axis}[width=.7\\linewidth, height=.45\\linewidth, ymax=0.9,"\
             "xlabel=Iterations, "\
-            "axis background/.style={fill=gray!7},"\
+            "cycle multi list={Dark2-8},"\
+            "axis background/.style={fill=color0},"\
             "grid=both, grid style={white},"\
+            "axis line style={white},"\
+            "every tick/.style={white},"\
             "legend style={\n"\
             "at={(1.05, 1.0)}, anchor=north west},"\
-            "cycle multi list={Dark2-8},"\
             "ylabel=Mean LCS]\n")
 
     for g in ["clique"]:
@@ -56,9 +59,11 @@ with open("top_shift_mason.tikz", "w") as f:
 
     f.write("\\begin{axis}[width=.7\\linewidth, height=.45\\linewidth, ymax=0.9,"\
             "at={(0, -.41\\linewidth)}, xlabel=Iterations,"\
-            "axis background/.style={fill=gray!7},"\
-            "grid=both, grid style={white},"\
             "cycle multi list={Dark2-8},"\
+            "axis background/.style={fill=color0},"\
+            "grid=both, grid style={white},"\
+            "axis line style={white},"\
+            "every tick/.style={white},"\
             "legend style={\n"\
             "at={(0, -0.2)}, anchor=north west}, ylabel=Mean GCS]\n")
 
@@ -87,11 +92,14 @@ with open("top_shift_mason.tikz", "w") as f:
 
 with open("top_shift_star.tikz", "w") as f:
     f.write("\\begin{tikzpicture}\n")
+    f.write("\\definecolor{color0}{rgb}{0.917647058823529,0.917647058823529,0.949019607843137}")
     f.write("\\begin{axis}[width=.7\\linewidth, height=.45\\linewidth, ymax=0.9,"\
             "xlabel=Iterations, "\
-            "axis background/.style={fill=gray!7},"\
-            "grid=both, grid style={white},"\
             "cycle multi list={Dark2-8},"\
+            "axis background/.style={fill=color0},"\
+            "grid=both, grid style={white},"\
+            "axis line style={white},"\
+            "every tick/.style={white},"\
             "legend style={\n"\
             "at={(1.05, 1.0)}, anchor=north west},"\
             "ylabel=Mean LCS]\n")
@@ -122,8 +130,10 @@ with open("top_shift_star.tikz", "w") as f:
     f.write("\\begin{axis}[width=.7\\linewidth, height=.45\\linewidth, ymax=0.9,"\
             "at={(0, -.41\\linewidth)}, xlabel=Iterations,"\
             "cycle multi list={Dark2-8},"\
-            "axis background/.style={fill=gray!7},"\
+            "axis background/.style={fill=color0},"\
             "grid=both, grid style={white},"\
+            "axis line style={white},"\
+            "every tick/.style={white},"\
             "legend style={\n"\
             "at={(0, -0.2)}, anchor=north west}, ylabel=Mean GCS]\n")
 
@@ -146,11 +156,14 @@ with open("top_shift_star.tikz", "w") as f:
 
 with open("env_shift.tikz", "w") as f:
     f.write("\\begin{tikzpicture}\n")
+    f.write("\\definecolor{color0}{rgb}{0.917647058823529,0.917647058823529,0.949019607843137}")
     f.write("\\begin{axis}[width=.7\\linewidth, height=.45\\linewidth, ymax=0.9,"\
             "xlabel=Iterations, "\
             "cycle multi list={Dark2-8},"\
-            "axis background/.style={fill=gray!7},"\
+            "axis background/.style={fill=color0},"\
             "grid=both, grid style={white},"\
+            "axis line style={white},"\
+            "every tick/.style={white},"\
             "legend style={\n"\
             "at={(1.05, 1.0)}, anchor=north west},"\
             "ylabel=Mean LCS]\n")
@@ -187,9 +200,11 @@ with open("env_shift.tikz", "w") as f:
 
     f.write("\\begin{axis}[width=.7\\linewidth, height=.45\\linewidth, ymax=0.9,"\
             "at={(0, -.41\\linewidth)}, xlabel=Iterations,"\
-            "axis background/.style={fill=gray!7},"\
-            "grid=both, grid style={white},"\
             "cycle multi list={Dark2-8},"\
+            "axis background/.style={fill=color0},"\
+            "grid=both, grid style={white},"\
+            "axis line style={white},"\
+            "every tick/.style={white},"\
             "legend style={\n"\
             "at={(0, -0.2)}, anchor=north west}, ylabel=Mean GCS]\n")
 
@@ -218,11 +233,14 @@ with open("env_shift.tikz", "w") as f:
 
 with open("env_shift_gauss.tikz", "w") as f:
     f.write("\\begin{tikzpicture}\n")
+    f.write("\\definecolor{color0}{rgb}{0.917647058823529,0.917647058823529,0.949019607843137}")
     f.write("\\begin{axis}[width=.7\\linewidth, height=.45\\linewidth, ymax=0.9,"\
             "xlabel=Iterations, "\
             "cycle multi list={Dark2-8},"\
-            "axis background/.style={fill=gray!7},"\
+            "axis background/.style={fill=color0},"\
             "grid=both, grid style={white},"\
+            "axis line style={white},"\
+            "every tick/.style={white},"\
             "legend style={\n"\
             "at={(1.05, 1.0)}, anchor=north west},"\
             "ylabel=Mean LCS$_{\mathrm{A}}$]\n")
@@ -259,9 +277,11 @@ with open("env_shift_gauss.tikz", "w") as f:
 
     f.write("\\begin{axis}[width=.7\\linewidth, height=.45\\linewidth, ymax=0.9,"\
             "at={(0, -.41\\linewidth)}, xlabel=Iterations,"\
-            "axis background/.style={fill=gray!7},"\
-            "grid=both, grid style={white},"\
             "cycle multi list={Dark2-8},"\
+            "axis background/.style={fill=color0},"\
+            "grid=both, grid style={white},"\
+            "axis line style={white},"\
+            "every tick/.style={white},"\
             "legend style={\n"\
             "at={(0, -0.2)}, anchor=north west}, ylabel=Mean LCS$_{\mathrm{B}}$]\n")
 

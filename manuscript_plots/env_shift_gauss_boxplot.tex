@@ -6,12 +6,12 @@
 \begin{document}
 \footnotesize
 \begin{tikzpicture}
-\begin{axis}[boxplot/draw direction=x,
-axis background/.style={fill=gray!7},
-xmajorgrids=true,
+\definecolor{color0}{rgb}{0.917647058823529,0.917647058823529,0.949019607843137}\begin{axis}[boxplot/draw direction=x,
+axis background/.style={fill=color0},every tick/.style={white},xmajorgrids=true,
+ymajorgrids=true,
 xminorgrids=true,
 minor x tick num=1,
-every major grid/.style={white},
+axis line style={white},every major grid/.style={white},
 every minor grid/.style={white},
 cycle multi list={Dark2-8},
 ytick={-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12},
