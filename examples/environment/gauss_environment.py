@@ -43,6 +43,7 @@ def gauss_divide(output_name, stim=STIM, stimuli_num=STIMULI_NUM,
 def find_focal_points(stimuli_file=STIMULI_FILE):
     with open(stimuli_file, 'r') as g:
         stimuli = json.load(g)
+    print(stimuli['stimuli'][0]['L'], stimuli['stimuli'][0]['a'], stimuli['stimuli'][0]['b'], stimuli['stimuli'][0].values())
     chips = np.array([i.values() for i in stimuli['stimuli']])
 
     min_v, max_v = chips.max(axis=0), chips.min(axis=0)
