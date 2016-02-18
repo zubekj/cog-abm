@@ -11,7 +11,7 @@ ball color=orange!80,
 text=black,
 inner sep=2pt,
 outer sep=0pt,
-minimum size=16 pt}}\graph [spring electrical layout',nodes={VertexStyle},node distance=6em] {
+minimum size=16 pt}}\graph [spring electrical layout,nodes={VertexStyle},node distance=4em] {
 2 -- 1;
 3 -- 2;
 4 -- 3;
@@ -36,6 +36,10 @@ minimum size=16 pt}}\graph [spring electrical layout',nodes={VertexStyle},node d
 12 -- 0;
 14 -- 0;
 15 -- 13;
+
+5 --[white] 7;
+12 --[white] 7;
+12 --[white] 5;
 };
 \end{tikzpicture}
 \end{document}
