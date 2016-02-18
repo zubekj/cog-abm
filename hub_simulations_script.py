@@ -36,7 +36,7 @@ pool.close()
 pool.join()
 
 # pandas
-# czy wywalamy co drugi wiersz?
+
 index = range(0, 20010, 50)
 columns = []
 
