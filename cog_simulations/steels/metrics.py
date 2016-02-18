@@ -101,11 +101,22 @@ def value_distance(r1, r2):
 
 
 def count_category(agents, parameters):
-    """
-    All categories created by the classifier counts, some of them may be
-    obscured by the others and not used in practice anymore.
-    """
-    return [len(agent.state.classifier.categories) for agent in agents]
+
+    stimuli = None
+
+    for environment in parameters['environments']:
+        if environment['name'] == 'global':
+            from core.steels_experiment import load_environment
+            _, env = load_environment([environment])
+            stimuli = env[0]['environment'].stimuli
+
+    def number_of_categories(agent):
+        agents_set = set()
+        for s in stimuli:
+            agents_set.add(agent.sense_and_classify(s))
+        return len(agents_set)
+
+    return [number_of_categories(agent) for agent in agents]
 
 
 def count_words(agents):
