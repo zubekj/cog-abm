@@ -32,15 +32,15 @@ Usage
 
 To run this software you need Python in version 2.x (3.x is not supported).
 
-There are mostly libraries which helps you develop your own simulations. Sample simulation you might find in src/steels/ folder. As of version 0.3 all parameters and configuration of simulations is stored in XML files.
+There are mostly libraries which helps you develop your own simulations. Sample simulation you might find in cog_simulations/steels/ folder. As of version 0.3 all parameters and configuration of simulations is stored in JSON files.
 
 
 Steels experiment
 -----------------
 An example experiment. It was described in work of Steels, L. and Belpaeme, T. (2005).
-Sample configuration is in files src/simulation.xml  and in src/simulation2.xml
-To run one go to src folder and run:
-python steels/steels_main.py -p "simulation.xml"
+Sample configuration is in files examples/simulations/basic_simulation.json
+To run one go to cog_simulations folder and run:
+python steels/steels_main.py -p "../examples/simulations/basic_simulation.json"
 this should generate some files – some of them are used by presenter which visualizes result by showing agents categorization at given points, and one is used by analyzer
 
 Usage: python steels_main.py [options]
@@ -72,7 +72,7 @@ Options:
 Presenter
 ---------
 This program uses files with extension .pout . It presents agents categorization at given iteration.
-To run it go to src/presenter
+To run it go to cog_simulations/presenter
 Usage: munsell_palette.py [options]
 
 Options:
@@ -91,14 +91,14 @@ Options:
 Example of full “usage path”
 ----------------------------
 
-Run simulation. From /src/steels run:
-python steels_main.py -p "simulation.xml"
+Run simulation. From /cog_simulations/steels run:
+python steels_main.py -p "../../examples/simulations/basic_simulation.json"
 
 now see result in chart:
 python analyzer.py -f \*.result -c it DS CS --xlabel="iteration" --ylabel "discriminative success & communicative success"
 
 to see categorization:
-from /src/presenter run:
+from /cog_simulations/presenter run:
 python munsell_palette.py -d ../ -a 10 --findfocal strength_based -l t
 
 
@@ -126,7 +126,7 @@ Authors
 =======
 
 :Authors:
-    *Programming:* Konrad Kurdej, Michał Łukasik, Marek Maj
+    *Programming:* Konrad Kurdej, Michał Łukasik, Marek Maj, Przemysław Wróblewski, Julian Zubek
 
     *Mentoring:* Dariusz Plewczyński, Franciszek Rakowski
 
