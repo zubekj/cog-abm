@@ -31,7 +31,7 @@ with open("top_shift_mason.tikz", "w") as f:
             "every tick/.style={white},"\
             "legend style={\n"\
             "at={(1.05, 1.0)}, anchor=north west},"\
-            "ylabel=Mean LCS]\n")
+            "ylabel=Mean CS\\textsubscript\{L\}]\n")
 
     for g in ["clique"]:
             f.write("\\addplot +[mark=none, dotted, thick] table[col sep=comma, x=Iteration, "\
@@ -65,7 +65,8 @@ with open("top_shift_mason.tikz", "w") as f:
             "axis line style={white},"\
             "every tick/.style={white},"\
             "legend style={\n"\
-            "at={(0, -0.2)}, anchor=north west}, ylabel=Mean GCS]\n")
+            "at={(0, -0.2)}, anchor=north west},"\
+            "ylabel=Mean CS\\textsubscript\{G\}]\n")
 
     for g in ["clique"]:
             f.write("\\addplot +[mark=none, dotted, thick] table[col sep=comma, x=Iteration, "\
@@ -102,7 +103,7 @@ with open("top_shift_star.tikz", "w") as f:
             "every tick/.style={white},"\
             "legend style={\n"\
             "at={(1.05, 1.0)}, anchor=north west},"\
-            "ylabel=Mean LCS]\n")
+            "ylabel=Mean CS\\textsubscript\{L\}]\n")
 
     for g in ["clique"]:
             f.write("\\addplot +[mark=none, dotted, thick] table[col sep=comma, x=Iteration, "\
@@ -135,7 +136,8 @@ with open("top_shift_star.tikz", "w") as f:
             "axis line style={white},"\
             "every tick/.style={white},"\
             "legend style={\n"\
-            "at={(0, -0.2)}, anchor=north west}, ylabel=Mean GCS]\n")
+            "at={(0, -0.2)}, anchor=north west},"\
+            "ylabel=Mean CS\\textsubscript\{G\}]\n")
 
     for g in ["clique"]:
             f.write("\\addplot +[mark=none, dotted, thick] table[col sep=comma, x=Iteration, "\
@@ -166,7 +168,7 @@ with open("env_shift.tikz", "w") as f:
             "every tick/.style={white},"\
             "legend style={\n"\
             "at={(1.05, 1.0)}, anchor=north west},"\
-            "ylabel=Mean LCS]\n")
+            "ylabel=Mean CS\\textsubscript\{L\}]\n")
 
     for g in ["clique"]:
             f.write("\\addplot +[mark=none, dotted, thick] table[col sep=comma, x=Iteration, "\
@@ -206,7 +208,8 @@ with open("env_shift.tikz", "w") as f:
             "axis line style={white},"\
             "every tick/.style={white},"\
             "legend style={\n"\
-            "at={(0, -0.2)}, anchor=north west}, ylabel=Mean GCS]\n")
+            "at={(0, -0.2)}, anchor=north west},"\
+            "ylabel=Mean CS\\textsubscript\{G\}]\n")
 
     for g in ["clique"]:
             f.write("\\addplot +[mark=none, dotted, thick] table[col sep=comma, x=Iteration, "\
@@ -243,7 +246,7 @@ with open("env_shift_gauss.tikz", "w") as f:
             "every tick/.style={white},"\
             "legend style={\n"\
             "at={(1.05, 1.0)}, anchor=north west},"\
-            "ylabel=Mean LCS$_{\mathrm{A}}$]\n")
+            "ylabel=Mean CS\\textsubscript\{A\}]\n")
 
     for g in ["clique"]:
             f.write("\\addplot +[mark=none, dotted, thick] table[col sep=comma, x=Iteration, "\
@@ -283,7 +286,8 @@ with open("env_shift_gauss.tikz", "w") as f:
             "axis line style={white},"\
             "every tick/.style={white},"\
             "legend style={\n"\
-            "at={(0, -0.2)}, anchor=north west}, ylabel=Mean LCS$_{\mathrm{B}}$]\n")
+            "at={(0, -0.2)}, anchor=north west},"\
+            "ylabel=Mean CS\\textsubscript\{B\}]\n")
 
     for g in ["clique"]:
             f.write("\\addplot +[mark=none, dotted, thick] table[col sep=comma, x=Iteration, "\
