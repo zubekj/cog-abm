@@ -100,35 +100,26 @@ def value_distance(r1, r2):
     return (weight1 * weight2) * value1.central_value.distance(value2.central_value)
 
 
-def count_category(agents, parameters):
+def count_category_words(agents, parameters):
 
-    stimuli = None
-
-    for environment in parameters['environments']:
-        if environment['name'] == 'global':
-            from core.steels_experiment import load_environment
-            _, env = load_environment([environment])
-            stimuli = env[0]['environment'].stimuli
-
-    def number_of_categories(agent):
-        agents_set = set()
+    def agent_words(agent):
+        agents_words = set()
+        stimuli = [unit.central_value
+                   for adaptive_network in agent.state.classifier.categories.values()
+                   for unit, _ in adaptive_network.units]
         for s in stimuli:
-            agents_set.add(agent.sense_and_classify(s))
-        return len(agents_set)
+            agents_words.add(agent.state.word_for(
+                agent.sense_and_classify(s)))
+        return agents_words
 
-    return [number_of_categories(agent) for agent in agents]
-
-
-def count_words(agents):
-
-    words = []
-
+    categories_nums = []
+    words = set()
     for agent in agents:
-        for word in agent.state.lexicon.known_words():
-            words.append(word)
+        awords = agent_words(agent)
+        words = words.union(awords)
+        categories_nums.append(len(awords))
 
-    return len(words)
-
+    return categories_nums + [len(words)]
 
 def ds_a(agent):
     return agent.get_fitness("DG")
