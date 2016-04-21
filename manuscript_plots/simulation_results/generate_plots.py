@@ -6,6 +6,12 @@ ts.index.names = ["Topology", "Iteration"]
 for g in ts.index.levels[0]:
     ts.loc[g].to_csv("top_shift_{0}.csv".format(g))
 
+ts = pd.read_csv("top_shift_ccw_final.csv", index_col=[0, 1])
+ts.index.names = ["Topology", "Iteration"]
+
+for g in ts.index.levels[0]:
+    ts.loc[g].to_csv("top_shift_ccw_{0}.csv".format(g))
+
 es = pd.read_csv("env_shift_results_final.csv", index_col=[0, 1])
 es.index.names = ["Topology", "Iteration"]
 
@@ -17,6 +23,12 @@ es.index.names = ["Topology", "Iteration"]
 
 for g in es.index.levels[0]:
     es.loc[g].to_csv("env_shift_gauss_{0}.csv".format(g))
+
+es = pd.read_csv("env_shift_gauss_ccw_final.csv", index_col=[0, 1])
+es.index.names = ["Topology", "Iteration"]
+
+for g in es.index.levels[0]:
+    es.loc[g].to_csv("env_shift_gauss_ccw_{0}.csv".format(g))
 
 
 with open("top_shift_mason.tikz", "w") as f:
