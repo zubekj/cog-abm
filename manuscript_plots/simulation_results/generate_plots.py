@@ -465,7 +465,7 @@ with open("env_shift_gauss.tikz", "w") as f:
 with open("env_shift_gauss_ccw.tikz", "w") as f:
     f.write("\\begin{tikzpicture}\n")
     f.write("\\definecolor{color0}{rgb}{0.917647058823529,0.917647058823529,0.949019607843137}")
-    f.write("\\begin{axis}[width=.7\\linewidth, height=.45\\linewidth,"\
+    f.write("\\begin{axis}[width=.7\\linewidth, height=.45\\linewidth, ymax=25"\
             "xlabel=Iterations, "\
             "cycle multi list={Dark2-8},"\
             "axis background/.style={fill=color0},"\
@@ -498,7 +498,7 @@ with open("env_shift_gauss_ccw.tikz", "w") as f:
                     "{{simulation_results/env_shift_gauss_ccw_{0}.csv}};\n".format(g))
 
     f.write("\\legend{clique, max avg bet, , , , , min avg bet, , , star, star speaker, star hearer}")
-    f.write("\\draw[dashed] (axis cs:9999,-0.1) -- (axis cs:9999,1);\n")
+    f.write("\\draw[dashed] (axis cs:9999,-0.1) -- (axis cs:9999,25);\n")
     f.write("\\end{axis}\n")
 
     f.write("\\begin{axis}[width=.7\\linewidth, height=.45\\linewidth,"\
