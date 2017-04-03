@@ -54,7 +54,7 @@
         },
         "environment": {
           "name": "global1",
-          "source": "../../../examples/environment/16_colors1.json",
+          "source": "../../../examples/environment/16_colors.json",
           "distance": 50
         }
       },
