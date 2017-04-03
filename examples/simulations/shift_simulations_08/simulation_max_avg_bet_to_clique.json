@@ -14,7 +14,7 @@
         "learning": true,
         "inc_category_threshold": 0.95,
         "network": {
-          "type": "Source", "source": "../../networks/N008d03_max_avg_betweenness_best01.json"
+          "type": "Source", "source": "../../networks/N008d03_max_avg_betweenness_best01.cogabm.json"
         },
         "environment": {
           "name": "global",
@@ -47,7 +47,7 @@
         "learning": false,
         "inc_category_threshold": 0.95,
         "network": {
-          "type": "Source", "source": "../../networks/N008d03_max_avg_betweenness_best01.json"
+          "type": "Source", "source": "../../networks/N008d03_max_avg_betweenness_best01.cogabm.json"
         },
         "environment": {
           "name": "global",
