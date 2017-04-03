@@ -84,9 +84,13 @@ if __name__ == "__main__":
 
     results, simulation = steels_experiment(**params)
 
+    import pandas as pd
+    results = pd.DataFrame(results[1], columns=results[0])
+    results.to_csv(args.results_file, index=False)
+
     # Saving results of simulation - always.
-    with open(args.results_file, "w") as f:
-        cPickle.dump((results, params), f)
+    #with open(args.results_file, "w") as f:
+    #    cPickle.dump((results, params), f)
 
     # Saving whole simulation - only when specified.
     save_simulation = args.save_simulation
