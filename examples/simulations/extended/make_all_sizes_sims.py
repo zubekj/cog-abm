@@ -6,7 +6,7 @@ import logging
 
 BASE_DIR = 'base_sims'
 OUT_DIR = '.'
-SIZES = [8, 12, 24, 32]  # No 16!
+SIZES = [8, 12, 24, 32, 48]  # No 16!
 
 
 logging.basicConfig(level=logging.INFO)
