@@ -10,7 +10,7 @@ DUMP_FREQ = 50
 N_SIM = 10
 
 networks = ["max_avg_bet", "min_avg_bet"]
-networks2 = ["hub", "clique", "hub_hearer", "hub_speaker"]
+networks2 = ["hub", "clique"]  # , "hub_hearer", "hub_speaker"]
 results = {"CSA", "DSA", "CLA", "DG_CLA"}
 
 SIZES = [8, 12]
