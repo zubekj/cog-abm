@@ -10,9 +10,9 @@ N_PROC = 6
 
 N_SIM = 10
 
-SIM_BASE_DIR = 'examples/simulations/extended'
-RES_BASE_DIR = 'results_of_simulation/extended'
-RESULTS_FILE = 'extended_simulation_results.csv'
+SIM_BASE_DIR = 'examples/simulations/ext_env_shift'
+RES_BASE_DIR = 'results_of_simulation/ext_env_shift'
+RESULTS_FILE = 'ext_env_shift_results.csv'
 
 
 def run_simulations():
