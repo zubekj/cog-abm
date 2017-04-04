@@ -34,11 +34,12 @@ def main():
             with open(in_path)as f_in:
                 sim = json.load(f_in)  # restore state
             sim['num_agents'] = size
-            for _, lst in sim['interactions_sets'].items():
-                for elem in lst:
-                    if elem['network']['type'] == "Source":
-                        elem['network']['source'] = mk_source(elem['network']['source'], size)
-                    # elem['environment']['source'] = '../' + elem['environment']['source']
+            if 'interactions_sets' in sim:
+                for _, lst in sim['interactions_sets'].items():
+                    for elem in lst:
+                        if elem['network']['type'] == "Source":
+                            elem['network']['source'] = mk_source(elem['network']['source'], size)
+                        # elem['environment']['source'] = '../' + elem['environment']['source']
             network = re.match(r'simulation_(\w+)\.json', name).group(1)
             out_name = 'simulation_N{:02d}_{}.json'.format(size, network)
             out_path = os.path.join(OUT_DIR, out_name)

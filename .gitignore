@@ -9,3 +9,4 @@
 *.project
 *.pydevproject
 !results_of_simulation
+.ipynb_checkpoints/
