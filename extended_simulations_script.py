@@ -70,5 +70,5 @@ for size in SIZES:
             data[result + "_mean"][network] = mean.mean(1)
             data[result + "_var"][network] = var.mean(1)
 
-    with open("simulations_results.csv", 'w') as f:
+    with open("simulations_results_{size:02d}.csv".format(size), 'w') as f:
         data.to_csv(f)
