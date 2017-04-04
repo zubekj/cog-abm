@@ -45,17 +45,17 @@ class Simulation(object):
                     game_names.append("DG" if name == "GG" else "DG_{0}".format(name))
         self.game_names = list(set(game_names))
 
-        self.statistic = (["it"] + ["{0}_{1}".format(gname, i) for gname in self.game_names
-                           for i, agent in enumerate(self.get_agents().agents)], [])
+        self.statistic = (["it", "agent"] + [gname for gname in self.game_names], [])
         self.dump_often = dump_often
         self.pb = True
         self.colour_order = colour_order
 
     def dump_results(self, iter_num):
         #cc = copy.deepcopy(self.get_agents())
-        cc = [agent.get_fitness(name) for name in self.game_names for agent in self.get_agents().agents]
-        kr = [iter_num] + cc
-        self.statistic[1].append(kr)
+        for agent in self.get_agents().agents:
+            kr = [iter_num, agent.id] + [agent.get_fitness(name)
+                                         for name in self.game_names]
+            self.statistic[1].append(kr)
         if self.dump_often:
             f = open(self.dump_often + str(iter_num) + ".pout", "wb")
             cPickle.dump(kr, f, PICKLE_PROTOCOL)
