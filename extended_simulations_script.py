@@ -1,82 +1,86 @@
 # -*- coding: utf-8 -*-
 # /COG_SIM
 import os
+import re
 from multiprocessing import Pool
 import pandas as pd  # must be python2
 
+
 N_PROC = 6
-ITER = 20000
-DUMP_FREQ = 50
-N_SIM = 10
 
-networks = ["max_avg_bet", "min_avg_bet"]
-networks2 = ["hub", "clique"]  # , "hub_hearer", "hub_speaker"]
-results = {"CSA", "DSA", "CLA", "DG_CLA"}
+# N_SIM = 10
+N_SIM = 3
 
-SIZES = [8, 12]
+SIM_BASE_DIR = 'examples/simulations/extended'
+RES_BASE_DIR = 'results_of_simulation/extended'
+RESULTS_FILE = 'extended_simulation_results.csv'
 
-for size in SIZES:
-    size_dir = 'results_of_simulation/extended/N{size:02d}'.format(size=size)
-    if not os.path.exists(size_dir):
-        os.mkdir(size_dir)
+
+def run_simulations():
+    print("Results file: " + RESULTS_FILE)
+    if os.path.exists(RESULTS_FILE):
+        print("Results file exists, exiting!")
+        return
+
+    SIMULATION_FILES = [
+        os.path.join(SIM_BASE_DIR, fn)
+        for fn in os.listdir(SIM_BASE_DIR)
+        if fn.endswith('.json')
+        ]
+    print("Running %d simulations:" % len(SIMULATION_FILES))
+    for fn in SIMULATION_FILES:
+        print(fn)
 
     pool = Pool(processes=N_PROC)
 
     # simulations
-    for i in range(N_SIM):
-        for network in networks + networks2:
-            res_fname = "results_of_simulation/extended/N{size:02d}/results_{0}_to_clique{1}".format(network, i, size=size)
+    for i in xrange(N_SIM):
+        for sim_fname in SIMULATION_FILES:
+            res_fname = os.path.join(RES_BASE_DIR, "{0}_{1}.csv".format(os.path.basename(sim_fname), i))
             if not os.path.isfile(res_fname):
-                pool.apply_async(os.system, ["python2 cog_simulations/steels/steels_main.py -s examples/simulations/extended/N{size:02d}/simulation_{0}_to_clique.json -r {1}".format(network, res_fname, size=size)])
+                pool.apply_async(os.system, ["python2 cog_simulations/steels/steels_main.py -s {0} -r {1}".format(sim_fname, res_fname)])
 
     pool.close()
     pool.join()
 
-    print("Simulations done")
+    print("Simulations done.")
 
-    pool = Pool(processes=N_PROC)
 
-    # analyzer
-    for i in range(N_SIM):
-        for result in results:
-            for network in networks+networks2:
-                res_fname = "results_of_simulation/extended/N{size:02d}/data_{0}_to_clique_{2}{1}".format(network, i, result, size=size)
-                if not os.path.isfile(res_fname):
-                    pool.apply_async(os.system, ["python2 cog_simulations/steels/analyzer.py -r results_of_simulation/extended/N{size:02d}/results_{0}_to_clique{1} it {2} > {3}".format(network, i, result, res_fname, size=size)])
+def merge_results():
+    RESULTS_PARTS = [
+        os.path.join(RES_BASE_DIR, fn)
+        for fn in os.listdir(RES_BASE_DIR)
+        if fn.endswith('.json')
+    ]
 
-    pool.close()
-    pool.join()
+    print("Merging %d results:" % len(RESULTS_PARTS))
+    for fn in RESULTS_PARTS:
+        print(fn)
 
-    print("Analyzing done")
+    res_dfs = []
 
     # pandas
-    # czy wywalamy co drugi wiersz?
-    index = range(0, ITER+10, DUMP_FREQ)
-    columns = []
+    for res_fname in RESULTS_PARTS:
+        res = pd.read_csv(res_fname).drop("agent", axis=1).groupby("it")
+        res = pd.concat(
+            (
+                res.mean().rename(columns=lambda c: "{0}_mean".format(c)),
+                res.var().rename(columns=lambda c: "{0}_avar".format(c))
+            ),
+            axis=1
+        )
+        m = re.match(r"^simulation_N(?Psize\d+)_(?Pnetwork\w+)_(?Pisim\d+)\.json$", res_fname)
+        res["network"] = m.group('network')
+        res["simulation"] = int(m.group['isim'])
+        res["network_size"] = int(m.group['size'])
+        res_dfs.append(res)
 
-    for result in results:
-        columns.append(result + "_mean")
-        columns.append(result + "_var")
+    res = pd.concat(res_dfs)
+    res.to_csv(RESULTS_FILE)
 
-    mindex = pd.MultiIndex.from_product((networks + networks2, index))
-    data = pd.DataFrame(index=mindex, columns=columns)
+    print("Stats done.")
 
-    for result in results:
-        for network in networks + networks2:
-            mean = pd.DataFrame(index=index)
-            var = pd.DataFrame(index=index)
-            for i in range(N_SIM):
-                print("results_of_simulation/extended/N{size:02d}/data_{0}_to_clique_{1}{2}".format(network, result, i, size=size))
-                data_sim = pd.read_csv(
-                    "results_of_simulation/extended/N{size:02d}/data_{0}_to_clique_{1}{2}".format(network, result, i, size=size), delim_whitespace=True, header=None, index_col=0)
-                mean[i] = (data_sim.mean(1))
-                var[i] = (data_sim.var(1))
-            data[result + "_mean"][network] = mean.mean(1)
-            data[result + "_var"][network] = var.mean(1)
 
-    print("Statistics done")
-
-    with open("simulations_results_{size:02d}.csv".format(size=size), 'w') as f:
-        data.to_csv(f)
-
-    print("All done")
+if __name__ == "__main__":
+    run_simulations()
+    merge_results()

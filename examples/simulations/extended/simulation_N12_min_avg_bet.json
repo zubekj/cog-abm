@@ -4,12 +4,12 @@
         "1": [
             {
                 "network": {
-                    "source": "../../../networks/N012d03_max_avg_betweenness_best01.cogabm.json", 
+                    "source": "../../networks/N012d03_min_avg_betweenness_best01.cogabm.json", 
                     "type": "Source"
                 }, 
                 "inc_category_threshold": 0.95, 
                 "environment": {
-                    "source": "../../../../examples/environment/1269_munsell_chips.json", 
+                    "source": "../../../examples/environment/1269_munsell_chips.json", 
                     "name": "global", 
                     "distance": 50
                 }, 
@@ -24,7 +24,7 @@
                 }, 
                 "id": 2, 
                 "environment": {
-                    "source": "../../../../examples/environment/1269_munsell_chips.json", 
+                    "source": "../../../examples/environment/1269_munsell_chips.json", 
                     "name": "global", 
                     "distance": 50
                 }, 
@@ -38,12 +38,12 @@
         "10000": [
             {
                 "network": {
-                    "source": "../../../networks/N012d03_max_avg_betweenness_best01.cogabm.json", 
+                    "source": "../../networks/N012d03_min_avg_betweenness_best01.cogabm.json", 
                     "type": "Source"
                 }, 
                 "inc_category_threshold": 0.95, 
                 "environment": {
-                    "source": "../../../../examples/environment/1269_munsell_chips.json", 
+                    "source": "../../../examples/environment/1269_munsell_chips.json", 
                     "name": "global", 
                     "distance": 50
                 }, 
@@ -58,7 +58,7 @@
                 }, 
                 "id": 2, 
                 "environment": {
-                    "source": "../../../../examples/environment/1269_munsell_chips.json", 
+                    "source": "../../../examples/environment/1269_munsell_chips.json", 
                     "name": "global", 
                     "distance": 50
                 }, 

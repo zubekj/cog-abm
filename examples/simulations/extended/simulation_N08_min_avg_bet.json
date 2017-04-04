@@ -1,14 +1,15 @@
 {
-    "num_agents": 32, 
+    "num_agents": 8, 
     "interactions_sets": {
         "1": [
             {
                 "network": {
-                    "type": "Hub"
+                    "source": "../../networks/N008d03_min_avg_betweenness_best01.cogabm.json", 
+                    "type": "Source"
                 }, 
                 "inc_category_threshold": 0.95, 
                 "environment": {
-                    "source": "../../../../examples/environment/1269_munsell_chips.json", 
+                    "source": "../../../examples/environment/1269_munsell_chips.json", 
                     "name": "global", 
                     "distance": 50
                 }, 
@@ -23,7 +24,7 @@
                 }, 
                 "id": 2, 
                 "environment": {
-                    "source": "../../../../examples/environment/1269_munsell_chips.json", 
+                    "source": "../../../examples/environment/1269_munsell_chips.json", 
                     "name": "global", 
                     "distance": 50
                 }, 
@@ -37,11 +38,12 @@
         "10000": [
             {
                 "network": {
-                    "type": "Hub"
+                    "source": "../../networks/N008d03_min_avg_betweenness_best01.cogabm.json", 
+                    "type": "Source"
                 }, 
                 "inc_category_threshold": 0.95, 
                 "environment": {
-                    "source": "../../../../examples/environment/1269_munsell_chips.json", 
+                    "source": "../../../examples/environment/1269_munsell_chips.json", 
                     "name": "global", 
                     "distance": 50
                 }, 
@@ -56,7 +58,7 @@
                 }, 
                 "id": 2, 
                 "environment": {
-                    "source": "../../../../examples/environment/1269_munsell_chips.json", 
+                    "source": "../../../examples/environment/1269_munsell_chips.json", 
                     "name": "global", 
                     "distance": 50
                 }, 
