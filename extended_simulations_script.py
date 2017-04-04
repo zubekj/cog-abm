@@ -8,8 +8,7 @@ import pandas as pd  # must be python2
 
 N_PROC = 6
 
-# N_SIM = 10
-N_SIM = 3
+N_SIM = 10
 
 SIM_BASE_DIR = 'examples/simulations/extended'
 RES_BASE_DIR = 'results_of_simulation/extended'
@@ -69,7 +68,7 @@ def merge_results():
             ),
             axis=1
         )
-        m = re.match(r"^simulation_N(?P<size>\d+)_(?P<network>\w+)\.json_(?P<isim>\d+)\.csv$", res_fname)
+        m = re.match(r"^simulation_N(?P<size>\d+)_(?P<network>\w+)\.json_(?P<isim>\d+)\.csv$", os.path.basename(res_fname))
         res["network"] = m.group('network')
         res["simulation"] = int(m.group('isim'))
         res["network_size"] = int(m.group('size'))
