@@ -71,8 +71,8 @@ def merge_results():
         )
         m = re.match(r"^simulation_N(?Psize\d+)_(?Pnetwork\w+)_(?Pisim\d+)\.json$", res_fname)
         res["network"] = m.group('network')
-        res["simulation"] = int(m.group['isim'])
-        res["network_size"] = int(m.group['size'])
+        res["simulation"] = int(m.group('isim'))
+        res["network_size"] = int(m.group('size'))
         res_dfs.append(res)
 
     res = pd.concat(res_dfs)
