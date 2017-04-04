@@ -36,15 +36,26 @@ class Simulation(object):
         self.interactions_set = interactions_sets[1]
         self.interactions_sets = interactions_sets
 
-        self.statistic = []
+        game_names = []
+        for k in self.interactions_sets:
+            for interaction in self.interactions_sets[k]:
+                name = interaction.game_name
+                game_names.append(name)
+                if interaction.__class__.__name__ == "GuessingGame":
+                    game_names.append("DG" if name == "GG" else "DG_{0}".format(name))
+        self.game_names = list(set(game_names))
+
+        self.statistic = (["it", "agent"] + [gname for gname in self.game_names], [])
         self.dump_often = dump_often
         self.pb = True
         self.colour_order = colour_order
 
     def dump_results(self, iter_num):
-        cc = copy.deepcopy(self.get_agents())
-        kr = (iter_num, cc)
-        self.statistic.append(kr)
+        #cc = copy.deepcopy(self.get_agents())
+        for agent in self.get_agents().agents:
+            kr = [iter_num, agent.id] + [agent.get_fitness(name)
+                                         for name in self.game_names]
+            self.statistic[1].append(kr)
         if self.dump_often:
             f = open(self.dump_often + str(iter_num) + ".pout", "wb")
             cPickle.dump(kr, f, PICKLE_PROTOCOL)

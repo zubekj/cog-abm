@@ -67,8 +67,12 @@ if __name__ == "__main__":
 
     set_logging_options()
 
+    print("A")
+
     with open(arguments.results) as f:
         results, parameters = cPickle.load(f)
+
+    print("A")
 
     functions_dictionary = {"ccw": lambda agents, iteration: count_category_words(agents, parameters),
                             "CS": lambda agents, iteration: [communication_success_of_population(agents, iteration)],
