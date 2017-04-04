@@ -32,6 +32,8 @@ for size in SIZES:
     pool.close()
     pool.join()
 
+    print("Simulations done")
+
     pool = Pool(processes=N_PROC)
 
     # analyzer
@@ -44,6 +46,8 @@ for size in SIZES:
 
     pool.close()
     pool.join()
+
+    print("Analyzing done")
 
     # pandas
     # czy wywalamy co drugi wiersz?
@@ -70,5 +74,9 @@ for size in SIZES:
             data[result + "_mean"][network] = mean.mean(1)
             data[result + "_var"][network] = var.mean(1)
 
-    with open("simulations_results_{size:02d}.csv".format(size), 'w') as f:
+    print("Statistics done")
+
+    with open("simulations_results_{size:02d}.csv".format(size=size), 'w') as f:
         data.to_csv(f)
+
+    print("All done")
