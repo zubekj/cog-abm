@@ -50,7 +50,7 @@ def merge_results():
     RESULTS_PARTS = [
         os.path.join(RES_BASE_DIR, fn)
         for fn in os.listdir(RES_BASE_DIR)
-        if fn.endswith('.json')
+        if fn.endswith('.csv')
     ]
 
     print("Merging %d results:" % len(RESULTS_PARTS))
@@ -69,7 +69,7 @@ def merge_results():
             ),
             axis=1
         )
-        m = re.match(r"^simulation_N(?Psize\d+)_(?Pnetwork\w+)_(?Pisim\d+)\.json$", res_fname)
+        m = re.match(r"^simulation_N(?P<size>\d+)_(?P<network>\w+)\.json_(?P<isim>\d+)\.csv$", res_fname)
         res["network"] = m.group('network')
         res["simulation"] = int(m.group('isim'))
         res["network_size"] = int(m.group('size'))
