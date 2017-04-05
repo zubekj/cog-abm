@@ -18,6 +18,7 @@ def run_simulations(sim_base_dir, res_base_dir, n_sim, n_proc):
         if fn.endswith('.json')
         ]
     print("Running %d simulations:" % len(simulation_files))
+    simulation_files.sort()
     for fn in simulation_files:
         print(fn)
 
@@ -53,6 +54,7 @@ def merge_results(res_base_dir, results_file):
         for fn in os.listdir(res_base_dir)
         if fn.endswith('.csv')
     ]
+    RESULT_PARTS.sort()
 
     print("Merging %d results:" % len(RESULTS_PARTS))
     for fn in RESULTS_PARTS:
