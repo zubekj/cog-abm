@@ -7,35 +7,26 @@ import pandas as pd  # must be python2
 
 
 N_PROC = 6
-
 N_SIM = 10
 
-SIM_BASE_DIR = 'examples/simulations/ext_env_shift'
-RES_BASE_DIR = 'results_of_simulation/ext_env_shift'
-RESULTS_FILE = 'ext_env_shift_results.csv'
 
+def run_simulations(sim_base_dir, res_base_dir, n_sim, n_proc):
 
-def run_simulations():
-    print("Results file: " + RESULTS_FILE)
-    if os.path.exists(RESULTS_FILE):
-        print("Results file exists, exiting!")
-        return
-
-    SIMULATION_FILES = [
-        os.path.join(SIM_BASE_DIR, fn)
-        for fn in os.listdir(SIM_BASE_DIR)
+    simulation_files = [
+        os.path.join(sim_base_dir, fn)
+        for fn in os.listdir(sim_base_dir)
         if fn.endswith('.json')
         ]
-    print("Running %d simulations:" % len(SIMULATION_FILES))
-    for fn in SIMULATION_FILES:
+    print("Running %d simulations:" % len(simulation_files))
+    for fn in simulation_files:
         print(fn)
 
     pool = Pool(processes=N_PROC)
 
     # simulations
-    for i in xrange(N_SIM):
-        for sim_fname in SIMULATION_FILES:
-            res_fname = os.path.join(RES_BASE_DIR, "{0}_{1}.csv".format(os.path.basename(sim_fname), i))
+    for i in range(N_SIM):
+        for sim_fname in simulation_files:
+            res_fname = os.path.join(res_base_dir, "{0}_{1}.csv".format(os.path.basename(sim_fname), i))
             if not os.path.isfile(res_fname):
                 pool.apply_async(os.system, ["python2 cog_simulations/steels/steels_main.py -s {0} -r {1}".format(sim_fname, res_fname)])
 
@@ -45,10 +36,15 @@ def run_simulations():
     print("Simulations done.")
 
 
-def merge_results():
+def merge_results(res_base_dir, results_file):
+    print("Results file: " + results_file)
+    if os.path.exists(results_file):
+        print("Results file %s exists, exiting!" % results_file)
+        return
+
     RESULTS_PARTS = [
-        os.path.join(RES_BASE_DIR, fn)
-        for fn in os.listdir(RES_BASE_DIR)
+        os.path.join(res_base_dir, fn)
+        for fn in os.listdir(res_base_dir)
         if fn.endswith('.csv')
     ]
 
@@ -75,11 +71,19 @@ def merge_results():
         res_dfs.append(res)
 
     res = pd.concat(res_dfs)
-    res.to_csv(RESULTS_FILE)
+    res.to_csv(results_file)
 
     print("Stats done.")
 
 
+def run_sim(name):
+    sim_base_dir = 'examples/simulations/%s' % name
+    res_base_dir = 'results_of_simulation/%s' % name
+    results_file = '%s_results.csv' % name
+    run_simulations(sim_base_dir, res_base_dir, N_SIM, N_PROC)
+    merge_results(res_base_dir, results_file)
+
+
 if __name__ == "__main__":
-    run_simulations()
-    merge_results()
+    run_sim('ext_env_shift')
+    run_sim('ext_top_shift')
