@@ -17,12 +17,12 @@ from cog_simulations.cog_abm.extras.fitness import get_buffered_average
 WINDOW_SIZE = 50
 
 
-def get_ds_fitness():
-    return get_buffered_average(WINDOW_SIZE)
+def get_ds_fitness(size):
+    return get_buffered_average(size)
 
 
-def get_cs_fitness():
-    return get_buffered_average(WINDOW_SIZE)
+def get_cs_fitness(size):
+    return get_buffered_average(size)
 
 
 def discrimination_success_of_agent(agent):
