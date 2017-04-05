@@ -23,7 +23,7 @@ def steels_experiment(num_iter=1000, dump_freq=50, alpha=0.1, beta=1, sigma=10, 
     """
 
     games_labels = load_games_labels(interactions_sets)
-    agents = load_agents(agents, games_labels)
+    agents = load_agents(agents, games_labels, dump_freq)
 
     for interactions_set in interactions_sets.values():
         for interaction_data in interactions_set:
@@ -58,7 +58,7 @@ def load_games_labels(interactions_sets):
     return list(set(labels))
 
 
-def load_agents(agents, games_labels):
+def load_agents(agents, games_labels, dump_freq):
     from cog_simulations.cog_abm.core.agent import Agent
     from cog_simulations.steels.core.steels_agent_state_with_lexicon import SteelsAgentStateWithLexicon
     from cog_simulations.cog_abm.agent.sensor import SimpleSensor
@@ -74,7 +74,7 @@ def load_agents(agents, games_labels):
         true_agent = Agent(state=state, sensor=SimpleSensor())
 
         for label in games_labels:
-            true_agent.set_fitness_measure(label, metrics.get_cs_fitness())
+            true_agent.set_fitness_measure(label, metrics.get_cs_fitness(dump_freq))
 
         true_agents.append(true_agent)
 
