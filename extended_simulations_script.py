@@ -2,7 +2,7 @@
 # /COG_SIM
 import os
 import re
-import concurrency.futures as cf
+import concurrent.futures as cf
 import pandas as pd  # must be python2
 
 
@@ -22,7 +22,7 @@ def run_simulations(sim_base_dir, res_base_dir, n_sim, n_proc):
         print(fn)
 
     future_to_desc = {}
-    with cf.ProcessPoolExecutor(max_workers=n_proc) as ex:
+    with cf.ThreadPoolExecutor(max_workers=n_proc) as ex:
         # simulations
         for i in range(N_SIM):
             for sim_fname in simulation_files:
