@@ -4,6 +4,8 @@ import os
 import re
 import concurrent.futures as cf
 import pandas as pd  # must be python2
+import time
+from datetime import timedelta
 
 
 N_PROC = 6
@@ -16,7 +18,7 @@ def run_simulations(sim_base_dir, res_base_dir, n_sim, n_proc):
         os.path.join(sim_base_dir, fn)
         for fn in os.listdir(sim_base_dir)
         if fn.endswith('.json')
-        ]
+    ]
     print("Running %d simulations:" % len(simulation_files))
     simulation_files.sort()
     for fn in simulation_files:
@@ -35,10 +37,18 @@ def run_simulations(sim_base_dir, res_base_dir, n_sim, n_proc):
                 else:
                     print(res_fname + ' already exists, skipping.')
 
+        t0 = time.time()
         n_completed = 0
         for f in cf.as_completed(future_to_desc):
             n_completed += 1
-            print("Completed {} ({}/{})".format(future_to_desc[f], n_completed, len(future_to_desc)))
+            td = timedelta(seconds=time.time() - t0)
+            print(
+                "Completed {} ({}/{}) in {}".format(
+                    future_to_desc[f],
+                    n_completed, len(future_to_desc),
+                    str(td)
+                )
+            )
 
     print("Simulations done.")
 
