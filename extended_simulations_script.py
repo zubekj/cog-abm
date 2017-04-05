@@ -59,21 +59,21 @@ def merge_results(res_base_dir, results_file):
         print("Results file %s exists, exiting!" % results_file)
         return
 
-    RESULTS_PARTS = [
+    result_parts = [
         os.path.join(res_base_dir, fn)
         for fn in os.listdir(res_base_dir)
         if fn.endswith('.csv')
     ]
-    RESULT_PARTS.sort()
+    result_parts.sort()
 
-    print("Merging %d results:" % len(RESULTS_PARTS))
-    for fn in RESULTS_PARTS:
+    print("Merging %d results:" % len(result_parts))
+    for fn in result_parts:
         print(fn)
 
     res_dfs = []
 
     # pandas
-    for res_fname in RESULTS_PARTS:
+    for res_fname in result_parts:
         res = pd.read_csv(res_fname).drop("agent", axis=1).groupby("it")
         res = pd.concat(
             (
