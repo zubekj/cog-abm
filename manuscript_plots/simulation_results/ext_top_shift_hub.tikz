@@ -1,0 +1,48 @@
+\begin{tikzpicture}
+\definecolor{color0}{rgb}{0.917647058823529,0.917647058823529,0.949019607843137}
+        \definecolor{Dark27qual0}{RGB}{27,158,119}
+        \definecolor{Dark27qual1}{RGB}{217,95,2}
+        \definecolor{Dark27qual2}{RGB}{117,112,179}
+        \definecolor{Dark27qual3}{RGB}{231,41,138}
+        \definecolor{Dark27qual4}{RGB}{102,166,30}
+        \definecolor{Dark27qual5}{RGB}{230,171,2}
+        \definecolor{Dark27qual6}{RGB}{166,118,29}
+    \begin{axis}[width=.7\linewidth, height=.45\linewidth, ymax=0.9,xlabel=Iterations, axis background/.style={fill=color0},grid=both, grid style={white},axis line style={white},every tick/.style={white},legend style={
+at={(1.05, 1.0)}, anchor=north west},ylabel=Mean CS\textsubscript{L}]
+\addplot +[mark=none, dashed, thick, color=Dark27qual0] table[col sep=comma, x=it, y=GG_mean] {simulation_results/ext_top_shift_hub_speaker_8.csv};
+\addlegendentry{star hearer 8}
+\addplot +[mark=none, dashed, thick, color=Dark27qual1] table[col sep=comma, x=it, y=GG_mean] {simulation_results/ext_top_shift_hub_speaker_12.csv};
+\addlegendentry{star hearer 12}
+\addplot +[mark=none, dashed, thick, color=Dark27qual2] table[col sep=comma, x=it, y=GG_mean] {simulation_results/ext_top_shift_hub_speaker_24.csv};
+\addlegendentry{star hearer 24}
+\addplot +[mark=none, dashed, thick, color=Dark27qual3] table[col sep=comma, x=it, y=GG_mean] {simulation_results/ext_top_shift_hub_speaker_32.csv};
+\addlegendentry{star hearer 32}
+\addplot +[mark=none, dashed, thick, color=Dark27qual4] table[col sep=comma, x=it, y=GG_mean] {simulation_results/ext_top_shift_hub_speaker_48.csv};
+\addlegendentry{star hearer 48}
+\addplot +[mark=none, solid, thick, color=Dark27qual0] table[col sep=comma, x=it, y=GG_mean] {simulation_results/ext_top_shift_hub_hearer_8.csv};
+\addlegendentry{star speaker 8}
+\addplot +[mark=none, solid, thick, color=Dark27qual1] table[col sep=comma, x=it, y=GG_mean] {simulation_results/ext_top_shift_hub_hearer_12.csv};
+\addlegendentry{star speaker 12}
+\addplot +[mark=none, solid, thick, color=Dark27qual2] table[col sep=comma, x=it, y=GG_mean] {simulation_results/ext_top_shift_hub_hearer_24.csv};
+\addlegendentry{star speaker 24}
+\addplot +[mark=none, solid, thick, color=Dark27qual3] table[col sep=comma, x=it, y=GG_mean] {simulation_results/ext_top_shift_hub_hearer_32.csv};
+\addlegendentry{star speaker 32}
+\addplot +[mark=none, solid, thick, color=Dark27qual4] table[col sep=comma, x=it, y=GG_mean] {simulation_results/ext_top_shift_hub_hearer_48.csv};
+\addlegendentry{star speaker 48}
+\draw[dashed] (axis cs:9999,-0.1) -- (axis cs:9999,1);
+\end{axis}
+\begin{axis}[width=.7\linewidth, height=.45\linewidth, ymax=0.9,at={(0, -.41\linewidth)}, xlabel=Iterations,axis background/.style={fill=color0},grid=both, grid style={white},axis line style={white},every tick/.style={white},legend style={
+at={(0, -0.2)}, anchor=north west},ylabel=Mean CS\textsubscript{G}]
+\addplot +[mark=none, dashed, thick, color=Dark27qual0] table[col sep=comma, x=it, y=CL_mean] {simulation_results/ext_top_shift_hub_speaker_8.csv};
+\addplot +[mark=none, dashed, thick, color=Dark27qual1] table[col sep=comma, x=it, y=CL_mean] {simulation_results/ext_top_shift_hub_speaker_12.csv};
+\addplot +[mark=none, dashed, thick, color=Dark27qual2] table[col sep=comma, x=it, y=CL_mean] {simulation_results/ext_top_shift_hub_speaker_24.csv};
+\addplot +[mark=none, dashed, thick, color=Dark27qual3] table[col sep=comma, x=it, y=CL_mean] {simulation_results/ext_top_shift_hub_speaker_32.csv};
+\addplot +[mark=none, dashed, thick, color=Dark27qual4] table[col sep=comma, x=it, y=CL_mean] {simulation_results/ext_top_shift_hub_speaker_48.csv};
+\addplot +[mark=none, solid, thick, color=Dark27qual0] table[col sep=comma, x=it, y=CL_mean] {simulation_results/ext_top_shift_hub_hearer_8.csv};
+\addplot +[mark=none, solid, thick, color=Dark27qual1] table[col sep=comma, x=it, y=CL_mean] {simulation_results/ext_top_shift_hub_hearer_12.csv};
+\addplot +[mark=none, solid, thick, color=Dark27qual2] table[col sep=comma, x=it, y=CL_mean] {simulation_results/ext_top_shift_hub_hearer_24.csv};
+\addplot +[mark=none, solid, thick, color=Dark27qual3] table[col sep=comma, x=it, y=CL_mean] {simulation_results/ext_top_shift_hub_hearer_32.csv};
+\addplot +[mark=none, solid, thick, color=Dark27qual4] table[col sep=comma, x=it, y=CL_mean] {simulation_results/ext_top_shift_hub_hearer_48.csv};
+\draw[dashed] (axis cs:9999,-0.1) -- (axis cs:9999,1);
+\end{axis}
+\end{tikzpicture}
