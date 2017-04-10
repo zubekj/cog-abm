@@ -1,0 +1,80 @@
+{
+    "num_agents": 32, 
+    "interactions_sets": {
+        "1": [
+            {
+                "network": {
+                    "source": "../../networks/N032d03_max_avg_betweenness_best01.cogabm.json", 
+                    "type": "Source"
+                }, 
+                "inc_category_threshold": 0.95, 
+                "environment": {
+                    "source": "../../../examples/environment/16_colors1.json", 
+                    "name": "global1", 
+                    "distance": 1
+                }, 
+                "context_size": 4, 
+                "learning": true, 
+                "type": "NamingGame", 
+                "id": 1
+            }, 
+            {
+                "network": {
+                    "source": "../../networks/N032d03_max_avg_betweenness_best01.cogabm.json", 
+                    "type": "Source"
+                }, 
+                "id": 2, 
+                "environment": {
+                    "source": "../../../examples/environment/16_colors2.json", 
+                    "name": "global2", 
+                    "distance": 1
+                }, 
+                "context_size": 4, 
+                "game_name": "CL", 
+                "learning": false, 
+                "type": "NamingGame", 
+                "inc_category_threshold": 0.95
+            }
+        ], 
+        "20000": [
+            {
+                "network": {
+                    "source": "../../networks/N032d03_max_avg_betweenness_best01.cogabm.json", 
+                    "type": "Source"
+                }, 
+                "inc_category_threshold": 0.95, 
+                "environment": {
+                    "source": "../../../examples/environment/16_colors1.json", 
+                    "name": "global1", 
+                    "distance": 1
+                }, 
+                "context_size": 4, 
+                "learning": false, 
+                "type": "NamingGame", 
+                "id": 1
+            }, 
+            {
+                "network": {
+                    "source": "../../networks/N032d03_max_avg_betweenness_best01.cogabm.json", 
+                    "type": "Source"
+                }, 
+                "id": 2, 
+                "environment": {
+                    "source": "../../../examples/environment/16_colors2.json", 
+                    "name": "global2", 
+                    "distance": 1
+                }, 
+                "context_size": 4, 
+                "game_name": "CL", 
+                "learning": true, 
+                "type": "NamingGame", 
+                "inc_category_threshold": 0.95
+            }
+        ]
+    }, 
+    "beta": 1, 
+    "dump_freq": 100, 
+    "alpha": 0.1, 
+    "sigma": 1, 
+    "num_iter": 40000
+}

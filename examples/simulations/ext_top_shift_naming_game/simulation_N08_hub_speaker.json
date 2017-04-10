@@ -1,0 +1,78 @@
+{
+    "num_agents": 8, 
+    "interactions_sets": {
+        "1": [
+            {
+                "network": {
+                    "type": "Hub"
+                }, 
+                "type": "NamingGame", 
+                "inc_category_threshold": 0.95, 
+                "environment": {
+                    "source": "../../../examples/environment/16_colors.json", 
+                    "name": "global", 
+                    "distance": 1
+                }, 
+                "context_size": 4, 
+                "learning": true, 
+                "role_model": "SPEAKER", 
+                "id": 1
+            }, 
+            {
+                "network": {
+                    "type": "Clique"
+                }, 
+                "id": 2, 
+                "environment": {
+                    "source": "../../../examples/environment/16_colors.json", 
+                    "name": "global", 
+                    "distance": 1
+                }, 
+                "context_size": 4, 
+                "game_name": "CL", 
+                "learning": false, 
+                "type": "NamingGame", 
+                "inc_category_threshold": 0.95
+            }
+        ], 
+        "5000": [
+            {
+                "network": {
+                    "type": "Hub"
+                }, 
+                "type": "NamingGame", 
+                "inc_category_threshold": 0.95, 
+                "environment": {
+                    "source": "../../../examples/environment/16_colors.json", 
+                    "name": "global", 
+                    "distance": 1
+                }, 
+                "context_size": 4, 
+                "learning": false, 
+                "role_model": "SPEAKER", 
+                "id": 1
+            }, 
+            {
+                "network": {
+                    "type": "Clique"
+                }, 
+                "id": 2, 
+                "environment": {
+                    "source": "../../../examples/environment/16_colors.json", 
+                    "name": "global", 
+                    "distance": 1
+                }, 
+                "context_size": 4, 
+                "game_name": "CL", 
+                "learning": true, 
+                "type": "NamingGame", 
+                "inc_category_threshold": 0.95
+            }
+        ]
+    }, 
+    "beta": 1, 
+    "dump_freq": 25, 
+    "alpha": 0.1, 
+    "sigma": 1, 
+    "num_iter": 10000
+}
