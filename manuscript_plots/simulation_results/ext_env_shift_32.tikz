@@ -7,9 +7,9 @@
                 \definecolor{Dark27qual4}{RGB}{102,166,30}
                 \definecolor{Dark27qual5}{RGB}{230,171,2}
                 \definecolor{Dark27qual6}{RGB}{166,118,29}
-                \begin{axis}[width=.53\linewidth, height=.35\linewidth, ymax=0.9,at={(0, 0)}, xlabel=Iters per node, axis background/.style={fill=color0},grid=both, grid style={white},axis line style={white},every tick/.style={white},legend columns=3,
+                \begin{axis}[width=.53\linewidth, height=.35\linewidth,ymax=0.9,at={(0, 0)}, xlabel=Iters per node, axis background/.style={fill=color0},grid=both, grid style={white},axis line style={white},every tick/.style={white},legend columns=3,
 legend style={
-at={(0, -0.3)}, anchor=north west},ylabel=CS\textsubscript{A}]
+at={(0.2, -0.4)}, anchor=north west},ylabel=CS\textsubscript{L}]
 \addplot +[mark=none, thick, dotted, color=Dark27qual0]table[col sep=comma, x index=0, y=GG_mean] {simulation_results/ext_env_shift_clique_32.csv};
 \addplot +[mark=none, thick, dashed, color=Dark27qual1]table[col sep=comma, x index=0, y=GG_mean] {simulation_results/ext_env_shift_max_avg_bet_32.csv};
 \addplot +[mark=none, thick, dashed, color=Dark27qual2]table[col sep=comma, x index=0, y=GG_mean] {simulation_results/ext_env_shift_min_avg_bet_32.csv};
@@ -18,7 +18,7 @@ at={(0, -0.3)}, anchor=north west},ylabel=CS\textsubscript{A}]
 \addplot +[mark=none, thick, solid, color=Dark27qual5]table[col sep=comma, x index=0, y=GG_mean] {simulation_results/ext_env_shift_hub_hearer_32.csv};
 \draw[dashed] (axis cs:650,-0.1) -- (axis cs:650,1);
 \end{axis}
-\begin{axis}[width=.53\linewidth, height=.35\linewidth, ymax=0.9,at={(0.5\linewidth, 0)}, xlabel=Iters per node,axis background/.style={fill=color0},grid=both, grid style={white},axis line style={white},every tick/.style={white},ylabel=CS\textsubscript{B}]
+\begin{axis}[width=.53\linewidth, height=.35\linewidth,ymax=0.9,at={(0.5\linewidth, 0)}, xlabel=Iters per node,axis background/.style={fill=color0},grid=both, grid style={white},axis line style={white},every tick/.style={white},ylabel=CS\textsubscript{G}]
 \addplot +[mark=none, thick, dotted, color=Dark27qual0]table[col sep=comma, x index=0, y=CL_mean] {simulation_results/ext_env_shift_clique_32.csv};
 \addplot +[mark=none, thick, dashed, color=Dark27qual1]table[col sep=comma, x index=0, y=CL_mean] {simulation_results/ext_env_shift_max_avg_bet_32.csv};
 \addplot +[mark=none, thick, dashed, color=Dark27qual2]table[col sep=comma, x index=0, y=CL_mean] {simulation_results/ext_env_shift_min_avg_bet_32.csv};

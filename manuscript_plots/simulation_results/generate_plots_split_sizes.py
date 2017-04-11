@@ -1,7 +1,7 @@
 import pandas as pd
 
 def generate_plot(outfile, ylabels, plot_files, plot_styles, plot_labels=None,
-                  columns=["GG_mean", "CL_mean"]):
+                  columns=["GG_mean", "CL_mean"], ymax=0.9):
     with open(outfile, "w") as f:
         f.write("\\begin{tikzpicture}\n")
         f.write("\\definecolor{color0}{rgb}{0.917647058823529,0.917647058823529,0.949019607843137}")
@@ -14,7 +14,8 @@ def generate_plot(outfile, ylabels, plot_files, plot_styles, plot_labels=None,
                 \\definecolor{Dark27qual5}{RGB}{230,171,2}
                 \\definecolor{Dark27qual6}{RGB}{166,118,29}
                 """)
-        f.write("\\begin{axis}[width=.53\\linewidth, height=.35\\linewidth, ymax=0.9,"\
+        f.write("\\begin{axis}[width=.53\\linewidth, height=.35\\linewidth," +\
+                "ymax={0},".format(ymax) +\
                 "at={(0, 0)}, xlabel=Iters per node, "\
                 "axis background/.style={fill=color0},"\
                 "grid=both, grid style={white},"\
@@ -22,7 +23,7 @@ def generate_plot(outfile, ylabels, plot_files, plot_styles, plot_labels=None,
                 "every tick/.style={white},"\
                 "legend columns=3,\n"\
                 "legend style={\n"\
-                "at={(0, -0.3)}, anchor=north west}," +\
+                "at={(0.2, -0.4)}, anchor=north west}," +\
                 "ylabel={0}]\n".format(ylabels[0]))
 
         if plot_labels is not None:
@@ -42,7 +43,8 @@ def generate_plot(outfile, ylabels, plot_files, plot_styles, plot_labels=None,
         f.write("\\draw[dashed] (axis cs:650,-0.1) -- (axis cs:650,1);\n")
         f.write("\\end{axis}\n")
 
-        f.write("\\begin{axis}[width=.53\\linewidth, height=.35\\linewidth, ymax=0.9,"\
+        f.write("\\begin{axis}[width=.53\\linewidth, height=.35\\linewidth," +\
+                "ymax={0},".format(ymax) +\
                 "at={(0.5\\linewidth, 0)}, xlabel=Iters per node,"\
                 "axis background/.style={fill=color0},"\
                 "grid=both, grid style={white},"\
@@ -64,24 +66,18 @@ def generate_plot(outfile, ylabels, plot_files, plot_styles, plot_labels=None,
 if __name__ == "__main__":
 
     ts = pd.read_csv("ext_top_shift_results_vi.csv")
-
-    network_sizes = []
     for n1, g1 in ts.groupby("network_size"):
         for n2, g2 in g1.groupby("network"):
             mean_values = g2.groupby("it").mean()
             mean_values.index = mean_values.index / int(n1)
             mean_values.to_csv("ext_top_shift_{0}_{1}.csv".format(n2, n1))
-        network_sizes.append(n1)
 
     ts = pd.read_csv("ext_env_shift_results_vi.csv")
-
-    network_sizes = []
     for n1, g1 in ts.groupby("network_size"):
         for n2, g2 in g1.groupby("network"):
             mean_values = g2.groupby("it").mean()
             mean_values.index = mean_values.index / int(n1)
             mean_values.to_csv("ext_env_shift_{0}_{1}.csv".format(n2, n1))
-        network_sizes.append(n1)
 
     ts = pd.read_csv("top_shift_results_final.csv")
     ts.columns = ["network", "it", "DG_CL_mean", "DG_CL_avar", "GG_mean",
@@ -97,6 +93,19 @@ if __name__ == "__main__":
     for n1, g1 in ts.groupby("network"):
         g1.iloc[:,1:].to_csv("ext_env_shift_{0}_16.csv".format(n1), index=False)
 
+    ts = pd.read_csv("ext_top_shift_naming_game_results_vi.csv")
+    for n1, g1 in ts.groupby("network_size"):
+        for n2, g2 in g1.groupby("network"):
+            mean_values = g2.groupby("it").mean()
+            mean_values.index = mean_values.index / int(n1)
+            mean_values.to_csv("ext_top_shift_naming_game_{0}_{1}.csv".format(n2, n1))
+
+    ts = pd.read_csv("ext_env_shift_naming_game_results_vi.csv")
+    for n1, g1 in ts.groupby("network_size"):
+        for n2, g2 in g1.groupby("network"):
+            mean_values = g2.groupby("it").mean()
+            mean_values.index = mean_values.index / int(n1)
+            mean_values.to_csv("ext_env_shift_naming_game_{0}_{1}.csv".format(n2, n1))
 
     networks = ["clique", "max_avg_bet", "min_avg_bet", "hub", "hub_speaker",
                 "hub_hearer"]
@@ -108,45 +117,28 @@ if __name__ == "__main__":
     ylabels_top_shift = ["CS\\textsubscript{L}", "CS\\textsubscript{G}"]
     ylabels_env_shift = ["CS\\textsubscript{A}", "CS\\textsubscript{B}"]
 
-    plot_files8 = ["ext_top_shift_{0}_8.csv".format(n) for n in networks]
-    generate_plot("ext_top_shift_8.tikz", ylabels_top_shift, plot_files8,
-                  styles)
+    for exp in ["top", "env"]:
+        for size in [8, 12, 24, 32, 48]:
+            plot_files = ["ext_{2}_shift_{0}_{1}.csv".format(n, size, exp)
+                          for n in networks]
+            if size == 48:
+                generate_plot("ext_{1}_shift_{0}.tikz".format(size, exp),
+                              ylabels_top_shift, plot_files, styles, labels)
+            else:
+                generate_plot("ext_{1}_shift_{0}.tikz".format(size, exp),
+                              ylabels_top_shift, plot_files, styles)
 
-    plot_files12 = ["ext_top_shift_{0}_12.csv".format(n) for n in networks]
-    generate_plot("ext_top_shift_12.tikz", ylabels_top_shift, plot_files12,
-                  styles)
-
-    plot_files24 = ["ext_top_shift_{0}_24.csv".format(n) for n in networks]
-    generate_plot("ext_top_shift_24.tikz", ylabels_top_shift, plot_files24,
-                  styles)
-
-    plot_files32 = ["ext_top_shift_{0}_32.csv".format(n) for n in networks]
-    generate_plot("ext_top_shift_32.tikz", ylabels_top_shift, plot_files32,
-                  styles)
-
-    plot_files48 = ["ext_top_shift_{0}_48.csv".format(n) for n in networks]
-    generate_plot("ext_top_shift_48.tikz", ylabels_top_shift, plot_files48,
-                  styles, labels)
-
-    plot_files8 = ["ext_env_shift_{0}_8.csv".format(n) for n in networks]
-    generate_plot("ext_env_shift_8.tikz", ylabels_env_shift, plot_files8,
-                  styles)
-
-    plot_files12 = ["ext_env_shift_{0}_12.csv".format(n) for n in networks]
-    generate_plot("ext_env_shift_12.tikz", ylabels_env_shift, plot_files12,
-                  styles)
-
-    plot_files24 = ["ext_env_shift_{0}_24.csv".format(n) for n in networks]
-    generate_plot("ext_env_shift_24.tikz", ylabels_env_shift, plot_files24,
-                  styles)
-
-    plot_files32 = ["ext_env_shift_{0}_32.csv".format(n) for n in networks]
-    generate_plot("ext_env_shift_32.tikz", ylabels_env_shift, plot_files32,
-                  styles)
-
-    plot_files48 = ["ext_env_shift_{0}_48.csv".format(n) for n in networks]
-    generate_plot("ext_env_shift_48.tikz", ylabels_env_shift, plot_files48,
-                  styles, labels)
+    for exp in ["top", "env"]:
+        for size in [8, 12, 16, 24, 32, 48]:
+            plot_files = ["ext_{2}_shift_naming_game_{0}_{1}.csv".format(n, size, exp)
+                          for n in networks]
+            if size == 16 or size == 48:
+                l = labels
+            else:
+                l = None
+            generate_plot("ext_{1}_shift_naming_game_{0}.tikz".format(size, exp),
+                          ylabels_top_shift, plot_files, styles, l,
+                          ["NG_mean", "CL_mean"], ymax=1.1)
 
     networks = ["clique", "max_avg_bet", "min_avg_bet", "hub", "hub_speaker",
                 "hub_hearer", "max_avg_clust", "max_max_bet", "min_max_clos",
