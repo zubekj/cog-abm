@@ -3,9 +3,11 @@
 *.bak
 *.swp
 */.coverage
+
 #SIMULATION RESULTS:
 *.pout
+net_env_shift_experiment/results_of_simulation
+
 #PROJECT FILES:
 *.project
 *.pydevproject
-!results_of_simulation

@@ -1,7 +1,7 @@
 import argparse
 import sys
 import logging
-import cPickle
+import pickle
 from time import localtime, strftime
 
 sys.path.append('../../')
@@ -86,10 +86,10 @@ if __name__ == "__main__":
 
     # Saving results of simulation - always.
     with open(args.results_file, "w") as f:
-        cPickle.dump((results, params), f)
+        pickle.dump((results, params), f)
 
     # Saving whole simulation - only when specified.
     save_simulation = args.save_simulation
     if save_simulation is not None:
         with open(save_simulation, 'w') as f:
-            cPickle.dump((simulation, params), f)
+            pickle.dump((simulation, params), f)

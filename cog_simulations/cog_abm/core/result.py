@@ -1,7 +1,7 @@
 """
 Module provides class for handling and gathering experiment results.
 """
-import cPickle
+import pickle
 import pprint
 
 
@@ -75,7 +75,7 @@ class ResultHandler(object):
         @param destination: File directory.
         """
         with open(destination, 'w') as file:
-            cPickle.dump(self.results, file)
+            pickle.dump(self.results, file)
 
 
     def save(self, result):
@@ -96,7 +96,7 @@ class ResultHandler(object):
         @param source: Source file directory.
         """
         with open(source, 'r') as file:
-            self.results = cPickle.load(file)
+            self.results = pickle.load(file)
 
 
 

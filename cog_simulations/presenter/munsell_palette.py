@@ -516,7 +516,7 @@ class MunsellPaletteInterface(object):
 
     def get_iteration_from_file(self, source):
         with open(source, 'r') as file:
-            tuple = cPickle.load(file)
+            tuple = pickle.load(file)
 
         self.iterations.append(tuple[0]) 
         agents = tuple[1]

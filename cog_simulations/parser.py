@@ -2,7 +2,7 @@
 Module provides parser for json documents.
 """
 import json
-import cPickle
+import pickle
 import os.path
 
 from cog_simulations.cog_abm.core.network import Network

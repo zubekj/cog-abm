@@ -5,13 +5,13 @@ import random
 import logging
 from time import time
 import copy
-import cPickle
+import pickle
 from ..extras.tools import get_progressbar
 from ..extras.words_storage import store_words
 
 log = logging.getLogger('COG-ABM')
 
-PICKLE_PROTOCOL = cPickle.HIGHEST_PROTOCOL
+PICKLE_PROTOCOL = pickle.HIGHEST_PROTOCOL
 
 
 class Simulation(object):
@@ -47,7 +47,7 @@ class Simulation(object):
         self.statistic.append(kr)
         if self.dump_often:
             f = open(self.dump_often + str(iter_num) + ".pout", "wb")
-            cPickle.dump(kr, f, PICKLE_PROTOCOL)
+            pickle.dump(kr, f, PICKLE_PROTOCOL)
             f.close()
             if self.colour_order:
                 store_words(self.get_agents(), self.colour_order, str(iter_num)+"words.pout")
