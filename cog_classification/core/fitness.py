@@ -82,5 +82,5 @@ class CurrentFitness(Fitness):
         :type value: bool
         """
         while len(self.memories) >= self.scope:
-            self.memories.pop()
+            self.memories.popleft()
         self.memories.append(value)

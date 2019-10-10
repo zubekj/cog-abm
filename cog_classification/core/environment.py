@@ -1,10 +1,8 @@
-from itertools import izip
-
 import numpy as np
 import random
 
 
-class Environment:
+class Environment(object):
     """
     Stores samples and their classes.
 
@@ -33,6 +31,7 @@ class Environment:
     def standard_distance(sample1, sample2):
         """
         Calculates standard distance between two samples of numerical values.
+        Defaults to Euclidean distance.
 
         :param iterable sample1: first sample.
         :param iterable sample2: second sample.
@@ -42,10 +41,10 @@ class Environment:
         """
 
         distance = 0
-        for v1, v2 in izip(sample1, sample2):
-            distance += abs(v1 - v2)
+        for v1, v2 in zip(sample1, sample2):
+            distance += (v1 - v2)**2
 
-        return distance
+        return distance**0.5
 
     def get_all(self):
         """
@@ -78,6 +77,28 @@ class Environment:
         sample_class = self.get_class(index)
         return index, sample, sample_class
 
+    def get_random_context_samples(self, num_samples, topic_index):
+        """
+        Returns a number of random samples which are different than topic.
+        In the default implementation samples have to belong to different
+        classes.
+
+        :param int topic_index: index of the topic sample present in the \
+                environment
+
+        :return: list of samples which are different than topic
+        """
+        samples = []
+        sample_indices = set()
+        topic_class = self.get_class(topic_index)
+        while True:
+            index, sample, cls = self.get_random_sample()
+            if not cls == topic_class and index not in sample_indices:
+                samples.append(sample)
+                sample_indices.add(index)
+                if len(samples) == num_samples:
+                    return samples
+
     def get_sample(self, index):
         """
         Returns sample with specified index.
@@ -97,3 +118,43 @@ class Environment:
         :rtype: numpy array
         """
         return np.array([self.samples[index] for index in indexes])
+
+
+class NoClassEnvironment(Environment):
+    """
+    A variant of environment where all samples belong to a single class.
+    Difference between topic and context in get_random_context_samples is checked
+    based on sample distance threshold.
+
+    :param list samples: list of samples. Not empty.
+    :param float distance_threshold: threshold for checking sample similarity.
+    :param distance: distance function between two samples.
+    :type distance: function(sample, sample)
+    """
+
+    def __init__(self, samples, distance_threshold=0, distance=None):
+        self.distance_threshold = distance_threshold
+        classes = [0] * len(samples)
+        super(NoClassEnvironment, self).__init__(samples, classes, distance)
+
+    def get_random_context_samples(self, num_samples, topic_index):
+        """
+        Returns a number of random samples which are different than topic.
+        The distance between samples has to be larger then distance_threshold.
+
+        :param int topic_index: index of the topic sample present in the \
+                environment
+
+        :return: list of samples which are different than topic
+        """
+        samples = []
+        sample_indices = set()
+        topic = self.get_sample(topic_index)
+        while True:
+            index, sample, _ = self.get_random_sample()
+            if self.distance(topic, sample) > self.distance_threshold \
+                    and index not in sample_indices:
+                samples.append(sample)
+                sample_indices.add(index)
+                if len(samples) == num_samples:
+                    return samples

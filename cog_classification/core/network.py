@@ -24,7 +24,7 @@ class Network(BehaviorSwitcher):
         :return: random agent from network.
         :rtype: Agent
         """
-        return random.choice(self.agents.values())
+        return random.choice(list(self.agents.values()))
 
     def get_agents(self, number_of_agents):
         """"
@@ -44,7 +44,7 @@ class Network(BehaviorSwitcher):
         candidates = []
 
         # Choosing firs agent.
-        agent_name = random.choice(self.agents.keys())
+        agent_name = random.choice(list(self.agents.keys()))
         agents.append(self.agents[agent_name])
         agents_names.append(agent_name)
 
@@ -76,4 +76,4 @@ class Network(BehaviorSwitcher):
         :return: all network's agents.
         :rtype: list of Agents
         """
-        return self.agents.values()
+        return list(self.agents.values())

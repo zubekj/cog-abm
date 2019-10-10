@@ -1,7 +1,5 @@
-from itertools import izip
-
 import numpy as np
-
+from scipy.spatial import distance
 
 class SampleStorage:
     """
@@ -42,8 +40,8 @@ class SampleStorage:
     "Modelowanie procesow poznawczych: konsensusowa metoda klasyfikacji z komunikacja miedzy agentami".
     """
 
-    def __init__(self, alpha=0.99, beta=1, sigma=1, new_weight=1, max_weight=1,
-                 forgetting_threshold=0.05, distance=None):
+    def __init__(self, alpha=0.99, beta=1, sigma=1, new_weight=1,
+                 max_weight=1, forgetting_threshold=0.05):
 
         self.category_name = 0
 
@@ -65,16 +63,15 @@ class SampleStorage:
         assert new_weight <= max_weight
 
         self.forgetting_threshold = forgetting_threshold
-        assert new_weight >= 0
-        assert new_weight <= max_weight
-
-        # Distance is used only in increase weights.
-        self.distance = distance
+        assert forgetting_threshold >= 0
+        assert forgetting_threshold <= max_weight
 
         # Categories: {category: {environment: ([sample_indexes], [sample_weight])}}
         self.categories = {}
         # Classes: {category: sample_class}
         self.classes = {}
+
+        self.sqr_sigma = -0.5 / self.sigma**2
 
     def add_sample(self, sample_index, environment, category=None, sample_weight=None):
         """
@@ -227,28 +224,30 @@ class SampleStorage:
         """
         samples = []
         samples_categories = []
+        samples_weights = []
 
         for category in self.get_categories():
             the_category = self.categories[category]
 
-            single_category_samples = []
             for environment in the_category:
-                sample_indexes, _ = the_category[environment]
-                for index in sample_indexes:
-                    single_category_samples.append(environment.get_sample(index))
+                sample_indices, weights = the_category[environment]
+                samples.append(environment.get_samples(sample_indices))
+                samples_weights += weights
+                samples_categories += [category] * len(sample_indices)
 
-            for sample in single_category_samples:
-                samples.append(sample)
-            samples_categories += [category] * len(single_category_samples)
+        if len(samples) > 0:
+            samples = np.vstack(samples)
+        samples_categories = np.array(samples_categories)
+        samples_weights = np.array(samples_weights)
 
-        return np.array(samples), np.array(samples_categories)
+        return samples, samples_categories, samples_weights
 
     def get_categories(self):
         """
         :return: list of all categories names of sample storage.
         :rtype: list
         """
-        return self.categories.keys()
+        return list(self.categories.keys())
 
     def get_categories_size(self):
         """
@@ -277,7 +276,7 @@ class SampleStorage:
         the_category = self.categories[category]
         for environment in the_category:
             sample_indexes, weights = the_category[environment]
-            for sample_index, weight in izip(sample_indexes, weights):
+            for sample_index, weight in zip(sample_indexes, weights):
                 samples.append((sample_index, environment, weight))
 
         return samples
@@ -333,16 +332,9 @@ class SampleStorage:
             sample_indexes, weights = the_category[environment_local]
 
             for i in range(len(sample_indexes)):
-
                 category_sample = environment_local.get_sample(sample_indexes[i])
-
-                if self.distance is None:
-                    distance = environment.distance(category_sample, sample)
-                else:
-                    distance = self.distance(category_sample, sample)
-
-                weight_change = self.beta * 0.1 ** (self.sigma * distance)
-                new_weight = min(weights[i] + weight_change, self.max_weight)
+                d = self.sample_activation(category_sample, sample)
+                new_weight = min(weights[i] + self.beta*d, self.max_weight)
 
                 # We don't change value directly because it will be easier to change only set weight if some
                 # changes will be necessary.
@@ -442,7 +434,7 @@ class SampleStorage:
 
             to_remove = []
             sample_indexes, weights = the_category[environment]
-            for i, (_, weight) in enumerate(izip(sample_indexes, weights)):
+            for i, (_, weight) in enumerate(zip(sample_indexes, weights)):
                 if weight < self.forgetting_threshold:
                     to_remove.append(i)
 
@@ -508,7 +500,7 @@ class SampleStorage:
             assert sample_index is not None
             # We must find index of sample_index.
             found = False
-            for i, (index, weight) in enumerate(izip(sample_indexes, weights)):
+            for i, (index, weight) in enumerate(zip(sample_indexes, weights)):
                 if index == sample_index:
                     weights[i] = new_weight
                     found = True
@@ -517,3 +509,9 @@ class SampleStorage:
             if not found:
                 sample_indexes.append(sample_index)
                 weights.append(new_weight)
+
+    def sample_activation(self, samples, data):
+        x = np.atleast_2d(samples)
+        xx = np.atleast_2d(data)
+        res = np.exp(self.sqr_sigma * ((x-xx[:,None,:])**2).sum(axis=2))
+        return np.squeeze(res)

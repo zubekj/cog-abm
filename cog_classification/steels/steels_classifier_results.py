@@ -46,7 +46,7 @@ class SteelsClassifierResults(Result):
             best_class = None
             most_votes = 0
 
-            for class_vote, number in classes_voting.iteritems():
+            for class_vote, number in classes_voting.items():
                 if number > most_votes:
                     most_votes = number
                     best_class = class_vote

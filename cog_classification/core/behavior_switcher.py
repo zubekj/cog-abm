@@ -19,7 +19,7 @@ class BehaviorSwitcher:
             if isinstance(behaviors, dict):
                 self.behaviors = behaviors
             else:
-                self.behaviors = {1L: behaviors}
+                self.behaviors = {1: behaviors}
         else:
             raise ValueError
         self.current_behavior = None

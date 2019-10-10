@@ -1,9 +1,11 @@
-from itertools import izip
+import math
+
 from sklearn import naive_bayes
 from sklearn.utils.validation import NotFittedError
 from cog_classification.core.agent import Agent
 from cog_classification.steels.lexicon import Lexicon
 from cog_classification.steels.sample_storage import SampleStorage
+from cog_classification.steels.adaptive_network_classifier import AdaptiveNetworkClassifier
 
 
 class SteelsAgent(Agent):
@@ -20,30 +22,6 @@ class SteelsAgent(Agent):
         Agent.__init__(self, aid)
         self.lexicon = lexicon or Lexicon()
 
-    def add_word_to_category(self, word, category):
-        return self.lexicon.add_word_to_category(word, category)
-
-    def decrease_weight_word_category(self, word, category):
-        self.lexicon.decrease_weight(word, category)
-
-    def find_category_for_word(self, word):
-        return self.lexicon.find_category_for_word(word)
-
-    def increase_weight_word_category(self, word, category):
-        self.lexicon.increase_weight(word, category)
-
-    def decrease_weights_for_other_categories(self, word, category):
-        self.lexicon.decrease_weights_for_other_categories(word, category)
-
-    def decrease_weights_for_other_words(self, word, category):
-        self.lexicon.decrease_weights_for_other_words(word, category)
-
-    def find_word_for_category(self, category):
-        return self.lexicon.find_word_for_category(category)
-
-    def get_words(self):
-        return self.lexicon.get_words()
-
 
 class SteelsClassificationAgent(SteelsAgent):
     """
@@ -58,10 +36,10 @@ class SteelsClassificationAgent(SteelsAgent):
     and can predict class of given sample.
     """
 
-    def __init__(self, aid=None, lexicon=None, classifier=None, sample_storage=None, alpha=0.99):
+    def __init__(self, aid=None, lexicon=None, classifier=None, sample_storage=None):
         SteelsAgent.__init__(self, aid, lexicon)
-        self.classifier = classifier or naive_bayes.GaussianNB()
-        self.sample_storage = sample_storage or SampleStorage(alpha=alpha)
+        self.sample_storage = sample_storage or SampleStorage()
+        self.classifier = classifier or AdaptiveNetworkClassifier(self.sample_storage)
 
     def add_sample(self, sample_index, environment, category=None):
         return self.sample_storage.add_sample(sample_index, environment, category)
@@ -77,13 +55,13 @@ class SteelsClassificationAgent(SteelsAgent):
         :return: the sample with the highest probability of belonging to given category.
         """
         the_best_sample = samples[0]
-        the_best_probability = -float('inf')
+        the_best_probability = -math.inf
 
         # We are looking for a sample that probability of belonging to guesses category is the highest.
         for sample in samples:
             probability = self.get_probability(sample, category)
             if the_best_probability < probability:
-                the_best_probability = property
+                the_best_probability = probability
                 the_best_sample = sample
 
         return the_best_sample
@@ -128,7 +106,7 @@ class SteelsClassificationAgent(SteelsAgent):
             assert all([any([c1 == c for c in self.sample_storage.get_categories()])
                         for c1 in self.lexicon.get_categories()])
         except AssertionError:
-            print [c for c in self.lexicon.get_categories() if c not in self.sample_storage.get_categories()]
+            print([c for c in self.lexicon.get_categories() if c not in self.sample_storage.get_categories()])
             raise AssertionError
 
     def forget(self):
@@ -147,7 +125,7 @@ class SteelsClassificationAgent(SteelsAgent):
         """
         Teaches classifier using samples and classes from sample storage.
         """
-        data, decisions = self.sample_storage.export()
+        data, decisions, _ = self.sample_storage.export()
         if len(decisions) > 0 and self.sample_storage.get_categories_size() > 1:
             self.classifier.fit(data, decisions)
 
@@ -171,11 +149,11 @@ class SteelsClassificationAgent(SteelsAgent):
         Returns 0 if no category known and, if hasn't learn categorisation yet.
         """
         if self.sample_storage.get_categories_size() == 1:
-                return sample_category in self.sample_storage.get_categories()
+            return int(sample_category in self.sample_storage.get_categories())
         else:
             try:
                 probabilities = self.classifier.predict_proba([sample])
-                for category, probability in izip(self.sample_storage.classes, probabilities[0]):
+                for category, probability in zip(self.sample_storage.classes, probabilities[0]):
                     if sample_category == category:
                         return probability
             except NotFittedError:

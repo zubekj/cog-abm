@@ -1,16 +1,16 @@
 import random
 
 from sklearn.utils.validation import NotFittedError
-from sklearn import cross_validation
 
 from cog_classification.core.environment import Environment
 from cog_classification.core.fitness import CurrentFitness
 from cog_classification.core.network import Network
 from cog_classification.core.simulation import Simulation
 from cog_classification.core.condition import IterationCondition
-from steels_classifier_results import SteelsClassifierResults
+from cog_classification.steels.steels_classifier_results import SteelsClassifierResults
 from cog_classification.steels.guessing_game import GuessingGame
 from cog_classification.steels.steels_agent import SteelsClassificationAgent
+from cog_classification.steels.sample_storage import SampleStorage
 from cog_classification.tools.topology_generator import generate_topology
 from cog_classification.core.behavior_switcher import BehaviorSwitcher
 
@@ -70,18 +70,19 @@ class SteelsClassifier:
 
         if self.classifiers is None:
             for _ in range(15):
-                agent = SteelsClassificationAgent(alpha=self.alpha)
+                agent = SteelsClassificationAgent(sample_storage=SampleStorage(alpha=self.alpha))
                 agents[agent.id] = agent
         else:
             for classifier in self.classifiers:
-                agent = SteelsClassificationAgent(classifier=classifier, alpha=self.alpha)
+                agent = SteelsClassificationAgent(classifier=classifier,
+                                                  sample_storage=SampleStorage(alpha=self.alpha))
                 agents[agent.id] = agent
 
         for agent in agents.values():
             agent.set_fitness("DG", CurrentFitness())
             agent.set_fitness("GG", CurrentFitness())
 
-        network = Network(agents, {1: generate_topology(self.topology, agents_names=agents.keys())})
+        network = Network(agents, {1: generate_topology(self.topology, agents_names=list(agents.keys()))})
 
         self.simulation = Simulation(network, self.interactions, BehaviorSwitcher(environment),
                                      SteelsClassifierResults(), self.condition)

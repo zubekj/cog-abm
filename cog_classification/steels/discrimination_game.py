@@ -45,10 +45,9 @@ class DiscriminationGame:
 
         if result:
             agent.increase_weights_sample_category(topic_index, environment, topic_category)
-
+            return topic_category, topic_index
         elif agent.get_fitness_measure("DG") >= self.good_agent_measure:
             return agent.add_sample(topic_index, environment, topic_category), topic_index
-
         else:
             return agent.add_sample(topic_index, environment), topic_index
 
@@ -63,12 +62,9 @@ class DiscriminationGame:
 
         SteelsAgent task is to classify this topic as different from other samples.
         """
-        topic_index = environment.get_random_sample_index()
-        topic_class = environment.get_class(topic_index)
-        other_samples = [self.sample_from_other_class(topic_class, environment) for _ in range(self.samples_number - 1)]
-
-        topic = environment.get_sample(topic_index)
-        return self.play_with_given_samples(agent, topic, other_samples)
+        topic_index, topic, topic_class = environment.get_random_sample()
+        other_samples = environment.get_random_context_samples(self.samples_number-1, topic_index)
+        return self.play_with_given_samples(agent, topic, other_samples), topic_index
 
     @staticmethod
     def play_with_given_samples(agent, topic, other_samples):
@@ -91,18 +87,3 @@ class DiscriminationGame:
             result = topic_category not in other_categories
 
         return result, topic_category
-
-    @staticmethod
-    def sample_from_other_class(sample_class, environment):
-        """
-        Finds in environment sample that has different class than sample class.
-
-        :param hashable sample_class: the prohibited class.
-        :param Environment environment: the environment from which sample will be picked.
-
-        :return: the sample that has class other than sample class.
-        """
-        while True:
-            index, sample, taken_class = environment.get_random_sample()
-            if not taken_class == sample_class:
-                return sample

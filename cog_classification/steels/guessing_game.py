@@ -4,7 +4,7 @@ import numpy as np
 from cog_classification.steels.discrimination_game import DiscriminationGame
 
 
-class GuessingGame:
+class GuessingGame(object):
     """
     This class implements steels guessing game.
 
@@ -55,8 +55,7 @@ class GuessingGame:
 
         # Choose of topic and other stimuli from environment.
         topic_index, topic, topic_class = environment.get_random_sample()
-        other_samples = [DiscriminationGame.sample_from_other_class(topic_class, environment)
-                         for _ in range(self.samples_number - 1)]
+        other_samples = environment.get_random_context_samples(self.samples_number-1, topic_index)
 
         # Speaker is trying to discriminate topic from other samples.
         result, speaker_category = self.game.play_with_given_samples(speaker, topic, other_samples)
@@ -64,10 +63,14 @@ class GuessingGame:
         # If speaker can discriminate topic from other_samples.
         if result:
             # Speaker is looking for word that suits topic category.
-            word = speaker.find_word_for_category(speaker_category)
+            word = speaker.lexicon.find_word_for_category(speaker_category)
+            # If speaker lacks a word, new word is generated.
+            if word is None:
+                word = speaker.lexicon.generate_word()
+                speaker.lexicon.update_weight(word, speaker_category)
 
             # Hearer is looking for category that suits speaker word.
-            hearer_category = hearer.find_category_for_word(word)
+            hearer_category = hearer.lexicon.find_category_for_word(word)
 
             # If hearer finds such category.
             if hearer_category is not None:
@@ -76,7 +79,7 @@ class GuessingGame:
                 all_samples = other_samples + [topic]
                 random.shuffle(all_samples)
 
-                # Hearer trying to guess topic that belongs the most to category.
+                # Hearer trying to guess topic that belongs the most to the category.
                 guessed_topic = hearer.the_best_sample_for_category(hearer_category, all_samples)
 
                 # If hearer correctly assumed that topic belongs to guesses category the most.
@@ -99,77 +102,70 @@ class GuessingGame:
         if result == "Success":
 
             # Strengthen association between word and category.
-            speaker.increase_weight_word_category(word, speaker_category)
+            speaker.lexicon.increase_weight(word, speaker_category)
             # Strengthen association between word and category.
-            hearer.increase_weight_word_category(word, hearer_category)
+            hearer.lexicon.increase_weight(word, hearer_category)
 
             # Weaken associations between other categories and word.
-            speaker.decrease_weights_for_other_categories(word, speaker_category)
+            speaker.lexicon.decrease_weights_for_other_categories(word, speaker_category)
             # Weaken associations between other words and category.
-            hearer.decrease_weights_for_other_words(word, hearer_category)
+            hearer.lexicon.decrease_weights_for_other_words(word, hearer_category)
 
-            # Strengthen memory of category.
-            speaker.increase_weights_sample_category(topic_index, environment, speaker_category)
-            # Strengthen memory of category.
-            hearer.increase_weights_sample_category(topic_index, environment, hearer_category)
+            # Strengthen memory of category after successfull discrimination.
+            self.game.learning_after_game(speaker, topic_index, environment,
+                                          speaker_category, True)
+            #speaker.forget()
+            self.game.learning_after_game(hearer, topic_index, environment,
+                                          hearer_category, True)
+            #hearer.forget()
 
             speaker.update_fitness_measure("GG", True)
             speaker.update_fitness_measure("DG", True)
 
             hearer.update_fitness_measure("GG", True)
 
-            speaker.forget()
-            hearer.forget()
-
         elif result == "Speaker failed discrimination.":
             # Speaker learns topic.
             self.game.learning_after_game(speaker, topic_index, environment, speaker_category, False)
+            speaker.forget()
 
             speaker.update_fitness_measure("GG", False)
             speaker.update_fitness_measure("DG", False)
             hearer.update_fitness_measure("GG", False)
 
-            speaker.forget()
-
         elif result == "Hearer didn't know word.":
             # Hearer plays discrimination game.
-            result, hearer_category = self.game.play_with_given_samples(hearer, environment.get_sample(topic_index),
-                                                                        other_samples)
-            # If hearer cannot discriminate topic.
-            if not result:
-                # Hearer learns topic.
-                hearer_category, _ = self.game.learning_after_game(hearer, topic_index, environment, hearer_category, result)
+            result, hearer_category = self.game.play_with_given_samples(hearer, environment.get_sample(topic_index), other_samples)
+            # Hearer learns topic.
+            hearer_category, _ = self.game.learning_after_game(hearer, topic_index, environment, hearer_category, result)
+            hearer.forget()
 
             # If hearer cannot learn then crash.
             if hearer_category is None:
                 raise ValueError
 
             # Associating the category for topic with word.
-            hearer.add_word_to_category(word, hearer_category)
+            hearer.lexicon.update_weight(word, hearer_category)
 
             speaker.update_fitness_measure("GG", False)
             speaker.update_fitness_measure("DG", True)
             hearer.update_fitness_measure("GG", False)
             hearer.update_fitness_measure("DG", result)
 
-            speaker.forget()
-            hearer.forget()
-
         elif result == "Not matching samples.":
 
             # Weaken association between word and category.
-            speaker.decrease_weight_word_category(word, speaker_category)
+            speaker.lexicon.decrease_weight(word, speaker_category)
             # Weaken association between word and category.
-            hearer.decrease_weight_word_category(word, hearer_category)
+            hearer.lexicon.decrease_weight(word, hearer_category)
 
             # Hearer learns topic.
-            self.game.learning_after_game(hearer, topic_index, environment, hearer_category, result=False)
+            self.game.learning_after_game(hearer, topic_index, environment, hearer_category, False)
+            hearer.forget()
+            #speaker.forget()
 
             speaker.update_fitness_measure("GG", False)
             speaker.update_fitness_measure("DG", True)
             hearer.update_fitness_measure("GG", False)
-
-            speaker.forget()
-            hearer.forget()
         else:
             raise ValueError
